@@ -1,28 +1,73 @@
 import { createGraphiQLFetcher } from "@graphiql/toolkit";
-import { getIntrospectionQuery, IntrospectionQuery } from "graphql";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import {
+  buildClientSchema,
+  getIntrospectionQuery,
+  GraphQLSchema,
+  IntrospectionQuery,
+} from "graphql";
+import { editor, Uri } from "monaco-editor";
+import { initializeMode } from "monaco-graphql/initializeMode";
 import { useEffect, useRef } from "react";
 
 export function useService() {
   const editorContainerElementRef = useRef<HTMLDivElement>(null);
-  const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
-    null
-  );
+  const editorInstanceRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const initializingRef = useRef(false);
 
   const init = async () => {
     if (editorInstanceRef.current || initializingRef.current) return;
     initializingRef.current = true;
 
-    const editorInstance = monaco.editor.create(
-      editorContainerElementRef.current!,
-      {
-        value: ["function x() {", '\tconsole.log("Hello world!");', "}"].join(
-          "\n"
-        ),
-        language: "typescript",
-      }
-    );
+    const defaultOperations =
+      localStorage.getItem("operations") ??
+      `
+# cmd/ctrl + return/enter will execute the op,
+# same in variables editor below
+# also available via context menu & f1 command palette
+
+query($limit: Int!) {
+    payloads(limit: $limit) {
+        customer
+    }
+}
+`;
+
+    const getOrCreateModel = (uri: string, value: string) => {
+      return (
+        editor.getModel(Uri.file(uri)) ??
+        editor.createModel(value, uri.split(".").pop(), Uri.file(uri))
+      );
+    };
+
+    const queryModel = getOrCreateModel("operation.graphql", defaultOperations);
+
+    const editorInstance = editor.create(editorContainerElementRef.current!, {
+      model: queryModel,
+      language: "graphql",
+    });
+
+    initializeMode({
+      diagnosticSettings: {
+        validateVariablesJSON: {
+          [Uri.file("operation.graphql").toString()]: [
+            Uri.file("variables.json").toString(),
+          ],
+        },
+        jsonDiagnosticSettings: {
+          validate: true,
+          schemaValidation: "error",
+          // set these again, because we are entirely re-setting them here
+          allowComments: true,
+          trailingCommas: "ignore",
+        },
+      },
+      schemas: [
+        {
+          schema: await getSchema(),
+          uri: "myschema.graphql",
+        },
+      ],
+    });
 
     editorInstanceRef.current = editorInstance;
     initializingRef.current = false;
@@ -42,9 +87,12 @@ export function useService() {
   return { editorContainerElementRef };
 }
 
-const fetcher = createGraphiQLFetcher({ url: "" });
+async function getSchema(): Promise<GraphQLSchema> {
+  const fetcher = createGraphiQLFetcher({
+    url: "https://countries.trevorblades.com",
+    // Add WebSocket options or disable subscriptions
+  });
 
-async function getSchema(): Promise<IntrospectionQuery> {
   const data = await fetcher({
     query: getIntrospectionQuery(),
     operationName: "IntrospectionQuery",
@@ -54,8 +102,9 @@ async function getSchema(): Promise<IntrospectionQuery> {
 
   if (!introspectionJSON) {
     throw new Error(
-      "This demo does not support subscriptions or HTTP multipart yet"
+      "this demo does not support subscriptions or http multipart yet"
     );
   }
-  return introspectionJSON;
+  return buildClientSchema(introspectionJSON);
 }
+

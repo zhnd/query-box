@@ -172,17 +172,7 @@ export function TabsContainer({
           {activeTab ? (
             <ResizablePanelGroup direction={"horizontal"}>
               <ResizablePanel defaultSize={50} minSize={30}>
-                <QueryEditor
-                  query={activeTab.query}
-                  variables={activeTab.variables}
-                  endpoint={activeEndpoint}
-                  onQueryChange={(query) =>
-                    onUpdateTab(activeTab.id, { query })
-                  }
-                  onVariablesChange={(variables) =>
-                    onUpdateTab(activeTab.id, { variables })
-                  }
-                />
+                <QueryEditor />
               </ResizablePanel>
               <ResizableHandle />
               <ResizablePanel defaultSize={50} minSize={30}>
