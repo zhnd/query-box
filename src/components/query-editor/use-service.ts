@@ -6,8 +6,10 @@ import {
   IntrospectionQuery,
 } from 'graphql'
 import { debounce } from 'lodash'
-import { editor, Uri } from 'monaco-editor'
+import { editor, languages, Uri } from 'monaco-editor'
 import { initializeMode } from 'monaco-graphql/initializeMode'
+import parserGraphql from 'prettier/parser-graphql'
+import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
 
 export function useService() {
@@ -51,6 +53,30 @@ query($limit: Int!) {
     const editorInstance = editor.create(editorContainerElementRef.current!, {
       model: queryModel,
       language: 'graphql',
+    })
+
+    languages.registerDocumentFormattingEditProvider('graphql', {
+      provideDocumentFormattingEdits: async (modal) => {
+        try {
+          const formattedText = await prettier.format(modal.getValue(), {
+            parser: 'graphql',
+            plugins: [parserGraphql],
+            printWidth: 80,
+            tabWidth: 2,
+            useTabs: false,
+            singleQuote: true,
+          })
+          return [
+            {
+              range: modal.getFullModelRange(),
+              text: formattedText,
+            },
+          ]
+        } catch (error) {
+          console.error('Formatting error:', error)
+          return []
+        }
+      },
     })
 
     initializeMode({
