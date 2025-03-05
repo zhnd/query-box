@@ -1,26 +1,11 @@
-import { GraphQLSchema } from 'graphql'
-import { createContext, ReactNode, useContext, useReducer } from 'react'
-
-type AppGlobalState = {
-  schema: GraphQLSchema | null
-}
-
-type AppProviderProps = {
-  children: ReactNode
-}
-
-const initialAppGlobalState: AppGlobalState = {
-  schema: null,
-}
-
-type AppAction =
-  | { type: 'reset' }
-  | { type: 'upsertSchema'; value: AppGlobalState['schema'] }
-
-type AppProviderState = {
-  state: AppGlobalState
-  dispatch: (action: AppAction) => void
-}
+import { createContext, useContext, useReducer } from 'react'
+import {
+  AppAction,
+  AppGlobalState,
+  AppProviderProps,
+  AppProviderState,
+  initialAppGlobalState,
+} from './types'
 
 function stateReducer(
   state: AppGlobalState,
