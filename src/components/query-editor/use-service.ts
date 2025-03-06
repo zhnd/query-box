@@ -6,7 +6,8 @@ import {
   IntrospectionQuery,
 } from 'graphql'
 import { debounce } from 'lodash'
-import { editor, languages, Uri } from 'monaco-editor'
+import { languages, Uri } from 'monaco-editor'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { initializeMode } from 'monaco-graphql/initializeMode'
 import parserGraphql from 'prettier/parser-graphql'
 import prettier from 'prettier/standalone'
@@ -14,7 +15,9 @@ import { useEffect, useRef } from 'react'
 
 export function useService() {
   const editorContainerElementRef = useRef<HTMLDivElement>(null)
-  const editorInstanceRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+  const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
+    null
+  )
   const initializingRef = useRef(false)
 
   const init = async () => {
@@ -37,8 +40,8 @@ query($limit: Int!) {
 
     const getOrCreateModel = (uri: string, value: string) => {
       return (
-        editor.getModel(Uri.file(uri)) ??
-        editor.createModel(value, uri.split('.').pop(), Uri.file(uri))
+        monaco.editor.getModel(Uri.file(uri)) ??
+        monaco.editor.createModel(value, uri.split('.').pop(), Uri.file(uri))
       )
     }
 
@@ -50,10 +53,16 @@ query($limit: Int!) {
       }, 600)
     )
 
-    const editorInstance = editor.create(editorContainerElementRef.current!, {
-      model: queryModel,
-      language: 'graphql',
-    })
+    const editorInstance = monaco.editor.create(
+      editorContainerElementRef.current!,
+      {
+        model: queryModel,
+        language: 'graphql',
+        minimap: {
+          enabled: false,
+        },
+      }
+    )
 
     languages.registerDocumentFormattingEditProvider('graphql', {
       provideDocumentFormattingEdits: async (modal) => {
