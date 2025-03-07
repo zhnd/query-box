@@ -1,34 +1,37 @@
 module.exports = {
-  mode: "development",
+  mode: 'development',
   entry: {
-    app: "./src/main.tsx",
+    app: './src/main.tsx',
   },
   module: {
-    rules: require("./rules"),
+    rules: require('./rules'),
   },
   output: {
-    filename: "[name].js",
-    chunkFilename: "[name].chunk.js",
+    filename: '[name].js',
+    chunkFilename: '[name].chunk.js',
   },
-  plugins: require("./plugins"),
+  plugins: require('./plugins'),
   resolve: {
-    extensions: [".js", ".ts", ".jsx", ".tsx", ".css"],
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
     alias: {
-      ...require("./aliases"),
+      ...require('./aliases'),
     },
   },
-  stats: "errors-warnings",
-  devtool: "cheap-module-source-map",
+  stats: 'errors-warnings',
+  devtool: 'cheap-module-source-map',
   devServer: {
     port: 3000,
     hot: true,
   },
   optimization: {
     splitChunks: {
-      chunks: "all",
+      chunks: 'all',
     },
   },
   performance: {
     hints: false,
   },
-};
+  cache: {
+    type: 'memory',
+  },
+}
