@@ -1,11 +1,11 @@
-const webpack = require("webpack");
-const { inDev } = require("./helpers");
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
-const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
-const WebpackBarPlugin = require("webpackbar");
+const webpack = require('webpack')
+const { inDev } = require('./helpers')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
+const WebpackBarPlugin = require('webpackbar')
 
 module.exports = [
   new ForkTsCheckerWebpackPlugin(),
@@ -14,26 +14,26 @@ module.exports = [
   inDev() && new webpack.HotModuleReplacementPlugin(),
   inDev() && new ReactRefreshWebpackPlugin(),
   new MonacoWebpackPlugin({
-    languages: ["json", "graphql"],
-    publicPath: "/",
+    languages: ['json', 'graphql'],
+    publicPath: '/',
     customLanguages: [
       // @ts-ignore
       {
-        label: "graphql",
+        label: 'graphql',
         worker: {
-          id: "graphql",
-          entry: require.resolve("monaco-graphql/esm/graphql.worker.js"),
+          id: 'graphql',
+          entry: require.resolve('monaco-graphql/esm/graphql.worker.js'),
         },
       },
     ],
   }),
   ,
   new HtmlWebpackPlugin({
-    template: "public/index.html",
+    template: 'public/index.html',
     inject: true,
   }),
   new MiniCssExtractPlugin({
-    filename: "[name].[chunkhash].css",
-    chunkFilename: "[name].[chunkhash].chunk.css",
+    filename: '[name].[chunkhash].css',
+    chunkFilename: '[name].[chunkhash].chunk.css',
   }),
-].filter(Boolean);
+].filter(Boolean)
