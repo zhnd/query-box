@@ -10,8 +10,11 @@ import {
 } from '@/components/ui/sidebar'
 import { appSidebarMenuItems } from './constants'
 import { MenuItem } from './menu-item'
+import { useAppSidebarService } from './use-service'
 
 export function AppSidebar() {
+  const service = useAppSidebarService()
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -25,7 +28,12 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {appSidebarMenuItems.map((item) => (
-                <MenuItem item={item} key={item.key} />
+                <MenuItem
+                  item={item}
+                  key={item.key}
+                  activeKey={service.activeAppSidebarMenuItemKey}
+                  onClick={service.updateActiveAppSidebarMenuItemKey}
+                />
               ))}
             </SidebarMenu>
           </SidebarGroupContent>

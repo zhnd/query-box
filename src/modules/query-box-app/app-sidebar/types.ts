@@ -9,4 +9,6 @@ export type AppSidebarItem = {
 
 export type MenuItemProps = {
   item: AppSidebarItem
+  activeKey: AppSidebarKeys | null
+  onClick: (key: AppSidebarKeys) => void
 }

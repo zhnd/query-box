@@ -11,13 +11,14 @@ import {
 import { MenuItemProps } from './types'
 
 export function MenuItem(props: MenuItemProps) {
-  const { item } = props
+  const { item, activeKey, onClick } = props
   const { state } = useSidebar()
   const isExpanded = state === 'expanded'
+  const isActive = item.key === activeKey
 
   const menuItemContent = (
-    <SidebarMenuItem>
-      <SidebarMenuButton asChild>
+    <SidebarMenuItem onClick={() => onClick(item.key)}>
+      <SidebarMenuButton asChild isActive={isActive}>
         <a href="#">
           {item.icon}
           <span>{item.title}</span>
@@ -32,16 +33,7 @@ export function MenuItem(props: MenuItemProps) {
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <SidebarMenuItem>
-          <SidebarMenuButton asChild>
-            <a href="#">
-              {item.icon}
-              <span>{item.title}</span>
-            </a>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      </TooltipTrigger>
+      <TooltipTrigger asChild>{menuItemContent}</TooltipTrigger>
       <TooltipContent
         forceMount
         side="right"
