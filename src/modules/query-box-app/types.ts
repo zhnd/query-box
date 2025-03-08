@@ -1,4 +1,4 @@
-export enum NavbarKeys {
+export enum AppSidebarKeys {
   ENDPOINT = 'endpoint',
   DOCUMENTATION = 'documentation',
 }
