@@ -34,4 +34,7 @@ module.exports = {
   cache: {
     type: 'memory',
   },
+  watchOptions: {
+    ignored: ['**/node_modules/**', '**/src-tauri/**'],
+  },
 }
