@@ -54,27 +54,5 @@ pub async fn run_migrations(app_handle: &AppHandle) -> Result<(), Box<dyn std::e
 pub async fn setup(app_handle: &tauri::AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     initialize_db(app_handle).await?;
     run_migrations(app_handle).await?;
-
-    create_test_data(app_handle).await?;
-    Ok(())
-}
-
-pub async fn create_test_data(
-    app_handle: &tauri::AppHandle,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let pool = app_handle.state::<SqlitePool>();
-
-    sqlx::query(
-        r#"
-        INSERT INTO endpoints (name, url)
-        VALUES
-            ('Google', 'https://www.google.com'),
-            ('Bing', 'https://www.bing.com'),
-            ('DuckDuckGo', 'https://www.duckduckgo.com')
-        "#,
-    )
-    .execute(&*pool)
-    .await?;
-
     Ok(())
 }
