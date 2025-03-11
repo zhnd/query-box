@@ -3,7 +3,7 @@ use tauri::{command, AppHandle, Manager};
 
 use crate::database::{
     entities::settings::{NewSetting, Setting, UpdateSetting},
-    repositories::SettingsRepository,
+    repositories::{settings_repo::UpsertOptions, SettingsRepository},
 };
 use std::collections::HashMap;
 
@@ -69,6 +69,19 @@ pub async fn create_setting(app_handle: AppHandle, setting: NewSetting) -> Resul
 pub async fn delete_setting(app_handle: AppHandle, key: String) -> Result<bool, String> {
     let pool = app_handle.state::<SqlitePool>();
     SettingsRepository::delete(&pool, &key)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn upsert_setting(
+    app_handle: AppHandle,
+    key: String,
+    value: String,
+    options: Option<UpsertOptions>,
+) -> Result<(), String> {
+    let pool = app_handle.state::<SqlitePool>();
+    SettingsRepository::upsert_setting(&pool, &key, value, options)
         .await
         .map_err(|e| e.to_string())
 }

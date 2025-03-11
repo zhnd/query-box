@@ -1,6 +1,14 @@
 use crate::database::entities::settings::{NewSetting, Setting, UpdateSetting};
+use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::collections::HashMap;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UpsertOptions {
+    pub value_type: String,
+    pub category: String,
+    pub description: String,
+}
 
 pub struct SettingsRepository;
 
@@ -121,5 +129,40 @@ impl SettingsRepository {
             .unwrap_or_default()
             .parse::<i64>()
             .map_err(|e| format!("Invalid number value for {}: {}", key, e).into())
+    }
+
+    pub async fn upsert_setting(
+        pool: &SqlitePool,
+        key: &str,
+        value: String,
+        options: Option<UpsertOptions>,
+    ) -> Result<(), sqlx::Error> {
+        let exists = Self::find_by_key(pool, key).await?.is_some();
+
+        if exists {
+            Self::update(pool, key, UpdateSetting { value }).await?;
+            Ok(())
+        } else {
+            let options = options.ok_or_else(|| {
+                sqlx::Error::Configuration(
+                    format!(
+                        "Cannot create setting '{}': missing type and category information",
+                        key
+                    )
+                    .into(),
+                )
+            })?;
+
+            let new_setting = NewSetting {
+                key: key.to_string(),
+                value,
+                value_type: options.value_type,
+                category: options.category,
+                description: Some(options.description),
+            };
+
+            Self::create(pool, new_setting).await?;
+            Ok(())
+        }
     }
 }

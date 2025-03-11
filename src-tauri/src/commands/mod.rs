@@ -15,7 +15,8 @@ macro_rules! app_commands {
             commands::get_setting,
             commands::update_setting,
             commands::create_setting,
-            commands::delete_setting
+            commands::delete_setting,
+            commands::upsert_setting,
         ]
     };
 }
