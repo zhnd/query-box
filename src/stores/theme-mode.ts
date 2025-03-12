@@ -4,9 +4,11 @@ import { persist, StorageValue } from 'zustand/middleware'
 
 const PERSIST_KEY = 'ui.theme.mode'
 export type ThemeMode = 'dark' | 'light' | 'system'
+export type ResolvedThemeMode = 'dark' | 'light'
 
 interface ThemeModeStoreState {
   themeMode: ThemeMode
+  resolvedThemeMode: ResolvedThemeMode
 }
 
 interface ThemeModeStoreActions {
@@ -21,6 +23,7 @@ const getItem = async (name: string) => {
     return {
       state: {
         themeMode: item?.value as ThemeMode,
+        resolvedThemeMode: item?.value as ResolvedThemeMode,
       },
     }
   } catch (error) {
@@ -52,29 +55,46 @@ const removeItem = async (name: string) => {
   }
 }
 
-function syncThemeModeToDom(theme: ThemeMode) {
+const setupSystemThemeListener = () => {
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+  const handleChange = () => {
+    const currentTheme = useThemeModeStore.getState().themeMode
+    if (currentTheme === 'system') {
+      const { resolvedThemeMode } = syncThemeModeToDom('system')
+      useThemeModeStore.setState({ resolvedThemeMode })
+    }
+  }
+
+  mediaQuery.addEventListener('change', handleChange)
+  return () => mediaQuery.removeEventListener('change', handleChange)
+}
+
+const syncThemeModeToDom = (theme: ThemeMode) => {
   const root = window.document.documentElement
   root.classList.remove('light', 'dark')
 
+  let resolvedThemeMode: ResolvedThemeMode
   if (theme === 'system') {
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-      .matches
-      ? 'dark'
-      : 'light'
-    root.classList.add(systemTheme)
-    return systemTheme
+    const currentSystemThemeMode = getCurrentSystemThemeMode()
+    root.classList.add(currentSystemThemeMode)
+    resolvedThemeMode = currentSystemThemeMode
+  } else {
+    resolvedThemeMode = theme
+    root.classList.add(theme)
   }
 
-  root.classList.add(theme)
+  return { resolvedThemeMode }
 }
 
 export const useThemeModeStore = create<ThemeModeStore>()(
   persist(
     (set) => ({
       themeMode: 'system',
+      resolvedThemeMode: 'light',
       setThemeMode: (themeMode: ThemeMode) => {
-        set({ themeMode })
-        syncThemeModeToDom(themeMode)
+        const { resolvedThemeMode } = syncThemeModeToDom(themeMode)
+        set({ themeMode, resolvedThemeMode })
       },
     }),
     {
@@ -85,6 +105,7 @@ export const useThemeModeStore = create<ThemeModeStore>()(
         removeItem,
       },
       onRehydrateStorage: () => (state) => {
+        setupSystemThemeListener()
         if (state) {
           syncThemeModeToDom(state.themeMode)
         }
@@ -93,4 +114,8 @@ export const useThemeModeStore = create<ThemeModeStore>()(
   )
 )
 
-export default useThemeModeStore
+export const getCurrentSystemThemeMode = (): ResolvedThemeMode => {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light'
+}

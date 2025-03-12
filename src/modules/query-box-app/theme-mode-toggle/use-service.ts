@@ -1,9 +1,9 @@
 import { useThemeModeStore } from '@/stores'
 
 export const useThemeModeToggleService = () => {
-  const { themeMode, setThemeMode } = useThemeModeStore()
+  const { resolvedThemeMode, setThemeMode } = useThemeModeStore()
   const toggleTheme = () => {
-    setThemeMode(themeMode === 'light' ? 'dark' : 'light')
+    setThemeMode(resolvedThemeMode === 'light' ? 'dark' : 'light')
   }
 
   return {
