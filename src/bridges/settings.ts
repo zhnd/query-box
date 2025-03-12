@@ -29,7 +29,6 @@ export class SettingsBridge {
     value: string,
     options?: UpsertSettingOptions
   ) {
-    console.log('upsert', value, options)
     try {
       return await invoke<void>('upsert_setting', { key, value, options })
     } catch (error) {
