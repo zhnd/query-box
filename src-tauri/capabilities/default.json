@@ -13,7 +13,18 @@
     "fs:default",
     {
       "identifier": "fs:scope-app",
-      "allow": [{ "path": "$APPDATA" }, { "path": "$APPDATA/**" }]
-    }
+      "allow": [
+        {
+          "path": "$APPDATA"
+        },
+        {
+          "path": "$APPDATA/**"
+        }
+      ]
+    },
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-start-dragging"
   ]
 }

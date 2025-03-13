@@ -27,3 +27,4 @@ tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 sqlx = {version = "0.8.3", features = ["sqlite"] }
 tokio = { version = "1.44.0", features = ["full"] }
 tauri-plugin-fs = "2"
+tauri-plugin-os = "2"

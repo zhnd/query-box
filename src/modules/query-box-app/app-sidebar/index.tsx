@@ -16,7 +16,7 @@ export function AppSidebar() {
   const service = useAppSidebarService()
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="sticky">
       <SidebarHeader>
         <header className="flex items-center justify-between group-data-[state=collapsed]:hidden">
           <h1 className="text-2xl font-bold">Query Box</h1>
