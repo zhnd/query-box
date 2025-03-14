@@ -3,7 +3,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarHeader,
   SidebarMenu,
   SidebarRail,
   SidebarTrigger,
@@ -17,12 +16,6 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <header className="flex items-center justify-between group-data-[state=collapsed]:hidden">
-          <h1 className="text-2xl font-bold">Query Box</h1>
-          <SidebarTrigger />
-        </header>
-      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
