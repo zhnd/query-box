@@ -1,29 +1,32 @@
 import { SettingsBridge } from '@/bridges'
+import { SettingsKeys, SettingsKeysType } from '@/constants'
+import {
+  SettingsCategories,
+  SettingsValueTypes,
+  UIResolvedUIThemeMode,
+  UIThemeMode,
+} from '@/types'
 import { create } from 'zustand'
 import { persist, StorageValue } from 'zustand/middleware'
 
-const PERSIST_KEY = 'ui.theme.mode'
-export type ThemeMode = 'dark' | 'light' | 'system'
-export type ResolvedThemeMode = 'dark' | 'light'
-
 interface ThemeModeStoreState {
-  themeMode: ThemeMode
-  resolvedThemeMode: ResolvedThemeMode
+  themeMode: UIThemeMode
+  resolvedThemeMode: UIResolvedUIThemeMode
 }
 
 interface ThemeModeStoreActions {
-  setThemeMode: (themeMode: ThemeMode) => void
+  setThemeMode: (themeMode: UIThemeMode) => void
 }
 
 type ThemeModeStore = ThemeModeStoreState & ThemeModeStoreActions
 
 const getItem = async (name: string) => {
   try {
-    const item = await SettingsBridge.getSetting(name)
+    const item = await SettingsBridge.getSetting(name as SettingsKeysType)
     return {
       state: {
-        themeMode: item?.value as ThemeMode,
-        resolvedThemeMode: item?.value as ResolvedThemeMode,
+        themeMode: item?.value as UIThemeMode,
+        resolvedThemeMode: item?.value as UIResolvedUIThemeMode,
       },
     }
   } catch (error) {
@@ -37,11 +40,15 @@ const setItem = async (
   value: StorageValue<ThemeModeStoreState>
 ) => {
   try {
-    await SettingsBridge.upsertSetting(name, value.state.themeMode, {
-      value_type: 'string',
-      category: 'theme',
-      description: 'The current theme of the application',
-    })
+    await SettingsBridge.upsertSetting(
+      name as SettingsKeysType,
+      value.state.themeMode,
+      {
+        value_type: SettingsValueTypes.STRING,
+        category: SettingsCategories.UI_THEME,
+        description: 'The current theme of the application',
+      }
+    )
   } catch (error) {
     console.error('Failed to set theme item:', error)
   }
@@ -70,11 +77,11 @@ const setupSystemThemeListener = () => {
   return () => mediaQuery.removeEventListener('change', handleChange)
 }
 
-const syncThemeModeToDom = (theme: ThemeMode) => {
+const syncThemeModeToDom = (theme: UIThemeMode) => {
   const root = window.document.documentElement
   root.classList.remove('light', 'dark')
 
-  let resolvedThemeMode: ResolvedThemeMode
+  let resolvedThemeMode: UIResolvedUIThemeMode
   if (theme === 'system') {
     const currentSystemThemeMode = getCurrentSystemThemeMode()
     root.classList.add(currentSystemThemeMode)
@@ -92,13 +99,13 @@ export const useThemeModeStore = create<ThemeModeStore>()(
     (set) => ({
       themeMode: 'system',
       resolvedThemeMode: 'light',
-      setThemeMode: (themeMode: ThemeMode) => {
+      setThemeMode: (themeMode: UIThemeMode) => {
         const { resolvedThemeMode } = syncThemeModeToDom(themeMode)
         set({ themeMode, resolvedThemeMode })
       },
     }),
     {
-      name: PERSIST_KEY,
+      name: SettingsKeys.UI.THEME.MODE,
       storage: {
         getItem,
         setItem,
@@ -114,7 +121,7 @@ export const useThemeModeStore = create<ThemeModeStore>()(
   )
 )
 
-export const getCurrentSystemThemeMode = (): ResolvedThemeMode => {
+export const getCurrentSystemThemeMode = (): UIResolvedUIThemeMode => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light'

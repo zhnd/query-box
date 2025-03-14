@@ -1,21 +1,23 @@
+import { SettingsKeysType } from '@/constants'
+import { SettingsCategories, SettingsValueTypes } from '@/types'
 import { invoke } from '@tauri-apps/api/core'
 
 export interface Setting {
-  key: string
+  key: SettingsKeysType
   value: string
-  value_type: string
-  category: string
+  value_type: SettingsValueTypes
+  category: SettingsCategories
   description?: string
 }
 
 export interface UpsertSettingOptions {
-  value_type: string
-  category: string
+  value_type: SettingsValueTypes
+  category: SettingsCategories
   description?: string
 }
 
 export class SettingsBridge {
-  static async getSetting(key: string) {
+  static async getSetting(key: SettingsKeysType) {
     try {
       return await invoke<Setting>('get_setting', { key })
     } catch (error) {
@@ -25,7 +27,7 @@ export class SettingsBridge {
   }
 
   static async upsertSetting(
-    key: string,
+    key: SettingsKeysType,
     value: string,
     options?: UpsertSettingOptions
   ) {
