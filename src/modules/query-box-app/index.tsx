@@ -12,7 +12,14 @@ export function QueryBoxApp() {
         <div className="flex flex-col h-screen overflow-hidden">
           <TitleBar />
           <div className="flex flex-1 min-h-0">
-            <SidebarProvider>
+            <SidebarProvider
+              style={
+                {
+                  '--sidebar-width': '16rem',
+                  '--sidebar-width-icon': '5rem',
+                } as React.CSSProperties
+              }
+            >
               <AppSidebar />
               <main className="flex flex-col flex-1 min-w-0">
                 <PageMenubar />

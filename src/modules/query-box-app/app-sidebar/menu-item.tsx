@@ -17,7 +17,10 @@ export function MenuItem(props: MenuItemProps) {
   const isActive = item.key === activeKey
 
   const menuItemContent = (
-    <SidebarMenuItem onClick={() => onClick(item.key)}>
+    <SidebarMenuItem
+      className="flex flex-row justify-center"
+      onClick={() => onClick(item.key)}
+    >
       <SidebarMenuButton asChild isActive={isActive}>
         <a href="#">
           {item.icon}

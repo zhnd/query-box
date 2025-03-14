@@ -16,7 +16,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent>
+      <SidebarContent className="mt-8">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
