@@ -1,66 +1,57 @@
-import { SettingsBridge } from '@/bridges'
+import { SettingsBridge, UpsertSettingOptions } from '@/bridges'
 import { SettingsKeysType } from '@/constants'
-import { SettingsCategories } from '@/types'
-import { StateStorage, StorageValue } from 'zustand/middleware'
+import { StorageValue } from 'zustand/middleware'
 
 export interface SettingsStorageOptions<T> {
-  settingKey: string
-  category: SettingsCategories
+  valueKey?: keyof T
+  defaultValue?: Partial<T>
+  upsertOptions?: UpsertSettingOptions
   serialize?: {
-    toValue?: (state: T) => string
+    toValue?: (value: StorageValue<T>) => string
     fromValue?: (value: string) => Partial<T>
   }
-  valueField?: keyof T
 }
 
-export function createSettingsStorage<T>(
-  options: SettingsStorageOptions<T>
-): StateStorage {
-  const { category, serialize, valueField } = options
+export function createSettingsStorage<T>(options: SettingsStorageOptions<T>) {
+  const { serialize, valueKey, defaultValue, upsertOptions } = options
 
-  const getItem = async (name: string): Promise<string | null> => {
+  const getItem = async (name: string): Promise<StorageValue<T> | null> => {
     try {
       const setting = await SettingsBridge.getSetting(name as SettingsKeysType)
-
       if (setting?.value) {
-        return JSON.stringify({
+        const newValue = {
           state: serialize?.fromValue
             ? serialize.fromValue(setting.value)
-            : valueField
-              ? ({ [valueField]: setting.value } as Partial<T>)
-              : JSON.parse(setting.value),
-        })
+            : {
+                [valueKey as string]: setting.value,
+              },
+        } as StorageValue<T>
+        return newValue
       }
 
-      return null
+      const defaultStateValue = { state: defaultValue as T } as StorageValue<T>
+      return defaultStateValue
     } catch (error) {
       console.error(`[SettingsStorage] Error getting setting ${name}:`, error)
       return null
     }
   }
 
-  const setItem = async (name: string, value: string): Promise<void> => {
+  const setItem = async (
+    name: string,
+    value: StorageValue<T>
+  ): Promise<void> => {
     try {
-      const parsedValue = JSON.parse(value) as StorageValue<T>
-      const state = parsedValue.state
-
-      let settingValue: string
-      if (serialize?.toValue) {
-        settingValue = serialize.toValue(state)
-      } else if (valueField) {
-        settingValue = String(state[valueField])
-      } else {
-        settingValue = JSON.stringify(state)
-      }
+      const upsertValue = serialize?.toValue
+        ? serialize.toValue(value)
+        : valueKey
+          ? String(value.state[valueKey])
+          : JSON.stringify(value.state)
 
       await SettingsBridge.upsertSetting(
         name as SettingsKeysType,
-        settingValue,
-        {
-          value_type: valueType,
-          category,
-          description: description,
-        }
+        upsertValue,
+        upsertOptions
       )
     } catch (error) {
       console.error(`[SettingsStorage] Error setting ${name}:`, error)
