@@ -8,7 +8,6 @@ export interface SettingsStorageOptions<T> {
   upsertOptions?: UpsertSettingOptions
   serialize?: {
     toValue?: (value: StorageValue<T>) => string
-    fromValue?: (value: string) => Partial<T>
   }
 }
 
@@ -20,11 +19,9 @@ export function createSettingsStorage<T>(options: SettingsStorageOptions<T>) {
       const setting = await SettingsBridge.getSetting(name as SettingsKeysType)
       if (setting?.value) {
         const newValue = {
-          state: serialize?.fromValue
-            ? serialize.fromValue(setting.value)
-            : {
-                [valueKey as string]: setting.value,
-              },
+          state: {
+            [valueKey as string]: setting.value,
+          },
         } as StorageValue<T>
         return newValue
       }

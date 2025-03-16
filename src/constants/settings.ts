@@ -4,6 +4,9 @@ export const SettingsKeys = {
     THEME: {
       MODE: 'ui.theme.mode',
     },
+    SIDEBAR: {
+      COLLAPSED: 'ui.sidebar.collapsed',
+    },
   },
 }
 
