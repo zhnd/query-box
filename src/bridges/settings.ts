@@ -43,6 +43,24 @@ export class SettingsBridge {
     }
   }
 
+  static serializeSettingValue<T>(value: T, value_type: SettingsValueTypes) {
+    switch (value_type) {
+      case SettingsValueTypes.BOOLEAN:
+        return (value as unknown as boolean).toString()
+
+      case SettingsValueTypes.NUMBER:
+        return (value as unknown as number).toString()
+
+      case SettingsValueTypes.ARRAY:
+      case SettingsValueTypes.JSON:
+        return JSON.stringify(value)
+
+      case SettingsValueTypes.STRING:
+      default:
+        return value as unknown as string
+    }
+  }
+
   static async getSetting<T>(key: SettingsKeysType) {
     try {
       const setting = await invoke<Setting>('get_setting', { key })
@@ -57,13 +75,17 @@ export class SettingsBridge {
     }
   }
 
-  static async upsertSetting(
+  static async upsertSetting<T>(
     key: SettingsKeysType,
-    value: string,
-    options?: UpsertSettingOptions
+    value: T,
+    options: UpsertSettingOptions
   ) {
     try {
-      return await invoke<void>('upsert_setting', { key, value, options })
+      return await invoke<void>('upsert_setting', {
+        key,
+        value: this.serializeSettingValue<T>(value, options.value_type),
+        options,
+      })
     } catch (error) {
       console.error('Error updating setting:', error)
       throw error
