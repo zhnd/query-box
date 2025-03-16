@@ -1,5 +1,4 @@
-import { SettingsBridge } from '@/bridges'
-import { SettingsKeys, SettingsKeysType } from '@/constants'
+import { SettingsKeys } from '@/constants'
 import {
   SettingsCategories,
   SettingsValueTypes,
@@ -7,7 +6,8 @@ import {
   UIThemeMode,
 } from '@/types'
 import { create } from 'zustand'
-import { persist, StorageValue } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
+import { createSettingsStorage } from './storages'
 
 interface ThemeModeStoreState {
   themeMode: UIThemeMode
@@ -19,48 +19,6 @@ interface ThemeModeStoreActions {
 }
 
 type ThemeModeStore = ThemeModeStoreState & ThemeModeStoreActions
-
-const getItem = async (name: string) => {
-  try {
-    const item = await SettingsBridge.getSetting(name as SettingsKeysType)
-    return {
-      state: {
-        themeMode: item?.value as UIThemeMode,
-        resolvedThemeMode: item?.value as UIResolvedUIThemeMode,
-      },
-    }
-  } catch (error) {
-    console.error('Failed to get theme item:', error)
-    return null
-  }
-}
-
-const setItem = async (
-  name: string,
-  value: StorageValue<ThemeModeStoreState>
-) => {
-  try {
-    await SettingsBridge.upsertSetting(
-      name as SettingsKeysType,
-      value.state.themeMode,
-      {
-        value_type: SettingsValueTypes.STRING,
-        category: SettingsCategories.UI_THEME,
-        description: 'The current theme of the application',
-      }
-    )
-  } catch (error) {
-    console.error('Failed to set theme item:', error)
-  }
-}
-
-const removeItem = async (name: string) => {
-  try {
-    await SettingsBridge.removeSetting(name)
-  } catch (error) {
-    console.error('Failed to remove theme item:', error)
-  }
-}
 
 const setupSystemThemeListener = () => {
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -106,11 +64,14 @@ export const useThemeModeStore = create<ThemeModeStore>()(
     }),
     {
       name: SettingsKeys.UI.THEME.MODE,
-      storage: {
-        getItem,
-        setItem,
-        removeItem,
-      },
+      storage: createSettingsStorage<ThemeModeStoreState>({
+        valueKey: 'themeMode',
+        upsertOptions: {
+          value_type: SettingsValueTypes.STRING,
+          category: SettingsCategories.UI_THEME,
+          description: 'Application theme mode (light/dark/system)',
+        },
+      }),
       onRehydrateStorage: () => (state) => {
         setupSystemThemeListener()
         if (state) {
