@@ -1,4 +1,4 @@
-import { AppSidebarKeys } from '@/modules/query-box-app/types'
+import { AppSidebarKeys } from '@/query-box-app/types'
 import { GraphQLSchema } from 'graphql'
 import { ReactNode } from 'react'
 

@@ -1,5 +1,5 @@
 import './App.css'
-import { QueryBoxApp } from './modules/query-box-app'
+import { QueryBoxApp } from './query-box-app'
 
 function App() {
   return <QueryBoxApp />
