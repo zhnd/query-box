@@ -24,8 +24,9 @@ export const useAppSidebarMenuStore = create<AppSidebarMenuStore>()(
     {
       name: SettingsKeys.UI.SIDEBAR.ACTIVE_ITEM,
       storage: createSettingsStorage<AppSidebarMenuStoreState>({
+        valueKey: 'activeItemKey',
         upsertOptions: {
-          value_type: SettingsValueTypes.JSON,
+          value_type: SettingsValueTypes.STRING,
           category: SettingsCategories.APP_SIDEBAR,
           description: 'Active item key in the app sidebar menu',
         },
