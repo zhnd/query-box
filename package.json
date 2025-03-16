@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
+    "generate-types": "node scripts/generate.js",
+    "predev": "npm run generate-types",
     "dev": "cross-env NODE_ENV=development webpack serve --config webpack/config.dev.js",
     "build": "cross-env NODE_ENV=production webpack --config webpack/config.prod.js",
     "tauri": "tauri",

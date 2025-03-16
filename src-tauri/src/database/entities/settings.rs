@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use typeshare::typeshare;
 
 /// Represents a single application setting in the key-value store pattern.
 ///
@@ -12,6 +13,8 @@ use sqlx::FromRow;
 /// with SQLite, which treats columns as potentially nullable during compile-time
 /// checking regardless of NOT NULL constraints in the schema.
 ///
+
+#[typeshare]
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Setting {
     /// Unique identifier for the setting, serving as the primary key.
@@ -38,6 +41,7 @@ pub struct Setting {
     pub updated_at: Option<String>,
 }
 
+#[typeshare]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewSetting {
     pub key: String,
@@ -47,6 +51,7 @@ pub struct NewSetting {
     pub description: Option<String>,
 }
 
+#[typeshare]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UpdateSetting {
     pub value: String,
