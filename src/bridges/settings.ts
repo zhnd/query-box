@@ -17,9 +17,39 @@ export interface UpsertSettingOptions {
 }
 
 export class SettingsBridge {
-  static async getSetting(key: SettingsKeysType) {
+  static parseSettingValue<T>(
+    value: string,
+    value_type: SettingsValueTypes
+  ): T {
     try {
-      return await invoke<Setting>('get_setting', { key })
+      switch (value_type) {
+        case SettingsValueTypes.BOOLEAN:
+          return (value === 'true') as unknown as T
+
+        case SettingsValueTypes.NUMBER:
+          return Number(value) as unknown as T
+
+        case SettingsValueTypes.ARRAY:
+        case SettingsValueTypes.JSON:
+          return JSON.parse(value) as T
+
+        case SettingsValueTypes.STRING:
+        default:
+          return value as unknown as T
+      }
+    } catch (error) {
+      console.error('Failed to parse setting value:', error)
+      return value as unknown as T
+    }
+  }
+
+  static async getSetting<T>(key: SettingsKeysType) {
+    try {
+      const setting = await invoke<Setting>('get_setting', { key })
+      return {
+        ...setting,
+        value: this.parseSettingValue<T>(setting.value, setting.value_type),
+      }
     } catch (error) {
       console.error('Error fetching setting:', error)
       throw error
