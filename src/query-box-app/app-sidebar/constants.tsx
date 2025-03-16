@@ -1,20 +1,20 @@
 import { Link, SquarePlay, Waypoints } from 'lucide-react'
-import { AppSidebarKeys } from '../types'
 import { AppSidebarItem } from './types'
+import { AppSidebarMenuItemKeys } from '@/constants'
 
 export const appSidebarMenuItems: Array<AppSidebarItem> = [
   {
-    key: AppSidebarKeys.ENDPOINT,
+    key: AppSidebarMenuItemKeys.ENDPOINT,
     title: 'Endpoint',
     icon: <Waypoints />,
   },
   {
-    key: AppSidebarKeys.DOCUMENTATION,
+    key: AppSidebarMenuItemKeys.DOCUMENTATION,
     title: 'Documentation',
     icon: <Link />,
   },
   {
-    key: AppSidebarKeys.EXPLORER,
+    key: AppSidebarMenuItemKeys.EXPLORER,
     title: 'Explorer',
     icon: <SquarePlay />,
   },

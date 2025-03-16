@@ -19,14 +19,6 @@ function stateReducer(
         ...state,
         schema: action.value,
       }
-    case 'setActiveAppSidebarMenuItemKey':
-      return {
-        ...state,
-        app: {
-          ...state.app,
-          activeAppSidebarMenuItemKey: action.value,
-        },
-      }
     case 'setEndpointId':
       return {
         ...state,

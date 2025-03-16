@@ -1,24 +1,19 @@
 import { useSidebar } from '@/components/ui/sidebar'
-import { useAppContext } from '@/providers'
-import { useAppSidebarCollapsedStore } from '@/stores'
+import { AppSidebarMenuItemKeys } from '@/constants'
+import { useAppSidebarCollapsedStore, useAppSidebarMenuStore } from '@/stores'
 import { useEffect, useRef } from 'react'
-import { AppSidebarKeys } from '../types'
 
 export const useAppSidebarService = () => {
-  const {
-    state: {
-      app: { activeAppSidebarMenuItemKey },
-    },
-    dispatch,
-  } = useAppContext()
   const updatedFromStoreRef = useRef(false)
   const { state, setOpen } = useSidebar()
 
   const { appSidebarCollapsed, setAppSidebarCollapsed } =
     useAppSidebarCollapsedStore()
 
-  const updateActiveAppSidebarMenuItemKey = (key: AppSidebarKeys) => {
-    dispatch({ type: 'setActiveAppSidebarMenuItemKey', value: key })
+  const { activeItemKey, setActiveItemKey } = useAppSidebarMenuStore()
+
+  const updateActiveAppSidebarMenuItemKey = (key: AppSidebarMenuItemKeys) => {
+    setActiveItemKey(key)
   }
 
   useEffect(() => {
@@ -38,8 +33,10 @@ export const useAppSidebarService = () => {
     }
   }, [appSidebarCollapsed])
 
+  console.log('activeItemKey', activeItemKey)
+
   return {
-    activeAppSidebarMenuItemKey,
+    activeItemKey,
     updateActiveAppSidebarMenuItemKey,
   }
 }

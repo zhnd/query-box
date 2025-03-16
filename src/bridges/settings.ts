@@ -46,6 +46,7 @@ export class SettingsBridge {
   static async getSetting<T>(key: SettingsKeysType) {
     try {
       const setting = await invoke<Setting>('get_setting', { key })
+      if (!setting) return null
       return {
         ...setting,
         value: this.parseSettingValue<T>(setting.value, setting.value_type),

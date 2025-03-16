@@ -1,14 +1,14 @@
+import { AppSidebarMenuItemKeys } from '@/constants'
 import { JSX } from 'react'
-import { AppSidebarKeys } from '../types'
 
 export type AppSidebarItem = {
-  key: AppSidebarKeys
+  key: AppSidebarMenuItemKeys
   title: string
   icon: JSX.Element
 }
 
 export type MenuItemProps = {
   item: AppSidebarItem
-  activeKey: AppSidebarKeys | null
-  onClick: (key: AppSidebarKeys) => void
+  activeKey: AppSidebarMenuItemKeys | null
+  onClick: (key: AppSidebarMenuItemKeys) => void
 }

@@ -1,4 +1,5 @@
 import { useAppContext } from '@/providers'
+import { useAppSidebarMenuStore } from '@/stores'
 import { useState } from 'react'
 import { getAppSidebarMenuItem } from '../app-sidebar/utils'
 
@@ -6,12 +7,15 @@ export const usePageMenubarService = () => {
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false)
   const {
     state: {
-      app: { activeAppSidebarMenuItemKey, endpointId },
+      app: { endpointId },
     },
     dispatch,
   } = useAppContext()
+
+  const { activeItemKey } = useAppSidebarMenuStore()
+
   const activeAppSidebarMenuItem = getAppSidebarMenuItem({
-    key: activeAppSidebarMenuItemKey,
+    key: activeItemKey,
   })
 
   const updateEndpointId = (value: string | null) => {

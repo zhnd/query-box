@@ -6,6 +6,7 @@ export const SettingsKeys = {
     },
     SIDEBAR: {
       COLLAPSED: 'ui.sidebar.collapsed',
+      ACTIVE_ITEM: 'ui.sidebar.active_item',
     },
   },
 }

@@ -24,7 +24,7 @@ export function AppSidebar() {
                 <MenuItem
                   item={item}
                   key={item.key}
-                  activeKey={service.activeAppSidebarMenuItemKey}
+                  activeKey={service.activeItemKey}
                   onClick={service.updateActiveAppSidebarMenuItemKey}
                 />
               ))}
