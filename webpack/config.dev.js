@@ -32,7 +32,9 @@ module.exports = {
     hints: false,
   },
   cache: {
-    type: 'memory',
+    type: 'filesystem',
+    compression: 'gzip',
+    allowCollectingMemory: true,
   },
   watchOptions: {
     ignored: ['**/node_modules/**', '**/src-tauri/**'],
