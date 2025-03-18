@@ -8,8 +8,8 @@ const path = require('path')
 const config = {
   configPath: path.join(__dirname, '../src-tauri/typeshare.toml'),
   rustSrcPath: path.join(__dirname, '../src-tauri/src'),
-  outputDir: path.join(__dirname, '../src/types/generated'),
-  outputFilename: 'index.ts',
+  outputDir: path.join(__dirname, '../src/generated'),
+  outputFilename: 'typeshare-types.ts',
   runPrettier: true,
 }
 function ensureOutputDirExists() {
