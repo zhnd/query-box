@@ -6,6 +6,7 @@ const fs = require('fs')
 const path = require('path')
 
 const config = {
+  configPath: path.join(__dirname, '../src-tauri/typeshare.toml'),
   rustSrcPath: path.join(__dirname, '../src-tauri/src'),
   outputDir: path.join(__dirname, '../src/types/generated'),
   outputFilename: 'index.ts',
@@ -36,7 +37,7 @@ function runTypeshare() {
   console.log(`🔄 Generating TypeScript types from Rust code...`)
 
   try {
-    const command = `typeshare --lang typescript --output-file "${outputPath}" "${config.rustSrcPath}"`
+    const command = `typeshare -c "${config.configPath}" --lang typescript --output-file "${outputPath}" "${config.rustSrcPath}"`
     if (config.debug) {
       console.log(`Executing: ${command}`)
     }

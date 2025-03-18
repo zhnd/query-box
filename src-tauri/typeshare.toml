@@ -1,0 +1,4 @@
+[typescript.type_mappings]
+"DateTime" = "string"
+"Uuid" = "string"
+"Json" = "string"
