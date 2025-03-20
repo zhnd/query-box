@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::types::Json;
+use sqlx::{types::Json, FromRow};
 use typeshare::typeshare;
 use uuid::Uuid;
 
@@ -118,7 +118,7 @@ pub struct Endpoint {
     /// Authentication configuration, if required
     pub auth: Option<AuthConfig>,
     /// Type-specific configuration options
-    pub config: EndpointConfig,
+    pub config: Option<EndpointConfig>,
     /// Custom HTTP headers to include in all requests
     pub headers: Option<Json<serde_json::Value>>,
     /// Whether the endpoint is marked as favorite
@@ -126,55 +126,97 @@ pub struct Endpoint {
     /// Optional tags for categorizing and filtering endpoints
     pub tags: Option<Vec<String>>,
     /// Timestamp when the endpoint was created
-    pub created_at: DateTime<Utc>,
+    pub created_at: String,
     /// Timestamp when the endpoint was last modified
-    pub updated_at: DateTime<Utc>,
+    pub updated_at: String,
 }
 
-/// Data transfer object for creating a new endpoint
-#[typeshare]
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CreateEndpointDto {
-    /// Display name of the endpoint
-    pub name: String,
-    /// Optional description providing additional information
-    pub description: Option<String>,
-    /// Type of the API endpoint
-    pub endpoint_type: EndpointType,
-    /// The URL where the endpoint can be accessed
-    pub url: String,
-    /// Authentication configuration, if required
-    pub auth: Option<AuthConfig>,
-    /// Type-specific configuration options
-    pub config: EndpointConfig,
-    /// Custom HTTP headers to include in all requests
-    pub headers: Option<Json<serde_json::Value>>,
-    /// Optional tags for categorizing and filtering endpoints
-    pub tags: Option<Vec<String>>,
-    /// Whether the endpoint is marked as favorite
-    pub favorite: Option<bool>,
+/// Database row representation of an endpoint
+#[derive(Debug, FromRow)]
+pub struct EndpointRow {
+    id: String,
+    name: String,
+    description: Option<String>,
+    endpoint_type: String,
+    url: String,
+    status: String,
+    auth: Option<String>,
+    config: String,
+    headers: Option<String>,
+    favorite: bool,
+    tags: Option<String>,
+    created_at: String,
+    updated_at: String,
 }
 
-/// Data transfer object for updating an existing endpoint
-#[typeshare]
-#[derive(Debug, Serialize, Deserialize)]
-pub struct UpdateEndpointDto {
-    /// Updated display name
-    pub name: Option<String>,
-    /// Updated description
-    pub description: Option<String>,
-    /// Updated endpoint URL
-    pub url: Option<String>,
-    /// Updated endpoint status
-    pub status: Option<EndpointStatus>,
-    /// Updated authentication configuration
-    pub auth: Option<AuthConfig>,
-    /// Updated type-specific configuration
-    pub config: Option<EndpointConfig>,
-    /// Updated custom HTTP headers
-    pub headers: Option<Json<serde_json::Value>>,
-    /// Updated tags for categorizing and filtering endpoints
-    pub tags: Option<Vec<String>>,
-    /// Updated favorite status
-    pub favorite: Option<bool>,
+impl TryFrom<EndpointRow> for Endpoint {
+    type Error = Box<dyn std::error::Error>;
+    fn try_from(row: EndpointRow) -> Result<Self, Self::Error> {
+        let id = Uuid::parse_str(&row.id)?;
+
+        let endpoint_type = match row.endpoint_type.to_lowercase().as_str() {
+            "graphql" => EndpointType::GraphQL,
+            _ => return Err("unknown endpoint type".into()),
+        };
+
+        let status = match row.status.to_lowercase().as_str() {
+            "active" => EndpointStatus::Active,
+            "inactive" => EndpointStatus::Inactive,
+            "error" => EndpointStatus::Error,
+            _ => EndpointStatus::Inactive,
+        };
+
+        let auth: Option<AuthConfig> = if let Some(json) = row.auth {
+            Some(serde_json::from_str(&json)?)
+        } else {
+            None
+        };
+
+        let config: Option<EndpointConfig> = if row.config.trim().is_empty() {
+            None
+        } else {
+            match serde_json::from_str(&row.config) {
+                Ok(config) => Some(config),
+                Err(e) => {
+                    println!("parse endpoint config error: {}", e);
+                    Some(EndpointConfig {
+                        graphql: Some(GraphQLConfig {
+                            introspection_enabled: true,
+                            schema_cache: None,
+                            default_headers: None,
+                            subscription_url: None,
+                        }),
+                    })
+                }
+            }
+        };
+
+        let headers = if let Some(json) = row.headers {
+            Some(sqlx::types::Json(serde_json::from_str(&json)?))
+        } else {
+            None
+        };
+
+        let tags = if let Some(tags_str) = row.tags {
+            Some(serde_json::from_str(&tags_str)?)
+        } else {
+            None
+        };
+
+        Ok(Endpoint {
+            id,
+            name: row.name,
+            description: row.description,
+            endpoint_type,
+            url: row.url,
+            status,
+            auth,
+            config,
+            headers,
+            favorite: row.favorite,
+            tags,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+        })
+    }
 }

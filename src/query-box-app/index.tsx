@@ -3,6 +3,7 @@ import { SidebarProvider } from '@/components/ui/sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppProvider } from '@/providers'
 import { AppSidebar } from './app-sidebar'
+import { Endpoint } from './endpoint'
 import { PageMenubar } from './page-menubar'
 
 export function QueryBoxApp() {
@@ -23,7 +24,9 @@ export function QueryBoxApp() {
               <AppSidebar />
               <main className="flex flex-col flex-1 min-w-0">
                 <PageMenubar />
-                <div className="flex-1 overflow-auto p-4"></div>
+                <div className="flex-1 overflow-auto p-4">
+                  <Endpoint />
+                </div>
               </main>
             </SidebarProvider>
           </div>

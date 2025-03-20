@@ -21,6 +21,7 @@ export class SettingsBridge {
     value: string,
     value_type: SettingsValueTypes
   ): T {
+    console.log('value:', value, value_type)
     try {
       switch (value_type) {
         case SettingsValueTypes.BOOLEAN:

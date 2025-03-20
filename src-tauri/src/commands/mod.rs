@@ -4,6 +4,9 @@ pub use graphql::*;
 pub mod settings_commands;
 pub use settings_commands::*;
 
+pub mod endpoint_commands;
+pub use endpoint_commands::*;
+
 ///
 /// # Command Registration Macro
 ///
@@ -36,6 +39,7 @@ macro_rules! app_commands {
             commands::create_setting,
             commands::delete_setting,
             commands::upsert_setting,
+            commands::get_all_endpoints,
         ]
     };
 }
