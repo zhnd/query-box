@@ -18,7 +18,7 @@ interface OverflowTooltipProps extends React.HTMLAttributes<HTMLDivElement> {
 export function OverflowTooltip({
   text,
   tooltipContent,
-  maxWidth = '100%',
+  maxWidth,
   truncate = true,
   delayDuration = 300,
   className,
@@ -65,10 +65,10 @@ export function OverflowTooltip({
             ref={textRef}
             className={cn(
               truncate ? 'text-ellipsis whitespace-nowrap overflow-hidden' : '',
-              'cursor-default',
+              'w-full cursor-default',
               className
             )}
-            style={{ maxWidth }}
+            style={maxWidth ? { maxWidth } : undefined}
             {...props}
           >
             {text}
