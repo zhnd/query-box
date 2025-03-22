@@ -1,3 +1,5 @@
+import { MoreHorizontal } from 'lucide-react'
+import { Button } from '../ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -5,9 +7,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@radix-ui/react-dropdown-menu'
-import { MoreHorizontal } from 'lucide-react'
-import { Button } from '../ui/button'
+} from '../ui/dropdown-menu'
 
 interface DataTableRowActionsProps {
   actions: {
