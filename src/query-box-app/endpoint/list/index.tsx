@@ -56,6 +56,11 @@ export function EndpointList() {
   ]
 
   return (
-    <DataTable columns={columns} data={service.endpointsInfo?.items ?? []} />
+    <DataTable
+      columns={columns}
+      data={service.endpointsInfo?.items ?? []}
+      paginationState={service.pagination}
+      onPaginationChange={service.onPaginationChange}
+    />
   )
 }

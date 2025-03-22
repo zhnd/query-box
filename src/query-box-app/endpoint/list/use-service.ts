@@ -1,10 +1,15 @@
 import { Endpoint, PaginatedResponse } from '@/generated/typeshare-types'
+import { PaginationState } from '@tanstack/react-table'
 import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useState } from 'react'
 
 export const useEndpointListService = () => {
   const [endpointsInfo, setEndpointsInfo] =
     useState<PaginatedResponse<Endpoint> | null>(null)
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  })
   const getData = async () => {
     console.log('Getting all endpoints...')
     try {
@@ -28,7 +33,10 @@ export const useEndpointListService = () => {
   useEffect(() => {
     getData()
   }, [])
+
   return {
     endpointsInfo,
+    pagination,
+    onPaginationChange: setPagination,
   }
 }
