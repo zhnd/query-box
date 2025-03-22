@@ -1,10 +1,9 @@
-import { useEndpointService } from './use-service'
+import { EndpointList } from './list'
 
 export function Endpoint() {
-  useEndpointService()
   return (
     <div>
-      <h1>Endpoint</h1>
+      <EndpointList />
     </div>
   )
 }
