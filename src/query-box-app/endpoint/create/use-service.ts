@@ -1,3 +1,5 @@
+import { EndpointBridge } from '@/bridges'
+import { EndpointType } from '@/generated/typeshare-types'
 import { useEndpointStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { nanoid } from 'nanoid'
@@ -43,8 +45,13 @@ export const useCreateEndpointService = () => {
 
   const onSubmit = async (values: FormValues) => {
     console.log('Form submitted:', values)
-    // Here you would call your service to save the endpoint
-    // service.createEndpoint(values)
+    await EndpointBridge.createEndpoint({
+      name: values.name,
+      url: values.url,
+      endpoint_type: EndpointType.GraphQL,
+      headers: values.headers && JSON.stringify(values.headers),
+      favorite: false,
+    })
     setCreateDialogOpen(false)
   }
 
