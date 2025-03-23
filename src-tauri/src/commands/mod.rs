@@ -40,6 +40,7 @@ macro_rules! app_commands {
             commands::delete_setting,
             commands::upsert_setting,
             commands::get_all_endpoints,
+            commands::create_endpoint,
         ]
     };
 }

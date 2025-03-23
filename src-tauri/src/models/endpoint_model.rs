@@ -22,13 +22,35 @@ pub struct CreateEndpointDto {
     /// Authentication configuration, if required
     pub auth: Option<AuthConfig>,
     /// Type-specific configuration options
-    pub config: EndpointConfig,
+    pub config: Option<EndpointConfig>,
     /// Custom HTTP headers to include in all requests
     pub headers: Option<Json<serde_json::Value>>,
-    /// Optional tags for categorizing and filtering endpoints
-    pub tags: Option<Vec<String>>,
     /// Whether the endpoint is marked as favorite
     pub favorite: Option<bool>,
+}
+
+impl CreateEndpointDto {
+    pub fn endpoint_type_str(&self) -> String {
+        self.endpoint_type.to_string()
+    }
+    pub fn status_str(&self) -> String {
+        // New endpoints are always active by default
+        EndpointStatus::Active.to_string()
+    }
+    pub fn auth_str(&self) -> Option<String> {
+        self.auth
+            .as_ref()
+            .map(|auth| serde_json::to_string(auth).unwrap_or_default())
+    }
+    pub fn config_str(&self) -> String {
+        serde_json::to_string(&self.config).unwrap_or_default()
+    }
+
+    pub fn headers_str(&self) -> Option<String> {
+        self.headers
+            .as_ref()
+            .map(|headers| serde_json::to_string(headers).unwrap_or_default())
+    }
 }
 
 /// Data transfer object for updating an existing endpoint

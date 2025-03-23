@@ -1,12 +1,16 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 use sqlx::{types::Json, FromRow};
+use strum_macros::{Display, EnumString};
 use typeshare::typeshare;
 use uuid::Uuid;
 
 /// Type of API endpoint
 #[typeshare]
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Display, EnumString)]
 #[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 pub enum EndpointType {
     /// GraphQL API endpoint
     GraphQL,
@@ -14,8 +18,9 @@ pub enum EndpointType {
 
 /// Status of an endpoint connection
 #[typeshare]
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Display, EnumString)]
 #[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 pub enum EndpointStatus {
     /// Endpoint is connected and working
     Active,
@@ -153,17 +158,11 @@ impl TryFrom<EndpointRow> for Endpoint {
     fn try_from(row: EndpointRow) -> Result<Self, Self::Error> {
         let id = Uuid::parse_str(&row.id)?;
 
-        let endpoint_type = match row.endpoint_type.to_lowercase().as_str() {
-            "graphql" => EndpointType::GraphQL,
-            _ => return Err("unknown endpoint type".into()),
-        };
+        let endpoint_type = EndpointType::from_str(&row.endpoint_type.to_lowercase())
+            .map_err(|_| "unknown endpoint type")?;
 
-        let status = match row.status.to_lowercase().as_str() {
-            "active" => EndpointStatus::Active,
-            "inactive" => EndpointStatus::Inactive,
-            "error" => EndpointStatus::Error,
-            _ => EndpointStatus::Inactive,
-        };
+        let status =
+            EndpointStatus::from_str(&row.status.to_lowercase()).unwrap_or(EndpointStatus::Active);
 
         let auth: Option<AuthConfig> = if let Some(json) = row.auth {
             Some(serde_json::from_str(&json)?)

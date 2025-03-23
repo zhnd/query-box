@@ -31,3 +31,5 @@ tauri-plugin-os = "2"
 typeshare = { version = "1.0.4" }
 uuid = { version = "1.16.0" }
 chrono = { version = "0.4", features = ["serde"] }
+strum = {version = "0.27" }
+strum_macros = { version = "0.27" }
