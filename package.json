@@ -47,6 +47,7 @@
     "lucide-react": "^0.479.0",
     "monaco-editor": "0.52.2",
     "monaco-graphql": "^1.6.0",
+    "nanoid": "^5.1.5",
     "prettier": "^3.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
