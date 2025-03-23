@@ -1,4 +1,4 @@
-use crate::database::entities::settings::{NewSetting, Setting, UpdateSetting};
+use crate::database::entities::settings_entity::{NewSetting, Setting, UpdateSetting};
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::collections::HashMap;

@@ -1,2 +1,2 @@
 pub mod endpoint_entity;
-pub mod settings;
+pub mod settings_entity;

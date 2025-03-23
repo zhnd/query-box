@@ -2,7 +2,7 @@ use sqlx::SqlitePool;
 use tauri::{command, AppHandle, Manager};
 
 use crate::database::{
-    entities::settings::{NewSetting, Setting, UpdateSetting},
+    entities::settings_entity::{NewSetting, Setting, UpdateSetting},
     repositories::{settings_repo::UpsertOptions, SettingsRepository},
 };
 use std::collections::HashMap;
