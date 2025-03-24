@@ -42,8 +42,10 @@ impl CreateEndpointDto {
             .as_ref()
             .map(|auth| serde_json::to_string(auth).unwrap_or_default())
     }
-    pub fn config_str(&self) -> String {
-        serde_json::to_string(&self.config).unwrap_or_default()
+    pub fn config_str(&self) -> Option<String> {
+        self.config
+            .as_ref()
+            .map(|config| serde_json::to_string(config).unwrap_or_default())
     }
 
     pub fn headers_str(&self) -> Option<String> {
