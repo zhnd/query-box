@@ -1,0 +1,14 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/dist":true,
+    "**/target": true,
+  },
+  // Compile rust-analyzer in a separate directory to avoid conflicts with the main project.
+  "rust-analyzer.cargo.targetDir": true,
+  "rust-analyzer.server.extraEnv": {
+    "RUST_BACKTRACE": "0"
+  },
+}
