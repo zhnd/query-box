@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO endpoint (\n                id,\n                name,\n                description,\n                endpoint_type,\n                url,\n                auth,\n                status,\n                config,\n                headers,\n                favorite\n            )\n            VALUES (\n                ?,  -- id\n                ?,  -- name\n                ?,  -- description\n                ?,  -- endpoint_type\n                ?,  -- url\n                ?,  -- auth\n                ?,  -- status\n                ?,  -- config\n                ?,  -- headers\n                ?   -- favorite\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": []
+  },
+  "hash": "5e0cf90e8ba66c856453fcbc47c39fdde631a594fd72b6ed76b4609589f5e027"
+}
