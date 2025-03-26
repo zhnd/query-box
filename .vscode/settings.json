@@ -11,4 +11,7 @@
   "rust-analyzer.server.extraEnv": {
     "RUST_BACKTRACE": "0"
   },
+  "rust-analyzer.linkedProjects": [
+    "./src-tauri/Cargo.toml"
+  ]
 }
