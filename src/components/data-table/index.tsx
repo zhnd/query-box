@@ -43,6 +43,7 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     onPaginationChange,
+    manualPagination: true,
     state: {
       pagination: paginationState,
     },

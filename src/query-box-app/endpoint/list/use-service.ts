@@ -1,41 +1,26 @@
-import { Endpoint, PaginatedResponse } from '@/generated/typeshare-types'
+import { EndpointBridge } from '@/bridges'
+import { useQuery } from '@tanstack/react-query'
 import { PaginationState } from '@tanstack/react-table'
-import { invoke } from '@tauri-apps/api/core'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export const useEndpointListService = () => {
-  const [endpointsInfo, setEndpointsInfo] =
-    useState<PaginatedResponse<Endpoint> | null>(null)
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   })
-  const getData = async () => {
-    console.log('Getting all endpoints...')
-    try {
-      const data = await invoke<PaginatedResponse<Endpoint>>(
-        'get_all_endpoints',
-        {
-          filter: {
-            pagination: {},
-          },
-        }
-      )
-      console.log('Data:', data)
-      setEndpointsInfo(data)
-      return data
-    } catch (error) {
-      console.error('Error updating setting:', error)
-      throw error
-    }
-  }
-
-  useEffect(() => {
-    getData()
-  }, [])
+  const { data } = useQuery({
+    queryKey: ['endpoints', pagination],
+    queryFn: () =>
+      EndpointBridge.listEndpoints({
+        pagination: {
+          page: pagination.pageIndex + 1,
+          per_page: pagination.pageSize,
+        },
+      }),
+  })
 
   return {
-    endpointsInfo,
+    endpointsInfo: data,
     pagination,
     onPaginationChange: setPagination,
   }
