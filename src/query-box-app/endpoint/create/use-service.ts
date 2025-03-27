@@ -2,7 +2,7 @@ import { EndpointBridge } from '@/bridges'
 import { EndpointType } from '@/generated/typeshare-types'
 import { useEndpointStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -32,6 +32,14 @@ export const useCreateEndpointService = () => {
     (state) => state.setCreateDialogOpen
   )
 
+  const mutation = useMutation({
+    mutationFn: EndpointBridge.createEndpoint,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['endpoints'] })
+      setCreateDialogOpen(false)
+    },
+  })
+
   const [testStatus, setTestStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
   >('idle')
@@ -47,16 +55,13 @@ export const useCreateEndpointService = () => {
   })
 
   const onSubmit = async (values: FormValues) => {
-    console.log('Form submitted:', values)
-    await EndpointBridge.createEndpoint({
+    mutation.mutate({
       name: values.name,
       url: values.url,
       endpoint_type: EndpointType.GraphQL,
       headers: values.headers && JSON.stringify(values.headers),
       favorite: false,
     })
-    await queryClient.invalidateQueries({ queryKey: ['endpoints'] })
-    setCreateDialogOpen(false)
   }
 
   const testConnection = async () => {
