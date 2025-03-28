@@ -1,21 +1,16 @@
 import { EndpointBridge } from '@/bridges'
 import { AppSidebarMenuItemKeys } from '@/constants'
-import { useAppContext } from '@/providers'
-import { useAppSidebarMenuStore } from '@/stores'
+import { useAppSidebarMenuStore, useEndpointSelectedStateStore } from '@/stores'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getAppSidebarMenuItem } from '../app-sidebar/utils'
 
 export const usePageMenubarService = () => {
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false)
-  const {
-    state: {
-      app: { endpointId },
-    },
-    dispatch,
-  } = useAppContext()
 
   const { activeItemKey } = useAppSidebarMenuStore()
+  const { selectedEndpoints } = useEndpointSelectedStateStore()
+  const { setSelectedEndpoint } = useEndpointSelectedStateStore()
 
   const { data: endpointsData } = useQuery({
     queryKey: ['endpoints'],
@@ -36,11 +31,14 @@ export const usePageMenubarService = () => {
     activeAppSidebarMenuItem?.key !== AppSidebarMenuItemKeys.ENDPOINT
 
   const selectedEndpoint = endpointsData?.items.find(
-    (endpoint) => endpoint.id === endpointId
+    (endpoint) => endpoint.id === selectedEndpoints?.[activeItemKey]
   )
 
-  const updateEndpointId = (value: string | null) => {
-    dispatch({ type: 'setEndpointId', value })
+  const updateEndpointId = (value: string) => {
+    setSelectedEndpoint({
+      menuItem: activeItemKey,
+      endpointId: value,
+    })
     setPopoverOpen(false)
   }
 
@@ -49,7 +47,6 @@ export const usePageMenubarService = () => {
   }
   return {
     activeAppSidebarMenuItem,
-    endpointId,
     updateEndpointId,
     updatePopoverOpen,
     popoverOpen,

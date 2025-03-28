@@ -63,7 +63,7 @@ export function PageMenubar() {
                             <Check
                               className={cn(
                                 'ml-auto',
-                                service.endpointId === endpoint.id
+                                service.selectedEndpoint?.id === endpoint.id
                                   ? 'opacity-100'
                                   : 'opacity-0'
                               )}

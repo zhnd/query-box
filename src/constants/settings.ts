@@ -9,6 +9,9 @@ export const SettingsKeys = {
       ACTIVE_ITEM: 'ui.sidebar.active_item',
     },
   },
+  APP_STATE: {
+    SELECTED_ENDPOINT: 'app_state.selected_endpoint',
+  },
 }
 
 export type SettingsKeysType = keyof typeof SettingsKeys
