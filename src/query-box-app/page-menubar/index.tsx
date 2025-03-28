@@ -17,17 +17,6 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import { ThemeModeToggle } from '../theme-mode-toggle'
 import { usePageMenubarService } from './use-service'
 
-const endpoints = [
-  {
-    id: '1',
-    url: 'https://api.example.com/v1',
-  },
-  {
-    id: '2',
-    url: 'https://api.example.com/v2',
-  },
-]
-
 export function PageMenubar() {
   const service = usePageMenubarService()
   return (
@@ -46,7 +35,9 @@ export function PageMenubar() {
               >
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-64 justify-between">
-                    Select Endpoint
+                    {service.selectedEndpoint
+                      ? service.selectedEndpoint.name
+                      : 'Select Endpoint'}
                     <ChevronsUpDown className="opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -57,22 +48,22 @@ export function PageMenubar() {
                       <CommandEmpty>No endpoints found</CommandEmpty>
 
                       <CommandGroup>
-                        {endpoints.map((endpoint) => (
+                        {service.endpoints.map((endpoint) => (
                           <CommandItem
                             key={endpoint.id}
-                            value={endpoint.url}
-                            title={endpoint.url}
+                            value={endpoint.id}
+                            title={endpoint.name}
                             onSelect={(currentValue) => {
                               service.updateEndpointId(currentValue)
                             }}
                           >
                             <span className="truncate block">
-                              {endpoint.url}
+                              {endpoint.name}
                             </span>
                             <Check
                               className={cn(
                                 'ml-auto',
-                                service.endpointId === endpoint.url
+                                service.endpointId === endpoint.id
                                   ? 'opacity-100'
                                   : 'opacity-0'
                               )}
