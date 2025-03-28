@@ -37,49 +37,55 @@ export function PageMenubar() {
           <span className="text-gray-500">
             {service.activeAppSidebarMenuItem?.title}
           </span>
-          <span className="px-1 text-gray-500">/</span>
-          <Popover
-            open={service.popoverOpen}
-            onOpenChange={service.updatePopoverOpen}
-          >
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-64 justify-between">
-                Select Endpoint
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64 p-0">
-              <Command>
-                <CommandInput placeholder="Search endpoint..." />
-                <CommandList>
-                  <CommandEmpty>No endpoints found</CommandEmpty>
+          {service.showEndpointSelector && (
+            <>
+              <span className="px-1 text-gray-500">/</span>
+              <Popover
+                open={service.popoverOpen}
+                onOpenChange={service.updatePopoverOpen}
+              >
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-64 justify-between">
+                    Select Endpoint
+                    <ChevronsUpDown className="opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-0">
+                  <Command>
+                    <CommandInput placeholder="Search endpoint..." />
+                    <CommandList>
+                      <CommandEmpty>No endpoints found</CommandEmpty>
 
-                  <CommandGroup>
-                    {endpoints.map((endpoint) => (
-                      <CommandItem
-                        key={endpoint.id}
-                        value={endpoint.url}
-                        title={endpoint.url}
-                        onSelect={(currentValue) => {
-                          service.updateEndpointId(currentValue)
-                        }}
-                      >
-                        <span className="truncate block">{endpoint.url}</span>
-                        <Check
-                          className={cn(
-                            'ml-auto',
-                            service.endpointId === endpoint.url
-                              ? 'opacity-100'
-                              : 'opacity-0'
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+                      <CommandGroup>
+                        {endpoints.map((endpoint) => (
+                          <CommandItem
+                            key={endpoint.id}
+                            value={endpoint.url}
+                            title={endpoint.url}
+                            onSelect={(currentValue) => {
+                              service.updateEndpointId(currentValue)
+                            }}
+                          >
+                            <span className="truncate block">
+                              {endpoint.url}
+                            </span>
+                            <Check
+                              className={cn(
+                                'ml-auto',
+                                service.endpointId === endpoint.url
+                                  ? 'opacity-100'
+                                  : 'opacity-0'
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </>
+          )}
         </div>
       )}
       <div className="ml-auto">

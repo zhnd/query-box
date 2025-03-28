@@ -1,3 +1,4 @@
+import { AppSidebarMenuItemKeys } from '@/constants'
 import { useAppContext } from '@/providers'
 import { useAppSidebarMenuStore } from '@/stores'
 import { useState } from 'react'
@@ -18,6 +19,9 @@ export const usePageMenubarService = () => {
     key: activeItemKey,
   })
 
+  const showEndpointSelector =
+    activeAppSidebarMenuItem?.key !== AppSidebarMenuItemKeys.ENDPOINT
+
   const updateEndpointId = (value: string | null) => {
     dispatch({ type: 'setEndpointId', value })
     setPopoverOpen(false)
@@ -33,5 +37,6 @@ export const usePageMenubarService = () => {
     updateEndpointId,
     updatePopoverOpen,
     popoverOpen,
+    showEndpointSelector,
   }
 }
