@@ -13,7 +13,7 @@ export function TabBar() {
   const service = useTabBarService()
 
   return (
-    <div className="flex-1 flex flex-row gap-2 items-center border-b">
+    <div className="tab-bar flex flex-row gap-2 items-center border-b">
       <div
         className="flex-1 flex space-x-4 min-w-0 overflow-x-auto scrollbar-hide"
         ref={service.tabsContainerRef}

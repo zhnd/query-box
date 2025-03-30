@@ -31,7 +31,7 @@ export function QueryBoxApp() {
                 <AppSidebar />
                 <main className="flex flex-col flex-1 min-w-0">
                   <PageMenubar />
-                  <div className="flex-1 p-4">
+                  <div className="flex-1 p-4 flex flex-col min-h-0 overflow-hidden">
                     <MainContentRenderer
                       activeAppSidebarMenuItem={
                         appService.activeAppSidebarMenuItem

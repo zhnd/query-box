@@ -12,6 +12,7 @@ import { initializeMode } from 'monaco-graphql/initializeMode'
 import parserGraphql from 'prettier/parser-graphql'
 import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
+import { githubDarkTheme, githubLightTheme } from './themes'
 
 export function useService() {
   const editorContainerElementRef = useRef<HTMLDivElement>(null)
@@ -23,6 +24,9 @@ export function useService() {
   const init = async () => {
     if (editorInstanceRef.current || initializingRef.current) return
     initializingRef.current = true
+
+    monaco.editor.defineTheme('github-light', githubLightTheme)
+    monaco.editor.defineTheme('github-dark', githubDarkTheme)
 
     const defaultOperations =
       localStorage.getItem('operations') ??
@@ -61,6 +65,7 @@ query($limit: Int!) {
         minimap: {
           enabled: false,
         },
+        theme: 'github-light',
       }
     )
 
