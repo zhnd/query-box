@@ -1,13 +1,18 @@
 import { TitleBar } from '@/components/titlebar'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { AppSidebarMenuItemKeys } from '@/constants'
 import { AppProvider } from '@/providers'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { FC } from 'react'
 import { AppSidebar } from './app-sidebar'
 import { Endpoint } from './endpoint'
+import { Explorer } from './explorer'
 import { PageMenubar } from './page-menubar'
+import { useAppService } from './use-app-service'
 const queryClient = new QueryClient()
 export function QueryBoxApp() {
+  const appService = useAppService()
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -26,8 +31,12 @@ export function QueryBoxApp() {
                 <AppSidebar />
                 <main className="flex flex-col flex-1 min-w-0">
                   <PageMenubar />
-                  <div className="flex-1 overflow-auto p-4">
-                    <Endpoint />
+                  <div className="flex-1 p-4">
+                    <MainContentRenderer
+                      activeAppSidebarMenuItem={
+                        appService.activeAppSidebarMenuItem
+                      }
+                    />
                   </div>
                 </main>
               </SidebarProvider>
@@ -37,4 +46,17 @@ export function QueryBoxApp() {
       </TooltipProvider>
     </QueryClientProvider>
   )
+}
+
+const MainContentRenderer: FC<{
+  activeAppSidebarMenuItem: AppSidebarMenuItemKeys
+}> = (props) => {
+  switch (props.activeAppSidebarMenuItem) {
+    case AppSidebarMenuItemKeys.ENDPOINT:
+      return <Endpoint />
+    case AppSidebarMenuItemKeys.EXPLORER:
+      return <Explorer />
+    default:
+      return <div>Not Found</div>
+  }
 }
