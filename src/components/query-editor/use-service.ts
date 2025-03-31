@@ -12,6 +12,7 @@ import { initializeMode } from 'monaco-graphql/initializeMode'
 import parserGraphql from 'prettier/parser-graphql'
 import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
+import { QUERY_EXAMPLE } from './constants'
 import { githubDarkTheme, githubLightTheme } from './themes'
 
 export function useService() {
@@ -29,18 +30,7 @@ export function useService() {
     monaco.editor.defineTheme('github-dark', githubDarkTheme)
 
     const defaultOperations =
-      localStorage.getItem('operations') ??
-      `
-# cmd/ctrl + return/enter will execute the op,
-# same in variables editor below
-# also available via context menu & f1 command palette
-
-query($limit: Int!) {
-    payloads(limit: $limit) {
-        customer
-    }
-}
-`
+      localStorage.getItem('operations') ?? QUERY_EXAMPLE
 
     const getOrCreateModel = (uri: string, value: string) => {
       return (
