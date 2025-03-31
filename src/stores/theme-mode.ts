@@ -48,7 +48,6 @@ const syncThemeModeToDom = (theme: UIThemeMode) => {
     resolvedThemeMode = theme
     root.classList.add(theme)
   }
-
   return { resolvedThemeMode }
 }
 
@@ -75,7 +74,8 @@ export const useThemeModeStore = create<ThemeModeStore>()(
       onRehydrateStorage: () => (state) => {
         setupSystemThemeListener()
         if (state) {
-          syncThemeModeToDom(state.themeMode)
+          const { resolvedThemeMode } = syncThemeModeToDom(state.themeMode)
+          useThemeModeStore.setState({ resolvedThemeMode })
         }
       },
     }
