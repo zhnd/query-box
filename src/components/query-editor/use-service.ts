@@ -62,6 +62,7 @@ export function useService() {
           useShadows: false,
           verticalSliderSize: 8,
         },
+        tabSize: 2,
         minimap: {
           enabled: false,
         },
