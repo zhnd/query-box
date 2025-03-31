@@ -7,7 +7,7 @@ import {
   IntrospectionQuery,
 } from 'graphql'
 import { debounce } from 'lodash'
-import { languages, Uri } from 'monaco-editor'
+import { Uri } from 'monaco-editor'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { initializeMode } from 'monaco-graphql/initializeMode'
 import parserGraphql from 'prettier/parser-graphql'
@@ -70,7 +70,7 @@ export function useService() {
       }
     )
 
-    languages.registerDocumentFormattingEditProvider('graphql', {
+    monaco.languages.registerDocumentFormattingEditProvider('graphql', {
       provideDocumentFormattingEdits: async (modal) => {
         try {
           const formattedText = await prettier.format(modal.getValue(), {
