@@ -1,3 +1,4 @@
+import { useThemeModeStore } from '@/stores'
 import { createGraphiQLFetcher } from '@graphiql/toolkit'
 import {
   buildClientSchema,
@@ -21,6 +22,8 @@ export function useService() {
     null
   )
   const initializingRef = useRef(false)
+
+  const { resolvedThemeMode } = useThemeModeStore()
 
   const init = async () => {
     if (editorInstanceRef.current || initializingRef.current) return
@@ -62,7 +65,7 @@ export function useService() {
         minimap: {
           enabled: false,
         },
-        theme: 'github-light',
+        theme: resolvedThemeMode === 'dark' ? 'github-dark' : 'github-light',
         automaticLayout: true,
       }
     )
@@ -128,6 +131,12 @@ export function useService() {
       }
     }
   }, [])
+
+  useEffect(() => {
+    editorInstanceRef.current?.updateOptions({
+      theme: resolvedThemeMode === 'dark' ? 'github-dark' : 'github-light',
+    })
+  }, [resolvedThemeMode])
 
   return { editorContainerElementRef }
 }
