@@ -70,6 +70,7 @@ query($limit: Int!) {
           enabled: false,
         },
         theme: 'github-light',
+        automaticLayout: true,
       }
     )
 
