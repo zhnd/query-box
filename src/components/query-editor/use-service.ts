@@ -62,6 +62,10 @@ query($limit: Int!) {
       {
         model: queryModel,
         language: 'graphql',
+        scrollbar: {
+          vertical: 'hidden',
+          horizontal: 'hidden',
+        },
         minimap: {
           enabled: false,
         },
