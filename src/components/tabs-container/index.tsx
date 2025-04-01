@@ -1,26 +1,26 @@
-import { HistoryPanel } from "@/components/history-panel";
-import { ResponseViewer } from "@/components/response-viewer";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Endpoint, HistoryItem, Tab } from "@/types";
-import { ClockIcon, PlayIcon, XIcon } from "lucide-react";
-import { useState } from "react";
-import { QueryEditor } from "../query-editor";
+import { HistoryPanel } from '@/components/history-panel'
+import { ResponseViewer } from '@/components/response-viewer'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { Endpoint, HistoryItem, Tab } from '@/types'
+import { ClockIcon, PlayIcon, XIcon } from 'lucide-react'
+import { useState } from 'react'
+import { QueryEditor } from '../query-editor'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from "../ui/resizable";
+} from '../ui/resizable'
 
 interface TabsContainerProps {
-  tabs: Tab[];
-  endpoints: Endpoint[];
-  history: HistoryItem[];
-  onCloseTab: (id: string) => void;
-  onSelectTab: (id: string) => void;
-  onUpdateTab: (id: string, tab: Partial<Tab>) => void;
-  onAddHistoryItem: (item: HistoryItem) => void;
-  onClearHistory: () => void;
+  tabs: Tab[]
+  endpoints: Endpoint[]
+  history: HistoryItem[]
+  onCloseTab: (id: string) => void
+  onSelectTab: (id: string) => void
+  onUpdateTab: (id: string, tab: Partial<Tab>) => void
+  onAddHistoryItem: (item: HistoryItem) => void
+  onClearHistory: () => void
 }
 
 export function TabsContainer({
@@ -33,35 +33,35 @@ export function TabsContainer({
   onAddHistoryItem,
   onClearHistory,
 }: TabsContainerProps) {
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
 
-  const activeTab = tabs.find((tab) => tab.isActive);
+  const activeTab = tabs.find((tab) => tab.isActive)
   const activeEndpoint = activeTab
     ? endpoints.find((endpoint) => endpoint.id === activeTab.endpointId)
-    : null;
+    : null
 
   const handleRunQuery = async () => {
-    if (!activeTab || !activeEndpoint) return;
+    if (!activeTab || !activeEndpoint) return
 
     // Set loading state
-    onUpdateTab(activeTab.id, { isLoading: true });
+    onUpdateTab(activeTab.id, { isLoading: true })
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
       // Mock response
       const mockResponse = JSON.stringify(
         {
           data: {
             viewer: {
-              login: "example-user",
-              name: "Example User",
+              login: 'example-user',
+              name: 'Example User',
               repositories: {
                 totalCount: 42,
                 nodes: [
-                  { name: "repo1", stargazerCount: 123 },
-                  { name: "repo2", stargazerCount: 456 },
+                  { name: 'repo1', stargazerCount: 123 },
+                  { name: 'repo2', stargazerCount: 456 },
                 ],
               },
             },
@@ -69,13 +69,13 @@ export function TabsContainer({
         },
         null,
         2
-      );
+      )
 
       // Update tab with response
       onUpdateTab(activeTab.id, {
         response: mockResponse,
         isLoading: false,
-      });
+      })
 
       // Add to history
       onAddHistoryItem({
@@ -85,15 +85,15 @@ export function TabsContainer({
         variables: activeTab.variables,
         response: mockResponse,
         timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
+      })
+    } catch {
       // Handle error
       onUpdateTab(activeTab.id, {
-        response: JSON.stringify({ error: "An error occurred" }, null, 2),
+        response: JSON.stringify({ error: 'An error occurred' }, null, 2),
         isLoading: false,
-      });
+      })
     }
-  };
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -107,7 +107,7 @@ export function TabsContainer({
                     value={tab.id}
                     onClick={() => onSelectTab(tab.id)}
                     className={`rounded-none border-b-2 border-transparent px-4 py-2 ${
-                      tab.isActive ? "border-primary" : ""
+                      tab.isActive ? 'border-primary' : ''
                     }`}
                   >
                     {tab.name}
@@ -126,7 +126,7 @@ export function TabsContainer({
           </Tabs>
           <div className="flex items-center mr-2">
             <Button
-              variant={isHistoryOpen ? "default" : "outline"}
+              variant={isHistoryOpen ? 'default' : 'outline'}
               size="sm"
               className="mr-2"
               onClick={() => setIsHistoryOpen(!isHistoryOpen)}
@@ -156,9 +156,9 @@ export function TabsContainer({
                   query: item.query,
                   variables: item.variables,
                   response: item.response,
-                });
+                })
               }
-              setIsHistoryOpen(false);
+              setIsHistoryOpen(false)
             }}
             onClearHistory={onClearHistory}
           />
@@ -166,20 +166,17 @@ export function TabsContainer({
 
         <div
           className={`flex flex-col flex-1 ${
-            isHistoryOpen ? "w-2/3" : "w-full"
+            isHistoryOpen ? 'w-2/3' : 'w-full'
           }`}
         >
           {activeTab ? (
-            <ResizablePanelGroup direction={"horizontal"}>
+            <ResizablePanelGroup direction={'horizontal'}>
               <ResizablePanel defaultSize={50} minSize={30}>
                 <QueryEditor />
               </ResizablePanel>
               <ResizableHandle />
               <ResizablePanel defaultSize={50} minSize={30}>
-                <ResponseViewer
-                  response={activeTab.response || ""}
-                  isLoading={activeTab.isLoading || false}
-                />
+                <ResponseViewer />
               </ResizablePanel>
             </ResizablePanelGroup>
           ) : (
@@ -190,5 +187,5 @@ export function TabsContainer({
         </div>
       </div>
     </div>
-  );
+  )
 }
