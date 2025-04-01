@@ -1,3 +1,4 @@
+import { githubDarkTheme, githubLightTheme } from '@/constants'
 import { useThemeModeStore } from '@/stores'
 import { createGraphiQLFetcher } from '@graphiql/toolkit'
 import {
@@ -14,7 +15,6 @@ import parserGraphql from 'prettier/parser-graphql'
 import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
 import { QUERY_EXAMPLE } from './constants'
-import { githubDarkTheme, githubLightTheme } from './themes'
 
 export function useService() {
   const editorContainerElementRef = useRef<HTMLDivElement>(null)
