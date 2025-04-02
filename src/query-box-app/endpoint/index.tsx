@@ -4,7 +4,7 @@ import { SearchEndpoint } from './search'
 
 export function Endpoint() {
   return (
-    <div>
+    <div className="endpoint">
       <SearchEndpoint />
       <EndpointList />
       <CreateEndpoint />

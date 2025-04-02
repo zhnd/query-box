@@ -20,7 +20,7 @@ import { usePageMenubarService } from './use-service'
 export function PageMenubar() {
   const service = usePageMenubarService()
   return (
-    <div className="w-full border-alpha-200 sticky flex h-16 items-center justify-between gap-2 border-b p-4 md:h-12">
+    <div className="w-full border-alpha-200 flex h-16 items-center justify-between gap-2 border-b p-4 md:h-12">
       {Boolean(service.activeAppSidebarMenuItem) && (
         <div className="flex-1 flex items-center flex-nowrap overflow-y-auto">
           <span className="text-gray-500">

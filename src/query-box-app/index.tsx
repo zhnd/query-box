@@ -17,30 +17,29 @@ export function QueryBoxApp() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AppProvider>
-          <div className="flex flex-col h-screen overflow-hidden">
+          <div className="flex flex-col h-screen">
             <TitleBar />
-            <div className="flex flex-1 min-h-0">
-              <SidebarProvider
-                style={
-                  {
-                    '--sidebar-width': '16rem',
-                    '--sidebar-width-icon': '5rem',
-                  } as React.CSSProperties
-                }
-              >
-                <AppSidebar />
-                <main className="flex flex-col flex-1 min-w-0">
-                  <PageMenubar />
-                  <div className="flex-1 p-4 flex flex-col min-h-0 overflow-hidden">
-                    <MainContentRenderer
-                      activeAppSidebarMenuItem={
-                        appService.activeAppSidebarMenuItem
-                      }
-                    />
-                  </div>
-                </main>
-              </SidebarProvider>
-            </div>
+            <SidebarProvider
+              className="flex-1 min-h-0"
+              style={
+                {
+                  '--sidebar-width': '16rem',
+                  '--sidebar-width-icon': '5rem',
+                } as React.CSSProperties
+              }
+            >
+              <AppSidebar />
+              <main className="flex-1 flex flex-col overflow-y-auto">
+                <PageMenubar />
+                <div className="main-content flex-1 p-4 flex flex-col min-h-0">
+                  <MainContentRenderer
+                    activeAppSidebarMenuItem={
+                      appService.activeAppSidebarMenuItem
+                    }
+                  />
+                </div>
+              </main>
+            </SidebarProvider>
           </div>
         </AppProvider>
       </TooltipProvider>
