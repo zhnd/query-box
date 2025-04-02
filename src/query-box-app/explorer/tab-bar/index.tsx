@@ -26,11 +26,11 @@ export function TabBar() {
               service.handleActiveTabChange(tab.id)
             }}
             className={cn(
-              'flex items-center shrink-0 cursor-pointer gap-2 group p-2 box-border border-b-2 border-transparent hover:border-b-primary',
+              'flex items-center shrink-0 cursor-pointer gap-2 group p-1 box-border border-b-2 border-transparent hover:border-b-primary',
               service.activeTabId === tab.id ? 'border-b-primary' : ''
             )}
           >
-            <span className="truncate flex-1">{tab.name}</span>
+            <span className="truncate flex-1 text-xs">{tab.name}</span>
             <Button
               variant="ghost"
               size="icon"
@@ -47,17 +47,17 @@ export function TabBar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 mr-1"
+          className="h-6 w-6 mr-1"
           onClick={service.addTab}
         >
-          <Plus className="h-4 w-4" />
+          <Plus />
           <span className="sr-only">Add tab</span>
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <ChevronRight className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="h-6 w-6">
+              <ChevronRight />
               <span className="sr-only">Show all tabs</span>
             </Button>
           </DropdownMenuTrigger>
@@ -75,8 +75,8 @@ export function TabBar() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <MoreHorizontal className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="h-6 w-6">
+              <MoreHorizontal />
               <span className="sr-only">More options</span>
             </Button>
           </DropdownMenuTrigger>
