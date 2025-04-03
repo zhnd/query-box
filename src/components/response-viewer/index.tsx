@@ -15,10 +15,13 @@ export function ResponseViewer() {
 
   return (
     <div className="flex-1 h-full flex flex-col">
-      <div className="p-4 border-b flex justify-between items-center">
+      <div className="px-2 py-1 border-b flex justify-between items-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 cursor-pointer"
+            >
               {viewLabels[service.activeView]}
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -27,6 +30,7 @@ export function ResponseViewer() {
             {ViewTypeMenuItems.map((item) => (
               <DropdownMenuItem
                 key={item.value}
+                className="cursor-pointer"
                 onClick={() => service.setActiveView(item.value)}
               >
                 {item.label}
