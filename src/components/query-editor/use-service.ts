@@ -56,7 +56,7 @@ export function useService() {
         model: queryModel,
         language: 'graphql',
         scrollbar: {
-          vertical: 'auto',
+          vertical: 'hidden',
           horizontal: 'hidden',
           verticalScrollbarSize: 8,
           useShadows: false,

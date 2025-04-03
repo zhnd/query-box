@@ -42,7 +42,7 @@ export const useJsonViewerService = () => {
         wordWrap: 'on',
         wrappingIndent: 'indent',
         scrollbar: {
-          vertical: 'auto',
+          vertical: 'hidden',
           horizontal: 'hidden',
           verticalScrollbarSize: 8,
           useShadows: false,
