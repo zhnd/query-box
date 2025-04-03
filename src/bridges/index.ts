@@ -1,2 +1,2 @@
 export * from './endpoint-bridge'
-export * from './settings'
+export * from './settings-bridge'
