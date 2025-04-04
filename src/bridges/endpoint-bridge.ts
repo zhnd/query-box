@@ -19,6 +19,16 @@ export class EndpointBridge {
       throw error
     }
   }
+  static async getEndpointById(id: string): Promise<Endpoint> {
+    try {
+      return await invoke<Endpoint>('get_endpoint_by_id', {
+        id,
+      })
+    } catch (error) {
+      console.error('Failed to get endpoint by ID:', error)
+      throw error
+    }
+  }
   static async createEndpoint(dto: CreateEndpointDto): Promise<Endpoint> {
     try {
       const endpoint = await invoke<Endpoint>('create_endpoint', {
