@@ -20,6 +20,17 @@ pub async fn get_all_endpoints(
         .map_err(|e| e.to_string())
 }
 
+#[command]
+pub async fn get_endpoint_by_id(
+    app_handle: AppHandle,
+    id: String,
+) -> Result<Option<Endpoint>, String> {
+    let pool = app_handle.state::<SqlitePool>();
+    EndpointRepository::find_by_id(&pool, &id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
 #[tauri::command]
 pub async fn create_endpoint(
     app_handle: AppHandle,

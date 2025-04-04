@@ -96,7 +96,23 @@ impl EndpointRepository {
 
         Ok(total)
     }
+    pub async fn find_by_id(pool: &SqlitePool, id: &str) -> Result<Option<Endpoint>, sqlx::Error> {
+        let endpoint_row = sqlx::query_as::<_, EndpointRow>("SELECT * FROM endpoint WHERE id = ?")
+            .bind(id)
+            .fetch_optional(pool)
+            .await?;
 
+        match endpoint_row {
+            Some(row) => match Endpoint::try_from(row) {
+                Ok(endpoint) => Ok(Some(endpoint)),
+                Err(e) => {
+                    eprintln!("Error converting endpoint row: {}", e);
+                    Err(sqlx::Error::RowNotFound)
+                }
+            },
+            None => Ok(None),
+        }
+    }
     pub async fn create(
         pool: &SqlitePool,
         dto: CreateEndpointDto,
