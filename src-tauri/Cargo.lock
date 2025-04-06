@@ -3178,7 +3178,6 @@ dependencies = [
 name = "query-box"
 version = "0.1.0"
 dependencies = [
- "chrono",
  "reqwest",
  "serde",
  "serde_json",
@@ -3190,7 +3189,6 @@ dependencies = [
  "tauri-plugin-fs",
  "tauri-plugin-opener",
  "tauri-plugin-os",
- "tauri-plugin-sql",
  "tokio",
  "typeshare",
  "uuid",
@@ -4027,7 +4025,6 @@ dependencies = [
  "sha2",
  "smallvec",
  "thiserror 2.0.11",
- "time",
  "tokio",
  "tokio-stream",
  "tracing",
@@ -4111,7 +4108,6 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror 2.0.11",
- "time",
  "tracing",
  "whoami",
 ]
@@ -4149,7 +4145,6 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror 2.0.11",
- "time",
  "tracing",
  "whoami",
 ]
@@ -4173,7 +4168,6 @@ dependencies = [
  "serde",
  "serde_urlencoded",
  "sqlx-core",
- "time",
  "tracing",
  "url",
 ]
@@ -4600,25 +4594,6 @@ dependencies = [
  "tauri",
  "tauri-plugin",
  "thiserror 2.0.11",
-]
-
-[[package]]
-name = "tauri-plugin-sql"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6ccca89ded6bd2ff49fdad9a5b34bcd624aa223fdfddbab83c85706ee3a4948"
-dependencies = [
- "futures-core",
- "indexmap 2.7.1",
- "log",
- "serde",
- "serde_json",
- "sqlx",
- "tauri",
- "tauri-plugin",
- "thiserror 2.0.11",
- "time",
- "tokio",
 ]
 
 [[package]]
