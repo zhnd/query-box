@@ -1,6 +1,6 @@
 import { EndpointBridge } from '@/bridges'
 import { EndpointType } from '@/generated/typeshare-types'
-import { useEndpointStore } from '@/stores'
+import { useEndpointPageStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
@@ -25,10 +25,12 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export const useCreateEndpointService = () => {
-  const createDialogOpen = useEndpointStore((state) => state.createDialogOpen)
+  const createDialogOpen = useEndpointPageStore(
+    (state) => state.createDialogOpen
+  )
   const queryClient = useQueryClient()
 
-  const setCreateDialogOpen = useEndpointStore(
+  const setCreateDialogOpen = useEndpointPageStore(
     (state) => state.setCreateDialogOpen
   )
 
