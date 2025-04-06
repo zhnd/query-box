@@ -9,7 +9,7 @@ import { createSettingsStorage } from './storages'
 
 interface setSelectedEndpointParams {
   menuItem: AppSidebarMenuItemKeys
-  endpointId: string
+  endpoint: Endpoint | null
 }
 
 interface EndpointSelectedStateStoreState {
@@ -45,13 +45,14 @@ export const useEndpointSelectedStateStore = create<EndpointStateStore>()(
         currentPageSelectedEndpoint: null,
         setSelectedEndpoint: ({
           menuItem,
-          endpointId,
+          endpoint,
         }: setSelectedEndpointParams) => {
           set((state) => ({
             selectedEndpoints: {
               ...state.selectedEndpoints,
-              [menuItem]: endpointId,
+              [menuItem]: endpoint?.id ?? null,
             },
+            currentPageSelectedEndpoint: endpoint,
           }))
         },
       }
