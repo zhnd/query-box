@@ -6,8 +6,11 @@ import {
 } from '@/components/ui/resizable'
 import { Request } from './request'
 import { TabBar } from './tab-bar'
+import { useExplorerService } from './use-explorer-sevice'
 
 export function Explorer() {
+  const service = useExplorerService()
+  console.log('Explorer', service.response)
   return (
     <div className="explorer flex-1 flex flex-col">
       <TabBar />
@@ -18,7 +21,7 @@ export function Explorer() {
           </ResizablePanel>
           <ResizableHandle />
           <ResizablePanel defaultSize={50} minSize={30}>
-            <ResponseViewer />
+            <ResponseViewer data={service.response} />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

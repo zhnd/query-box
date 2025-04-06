@@ -16,7 +16,13 @@ import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
 import { QUERY_EXAMPLE } from './constants'
 
-export function useService() {
+export interface QueryEditorProps {
+  initialValue?: string
+  onChange?: (value: string) => void
+}
+
+export function useService(props: QueryEditorProps) {
+  const { onChange } = props
   const editorContainerElementRef = useRef<HTMLDivElement>(null)
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
     null
@@ -47,6 +53,7 @@ export function useService() {
     queryModel.onDidChangeContent(
       debounce(() => {
         console.log('content changed', queryModel.getValue())
+        onChange?.(queryModel.getValue())
       }, 600)
     )
 
