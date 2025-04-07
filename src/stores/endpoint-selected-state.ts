@@ -2,6 +2,7 @@ import { EndpointBridge } from '@/bridges'
 import { AppSidebarMenuItemKeys, SettingsKeys } from '@/constants'
 import { Endpoint } from '@/generated/typeshare-types'
 import { SettingsCategories, SettingsValueTypes } from '@/types'
+import _ from 'lodash'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { useAppSidebarMenuStore } from './app-sidebar-menu'
@@ -9,7 +10,7 @@ import { createSettingsStorage } from './storages'
 
 interface setSelectedEndpointParams {
   menuItem: AppSidebarMenuItemKeys
-  endpointId: string
+  endpoint: Endpoint | null
 }
 
 interface EndpointSelectedStateStoreState {
@@ -25,33 +26,20 @@ type EndpointStateStore = EndpointSelectedStateStoreState &
 
 export const useEndpointSelectedStateStore = create<EndpointStateStore>()(
   persist(
-    (set, get) => {
-      useAppSidebarMenuStore.subscribe(
-        (state) => state.activeItemKey,
-        async (activeItemKey) => {
-          const currentPageSelectedEndpoint =
-            await getCurrentPageSelectedEndpoint({
-              activeItemKey: activeItemKey,
-              selectedEndpoints: get().selectedEndpoints,
-            })
-          set((prevState) => ({
-            ...prevState,
-            currentPageSelectedEndpoint,
-          }))
-        }
-      )
+    (set) => {
       return {
         selectedEndpoints: {},
         currentPageSelectedEndpoint: null,
         setSelectedEndpoint: ({
           menuItem,
-          endpointId,
+          endpoint,
         }: setSelectedEndpointParams) => {
           set((state) => ({
             selectedEndpoints: {
               ...state.selectedEndpoints,
-              [menuItem]: endpointId,
+              [menuItem]: endpoint?.id ?? null,
             },
+            currentPageSelectedEndpoint: endpoint,
           }))
         },
       }
@@ -66,6 +54,43 @@ export const useEndpointSelectedStateStore = create<EndpointStateStore>()(
           description: 'Selected endpoint ID in the application state',
         },
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return
+        // Rehydrate the current page selected endpoint based on the active menu item
+        // and the selected endpoints
+        // This is necessary to ensure that the current page selected endpoint is set
+        // correctly when the app is rehydrated
+        useAppSidebarMenuStore.subscribe(
+          (menuState) => menuState.activeItemKey,
+          async (activeItemKey) => {
+            const currentPageSelectedEndpoint =
+              await getCurrentPageSelectedEndpoint({
+                activeItemKey: activeItemKey,
+                selectedEndpoints: state.selectedEndpoints,
+              })
+
+            if (currentPageSelectedEndpoint) {
+              useEndpointSelectedStateStore.setState({
+                currentPageSelectedEndpoint,
+              })
+            }
+          }
+        )
+        // Initial fetch for the current page selected endpoint
+        const activeItemKey = useAppSidebarMenuStore.getState().activeItemKey
+        if (activeItemKey) {
+          getCurrentPageSelectedEndpoint({
+            activeItemKey,
+            selectedEndpoints: state.selectedEndpoints,
+          }).then((endpoint) => {
+            if (endpoint) {
+              useEndpointSelectedStateStore.setState({
+                currentPageSelectedEndpoint: endpoint,
+              })
+            }
+          })
+        }
+      },
     }
   )
 )
@@ -75,13 +100,14 @@ const getCurrentPageSelectedEndpoint = async (params: {
   selectedEndpoints: Record<string, string | null>
 }) => {
   const { activeItemKey, selectedEndpoints } = params
-  if (!activeItemKey) return null
 
+  if (!activeItemKey || _.isEmpty(selectedEndpoints)) return null
   const selectedEndpointId = selectedEndpoints[activeItemKey]
+
   // if no endpointId is selected, fetch the first endpoint from the list
   return selectedEndpointId
-    ? fetchEndpointById(selectedEndpointId)
-    : fetchFallbackEndpoint()
+    ? await fetchEndpointById(selectedEndpointId)
+    : await fetchFallbackEndpoint()
 }
 
 const fetchFallbackEndpoint = async () => {

@@ -8,9 +8,10 @@ import {
 import { ChevronDown } from 'lucide-react'
 import { JsonViewer } from '../json-viewer'
 import { ResponseViewType, viewLabels, ViewTypeMenuItems } from './constants'
-import { useResponseViewerService } from './use-service'
+import { ResponseViewerProps, useResponseViewerService } from './use-service'
 
-export function ResponseViewer() {
+export function ResponseViewer(props: ResponseViewerProps) {
+  const { data } = props
   const service = useResponseViewerService()
 
   return (
@@ -42,9 +43,9 @@ export function ResponseViewer() {
 
       <div className="flex-1 overflow-auto">
         {service.activeView === ResponseViewType.BODY ? (
-          <JsonViewer />
+          <JsonViewer data={data} />
         ) : (
-          <JsonViewer />
+          <JsonViewer data={data} />
         )}
       </div>
     </div>

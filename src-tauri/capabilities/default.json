@@ -8,8 +8,6 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "sql:default",
-    "sql:allow-execute",
     "fs:default",
     {
       "identifier": "fs:scope-app",

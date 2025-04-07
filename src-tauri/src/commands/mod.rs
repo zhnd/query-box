@@ -7,6 +7,9 @@ pub use settings_commands::*;
 pub mod endpoint_commands;
 pub use endpoint_commands::*;
 
+pub mod request_history_commands;
+pub use request_history_commands::*;
+
 ///
 /// # Command Registration Macro
 ///
@@ -42,6 +45,7 @@ macro_rules! app_commands {
             commands::get_all_endpoints,
             commands::get_endpoint_by_id,
             commands::create_endpoint,
+            commands::get_all_request_histories,
         ]
     };
 }
