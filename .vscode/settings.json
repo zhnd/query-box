@@ -13,5 +13,13 @@
   },
   "rust-analyzer.linkedProjects": [
     "./src-tauri/Cargo.toml"
+  ],
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "query-box-dev",
+      "database": "${workspaceFolder:query-box}/app.sqlite"
+    }
   ]
 }
