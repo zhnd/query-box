@@ -1,5 +1,5 @@
-mod graphql;
-pub use graphql::*;
+mod graphql_commands;
+pub use graphql_commands::*;
 
 pub mod settings_commands;
 pub use settings_commands::*;
