@@ -12,8 +12,6 @@ use crate::common::http_method::HttpMethod;
 pub struct RequestHistory {
     /// Unique identifier for the request history entry
     pub id: Uuid,
-    /// Table identifier for the request history entry
-    pub tab_id: String,
     /// Identifier of the endpoint associated with this request
     pub endpoint_id: Uuid,
     /// History name
@@ -35,7 +33,6 @@ pub struct RequestHistory {
 #[derive(Debug, FromRow)]
 pub struct RequestHistoryRow {
     pub id: String,
-    pub tab_id: String,
     pub endpoint_id: String,
     pub name: Option<String>,
     pub method: String,
@@ -67,7 +64,6 @@ impl TryFrom<RequestHistoryRow> for RequestHistory {
 
         Ok(Self {
             id: Uuid::parse_str(&row.id)?,
-            tab_id: row.tab_id,
             endpoint_id: Uuid::parse_str(&row.endpoint_id)?,
             name: row.name,
             method,
