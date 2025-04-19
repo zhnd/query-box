@@ -1,7 +1,7 @@
-import { useEndpointStore } from '@/stores'
+import { useEndpointPageStore } from '@/stores'
 
 export const useEndpointSearchService = () => {
-  const setCreateDialogOpen = useEndpointStore(
+  const setCreateDialogOpen = useEndpointPageStore(
     (state) => state.setCreateDialogOpen
   )
 

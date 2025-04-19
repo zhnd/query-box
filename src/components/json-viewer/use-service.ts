@@ -3,7 +3,12 @@ import { useThemeModeStore } from '@/stores'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { useEffect, useRef } from 'react'
 
-export const useJsonViewerService = () => {
+export interface JsonViewerProps {
+  data?: string
+}
+
+export const useJsonViewerService = (props: JsonViewerProps) => {
+  const { data } = props
   const viewContainerElementRef = useRef<HTMLDivElement>(null)
 
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
@@ -76,6 +81,29 @@ export const useJsonViewerService = () => {
       theme: resolvedThemeMode === 'dark' ? 'github-dark' : 'github-light',
     })
   }, [resolvedThemeMode])
+
+  useEffect(() => {
+    if (editorInstanceRef.current && data) {
+      try {
+        // 如果 data 是 JSON 字符串，尝试格式化它
+        let formattedData = data
+        try {
+          const jsonObject = JSON.parse(data)
+          formattedData = JSON.stringify(jsonObject, null, '\t')
+        } catch {
+          // 如果解析失败，使用原始数据
+        }
+
+        // 使用 setValue 更新编辑器内容
+        editorInstanceRef.current.setValue(formattedData)
+
+        // 可选：重置视图位置到顶部
+        editorInstanceRef.current.revealPosition({ lineNumber: 1, column: 1 })
+      } catch (error) {
+        console.error('Failed to update editor value:', error)
+      }
+    }
+  }, [data])
 
   return {
     viewContainerElementRef,
