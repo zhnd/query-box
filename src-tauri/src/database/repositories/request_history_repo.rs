@@ -1,12 +1,11 @@
-use std::result;
-
 use sqlx::{QueryBuilder, Sqlite, SqlitePool};
 use uuid::Uuid;
 
 use crate::{
     database::entities::request_history_entity::{RequestHistory, RequestHistoryRow},
     models::request_history_model::{
-        CreateRequestHistoryDto, DeleteRequestHistoryDto, UpdateRequestHistoryDto,
+        CreateRequestHistoryDto, DeleteRequestHistoryDto, RequestHistoryFilter,
+        UpdateRequestHistoryDto,
     },
 };
 
@@ -15,14 +14,14 @@ pub struct RequestHistoryRepository;
 impl RequestHistoryRepository {
     pub async fn find_all(
         pool: &SqlitePool,
-        endpoint_id: String,
+        filter: RequestHistoryFilter,
     ) -> Result<Vec<RequestHistory>, anyhow::Error> {
         let rows: Vec<RequestHistoryRow> = sqlx::query_as::<_, RequestHistoryRow>(
             r#"
             SELECT * FROM request_history WHERE endpoint_id = ? ORDER BY created_at DESC
             "#,
         )
-        .bind(endpoint_id)
+        .bind(filter.endpoint_id)
         .fetch_all(pool)
         .await?;
 
@@ -168,13 +167,14 @@ impl RequestHistoryRepository {
         );
         let mut separated = builder.separated(" AND ");
 
-        if let Some(id) = &dto.id {
-            separated.push("id = ");
-            separated.push_bind(id);
+        if let Some(id) = dto.id {
+            separated.push("id = ").push_bind_unseparated(id);
         }
-        if let Some(endpoint_id) = &dto.endpoint_id {
-            separated.push("endpoint_id = ");
-            separated.push_bind(endpoint_id);
+
+        if let Some(endpoint_id) = dto.endpoint_id {
+            separated
+                .push("endpoint_id = ")
+                .push_bind_unseparated(endpoint_id);
         }
 
         let query = builder.build();

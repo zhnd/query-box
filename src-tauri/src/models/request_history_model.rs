@@ -44,3 +44,9 @@ pub struct DeleteRequestHistoryDto {
     pub id: Option<String>,
     pub endpoint_id: Option<String>,
 }
+
+#[typeshare]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RequestHistoryFilter {
+    pub endpoint_id: String,
+}
