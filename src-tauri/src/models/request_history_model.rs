@@ -37,3 +37,10 @@ pub struct UpdateRequestHistoryDto {
     /// Query parameters included in the request
     pub query: Option<String>,
 }
+
+#[typeshare]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeleteRequestHistoryDto {
+    pub id: Option<String>,
+    pub endpoint_id: Option<String>,
+}

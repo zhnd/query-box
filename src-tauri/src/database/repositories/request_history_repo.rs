@@ -1,9 +1,13 @@
+use std::result;
+
 use sqlx::{QueryBuilder, Sqlite, SqlitePool};
 use uuid::Uuid;
 
 use crate::{
     database::entities::request_history_entity::{RequestHistory, RequestHistoryRow},
-    models::request_history_model::{CreateRequestHistoryDto, UpdateRequestHistoryDto},
+    models::request_history_model::{
+        CreateRequestHistoryDto, DeleteRequestHistoryDto, UpdateRequestHistoryDto,
+    },
 };
 
 pub struct RequestHistoryRepository;
@@ -147,15 +151,38 @@ impl RequestHistoryRepository {
         RequestHistory::try_from(request_history_row).map_err(|e| anyhow::Error::msg(e.to_string()))
     }
 
-    pub async fn delete(pool: &SqlitePool, id: String) -> Result<(), anyhow::Error> {
-        sqlx::query!(
+    pub async fn delete(
+        pool: &SqlitePool,
+        dto: DeleteRequestHistoryDto,
+    ) -> Result<(), anyhow::Error> {
+        if dto.id.is_none() && dto.endpoint_id.is_none() {
+            return Err(anyhow::Error::msg(
+                "Either id or endpoint_id must be provided",
+            ));
+        }
+
+        let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(
             r#"
-            DELETE FROM request_history WHERE id = ?
+            DELETE FROM request_history WHERE
             "#,
-            id
-        )
-        .execute(pool)
-        .await?;
+        );
+        let mut separated = builder.separated(" AND ");
+
+        if let Some(id) = &dto.id {
+            separated.push("id = ");
+            separated.push_bind(id);
+        }
+        if let Some(endpoint_id) = &dto.endpoint_id {
+            separated.push("endpoint_id = ");
+            separated.push_bind(endpoint_id);
+        }
+
+        let query = builder.build();
+        let result = query.execute(pool).await?;
+
+        if result.rows_affected() == 0 {
+            return Err(anyhow::Error::msg("No record found matching the criteria"));
+        }
 
         Ok(())
     }
