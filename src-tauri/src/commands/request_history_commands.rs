@@ -40,3 +40,11 @@ pub async fn update_request_history(
         .await
         .map_err(|e| e.to_string())
 }
+
+#[command]
+pub async fn delete_request_history(app_handle: AppHandle, id: String) -> Result<(), String> {
+    let pool = app_handle.state::<SqlitePool>();
+    RequestHistoryRepository::delete(&pool, id)
+        .await
+        .map_err(|e| e.to_string())
+}

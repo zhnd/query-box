@@ -48,6 +48,7 @@ macro_rules! app_commands {
             commands::get_all_request_histories,
             commands::create_request_history,
             commands::update_request_history,
+            commands::delete_request_history,
         ]
     };
 }

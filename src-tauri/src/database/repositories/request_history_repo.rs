@@ -1,4 +1,4 @@
-use sqlx::SqlitePool;
+use sqlx::{QueryBuilder, Sqlite, SqlitePool};
 use uuid::Uuid;
 
 use crate::{
@@ -12,9 +12,11 @@ impl RequestHistoryRepository {
     pub async fn find_all(
         pool: &SqlitePool,
         endpoint_id: String,
-    ) -> Result<Vec<RequestHistory>, sqlx::Error> {
+    ) -> Result<Vec<RequestHistory>, anyhow::Error> {
         let rows: Vec<RequestHistoryRow> = sqlx::query_as::<_, RequestHistoryRow>(
-            "SELECT * FROM request_history WHERE endpoint_id = ? ORDER BY created_at DESC",
+            r#"
+            SELECT * FROM request_history WHERE endpoint_id = ? ORDER BY created_at DESC
+            "#,
         )
         .bind(endpoint_id)
         .fetch_all(pool)
@@ -85,32 +87,54 @@ impl RequestHistoryRepository {
         dto: UpdateRequestHistoryDto,
     ) -> Result<RequestHistory, anyhow::Error> {
         let mut tx = pool.begin().await?;
-
-        let method_str = dto
-            .method
-            .as_ref()
-            .map(|m| m.to_string())
-            .unwrap_or_else(|| "GET".to_string());
-
-        sqlx::query!(
+        let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(
             r#"
             UPDATE request_history SET
-                name = ?,
-                method = ?,
-                headers = ?,
-                body = ?,
-                query = ?
-            WHERE id = ?
             "#,
-            dto.name,
-            method_str,
-            dto.headers,
-            dto.body,
-            dto.query,
-            dto.id,
-        )
-        .execute(&mut *tx)
-        .await?;
+        );
+
+        let mut separated = builder.separated(", ");
+        let mut update_field_count = 0;
+
+        if let Some(name) = &dto.name {
+            separated.push("name = ");
+            separated.push_bind(name);
+            update_field_count += 1;
+        }
+
+        if let Some(method) = &dto.method {
+            separated.push("method = ");
+            separated.push_bind(method.to_string());
+            update_field_count += 1;
+        }
+
+        if let Some(headers) = &dto.headers {
+            separated.push("headers = ");
+            separated.push_bind(headers);
+            update_field_count += 1;
+        }
+
+        if let Some(body) = &dto.body {
+            separated.push("body = ");
+            separated.push_bind(body);
+            update_field_count += 1;
+        }
+
+        if let Some(query) = &dto.query {
+            separated.push("query = ");
+            separated.push_bind(query);
+            update_field_count += 1;
+        }
+
+        if update_field_count == 0 {
+            return Err(anyhow::Error::msg("No fields to update"));
+        }
+
+        builder.push(" WHERE id = ");
+        builder.push_bind(&dto.id);
+
+        let query = builder.build();
+        query.execute(&mut *tx).await?;
 
         let request_history_row =
             sqlx::query_as::<_, RequestHistoryRow>(r#"SELECT * FROM request_history WHERE id = ?"#)
@@ -121,5 +145,18 @@ impl RequestHistoryRepository {
         tx.commit().await?;
 
         RequestHistory::try_from(request_history_row).map_err(|e| anyhow::Error::msg(e.to_string()))
+    }
+
+    pub async fn delete(pool: &SqlitePool, id: String) -> Result<(), anyhow::Error> {
+        sqlx::query!(
+            r#"
+            DELETE FROM request_history WHERE id = ?
+            "#,
+            id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
     }
 }
