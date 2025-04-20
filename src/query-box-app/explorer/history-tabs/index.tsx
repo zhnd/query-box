@@ -7,10 +7,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { ChevronRight, MoreHorizontal, Plus, X } from 'lucide-react'
-import { useTabBarService } from './use-service'
+import { useRequestHistoryTabsService } from './use-service'
 
-export function TabBar() {
-  const service = useTabBarService()
+export function RequestHistoryTabs() {
+  const service = useRequestHistoryTabsService()
 
   return (
     <div className="tab-bar flex flex-row gap-2 items-center border-b">
@@ -18,24 +18,28 @@ export function TabBar() {
         className="flex-1 flex space-x-4 min-w-0 overflow-x-auto scrollbar-hide"
         ref={service.tabsContainerRef}
       >
-        {service.tabs.map((tab) => (
+        {service.requestHistories.map((record, index) => (
           <div
-            key={tab.id}
-            data-tab-id={tab.id}
+            key={record.id}
+            data-tab-id={record.id}
             onClick={() => {
-              service.handleActiveTabChange(tab.id)
+              service.handleActiveTabChange(record.id)
             }}
             className={cn(
               'flex items-center shrink-0 cursor-pointer gap-2 group p-1 box-border border-b-2 border-transparent hover:border-b-primary',
-              service.activeTabId === tab.id ? 'border-b-primary' : ''
+              service.activeRequestHistory?.id === record.id
+                ? 'border-b-primary'
+                : ''
             )}
           >
-            <span className="truncate flex-1 text-xs">{tab.name}</span>
+            <span className="truncate flex-1 text-xs">
+              {record.name ?? `Request ${index + 1}`}
+            </span>
             <Button
               variant="ghost"
               size="icon"
               className="flex items-center cursor-pointer w-5 h-5"
-              onClick={() => service.removeTab(tab.id)}
+              onClick={() => service.handleDeleteRequestHistory(record.id)}
             >
               <X />
               <span className="sr-only">Close tab</span>
@@ -48,7 +52,7 @@ export function TabBar() {
           variant="ghost"
           size="icon"
           className="h-6 w-6 mr-1"
-          onClick={service.addTab}
+          onClick={service.handleAddRequestHistory}
         >
           <Plus />
           <span className="sr-only">Add tab</span>
@@ -62,12 +66,12 @@ export function TabBar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            {service.tabs.map((tab) => (
+            {service.requestHistories.map((record) => (
               <DropdownMenuItem
-                key={tab.id}
-                onClick={() => service.handleActiveTabChange(tab.id)}
+                key={record.id}
+                onClick={() => service.handleActiveTabChange(record.id)}
               >
-                {tab.name}
+                {record.name}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -81,7 +85,7 @@ export function TabBar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={service.closeAllTabs}>
+            <DropdownMenuItem onClick={service.handleDeleteAllRequestHistories}>
               Close all tabs
             </DropdownMenuItem>
           </DropdownMenuContent>
