@@ -100,32 +100,29 @@ impl RequestHistoryRepository {
         let mut update_field_count = 0;
 
         if let Some(name) = &dto.name {
-            separated.push("name = ");
-            separated.push_bind(name);
+            separated.push("name = ").push_bind_unseparated(name);
             update_field_count += 1;
         }
 
         if let Some(method) = &dto.method {
-            separated.push("method = ");
-            separated.push_bind(method.to_string());
+            separated
+                .push("method = ")
+                .push_bind_unseparated(method.to_string());
             update_field_count += 1;
         }
 
         if let Some(headers) = &dto.headers {
-            separated.push("headers = ");
-            separated.push_bind(headers);
+            separated.push("headers = ").push_bind_unseparated(headers);
             update_field_count += 1;
         }
 
         if let Some(body) = &dto.body {
-            separated.push("body = ");
-            separated.push_bind(body);
+            separated.push("body = ").push_bind_unseparated(body);
             update_field_count += 1;
         }
 
         if let Some(query) = &dto.query {
-            separated.push("query = ");
-            separated.push_bind(query);
+            separated.push("query = ").push_bind_unseparated(query);
             update_field_count += 1;
         }
 
@@ -139,11 +136,14 @@ impl RequestHistoryRepository {
         let query = builder.build();
         query.execute(&mut *tx).await?;
 
-        let request_history_row =
-            sqlx::query_as::<_, RequestHistoryRow>(r#"SELECT * FROM request_history WHERE id = ?"#)
-                .bind(&dto.id)
-                .fetch_one(&mut *tx) // Changed from pool to &mut *tx
-                .await?;
+        let request_history_row = sqlx::query_as::<_, RequestHistoryRow>(
+            r#"
+                SELECT * FROM request_history WHERE id = ?
+                "#,
+        )
+        .bind(&dto.id)
+        .fetch_one(&mut *tx) // Changed from pool to &mut *tx
+        .await?;
 
         tx.commit().await?;
 
