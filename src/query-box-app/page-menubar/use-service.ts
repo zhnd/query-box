@@ -9,8 +9,12 @@ export const usePageMenubarService = () => {
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false)
 
   const { activeItemKey } = useAppSidebarMenuStore()
-  const { selectedEndpoints } = useEndpointSelectedStateStore()
-  const { setSelectedEndpoint } = useEndpointSelectedStateStore()
+  const selectedEndpoint = useEndpointSelectedStateStore(
+    (state) => state.currentPageSelectedEndpoint
+  )
+  const setSelectedEndpoint = useEndpointSelectedStateStore(
+    (state) => state.setSelectedEndpoint
+  )
 
   const { data: endpointsData } = useQuery({
     queryKey: ['endpoints'],
@@ -30,14 +34,10 @@ export const usePageMenubarService = () => {
   const showEndpointSelector =
     activeAppSidebarMenuItem?.key !== AppSidebarMenuItemKeys.ENDPOINT
 
-  const selectedEndpoint = endpointsData?.items.find(
-    (endpoint) => endpoint.id === selectedEndpoints?.[activeItemKey]
-  )
-
   const updateEndpointId = (value: string) => {
     setSelectedEndpoint({
       menuItem: activeItemKey,
-      endpointId: value,
+      endpoint: endpointsData?.items.find((item) => item.id === value) ?? null,
     })
     setPopoverOpen(false)
   }

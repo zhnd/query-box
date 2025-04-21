@@ -23,13 +23,12 @@ tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1.0.140"
 reqwest = {version = "0.12.12", features = ["json"] }
-tauri-plugin-sql = { version = "2", features = ["sqlite"] }
-sqlx = {version = "0.8.3", features = ["sqlite"] }
+sqlx = {version = "0.8.3", features = ["sqlite", "runtime-tokio"] }
 tokio = { version = "1.44.0", features = ["full"] }
 tauri-plugin-fs = "2"
 tauri-plugin-os = "2"
 typeshare = { version = "1.0.4" }
 uuid = { version = "1.16.0" }
-chrono = { version = "0.4", features = ["serde"] }
 strum = {version = "0.27" }
 strum_macros = { version = "0.27" }
+anyhow = "1.0.98"

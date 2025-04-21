@@ -172,7 +172,7 @@ export function TabsContainer({
           {activeTab ? (
             <ResizablePanelGroup direction={'horizontal'}>
               <ResizablePanel defaultSize={50} minSize={30}>
-                <QueryEditor />
+                <QueryEditor endpointUrl="" />
               </ResizablePanel>
               <ResizableHandle />
               <ResizablePanel defaultSize={50} minSize={30}>

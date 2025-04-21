@@ -16,7 +16,16 @@ import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
 import { QUERY_EXAMPLE } from './constants'
 
-export function useService() {
+export interface QueryEditorProps {
+  endpointUrl: string
+  initialValue?: string
+  value?: string
+  onChange?: (value: string) => void
+}
+
+export function useService(props: QueryEditorProps) {
+  const { onChange, initialValue, value, endpointUrl } = props
+
   const editorContainerElementRef = useRef<HTMLDivElement>(null)
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
     null
@@ -32,8 +41,7 @@ export function useService() {
     monaco.editor.defineTheme('github-light', githubLightTheme)
     monaco.editor.defineTheme('github-dark', githubDarkTheme)
 
-    const defaultOperations =
-      localStorage.getItem('operations') ?? QUERY_EXAMPLE
+    const defaultOperations = initialValue || QUERY_EXAMPLE
 
     const getOrCreateModel = (uri: string, value: string) => {
       return (
@@ -46,7 +54,7 @@ export function useService() {
 
     queryModel.onDidChangeContent(
       debounce(() => {
-        console.log('content changed', queryModel.getValue())
+        onChange?.(queryModel.getValue())
       }, 600)
     )
 
@@ -112,7 +120,9 @@ export function useService() {
       },
       schemas: [
         {
-          schema: await getSchema(),
+          schema: await getSchema({
+            endpointUrl,
+          }),
           uri: 'myschema.graphql',
         },
       ],
@@ -139,13 +149,21 @@ export function useService() {
     })
   }, [resolvedThemeMode])
 
+  useEffect(() => {
+    const currentValue = editorInstanceRef.current?.getValue()
+    if (currentValue === value) return
+    editorInstanceRef.current?.setValue(value ?? '')
+  }, [value])
+
   return { editorContainerElementRef }
 }
 
-async function getSchema(): Promise<GraphQLSchema> {
+async function getSchema(params: {
+  endpointUrl: string
+}): Promise<GraphQLSchema> {
+  const { endpointUrl } = params
   const fetcher = createGraphiQLFetcher({
-    url: 'https://countries.trevorblades.com',
-    // Add WebSocket options or disable subscriptions
+    url: endpointUrl,
   })
 
   const data = await fetcher({

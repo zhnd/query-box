@@ -7,12 +7,14 @@
     // words - list of words to be always considered correct
     "words": [
         "githubusercontent",
+        "graphiql",
         "mkdirp",
         "sqlx",
         "streetsidesoftware",
         "tauri",
         "tsmerge",
         "typeshare",
+        "unseparated",
         "visualstudio",
         "vsmarketplacebadge"
     ],
