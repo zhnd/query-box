@@ -26,8 +26,6 @@ export const useRequestHistoryTabsService = () => {
     (state) => state.currentPageSelectedEndpoint
   )
 
-  console.log('selectedEndpoint', selectedEndpoint)
-
   const createEmptyRequestHistory = async () => {
     return await RequestHistoryBridge.createRequestHistory({
       endpoint_id: selectedEndpoint?.id ?? '',
@@ -46,7 +44,6 @@ export const useRequestHistoryTabsService = () => {
       await RequestHistoryBridge.listRequestHistories({
         endpoint_id: selectedEndpoint?.id ?? '',
       })
-    console.log('initialRequestHistories', initialRequestHistories)
     if (initialRequestHistories.length === 0) {
       await handleAddRequestHistory()
       return

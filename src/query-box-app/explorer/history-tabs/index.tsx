@@ -66,12 +66,12 @@ export function RequestHistoryTabs() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            {service.requestHistories.map((record) => (
+            {service.requestHistories.map((record, index) => (
               <DropdownMenuItem
                 key={record.id}
                 onClick={() => service.handleActiveTabChange(record.id)}
               >
-                {record.name}
+                {record.name ?? `Request ${index + 1}`}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

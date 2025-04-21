@@ -10,7 +10,6 @@ import { useExplorerService } from './use-explorer-sevice'
 
 export function Explorer() {
   const service = useExplorerService()
-  console.log('Explorer', service.response)
   return (
     <div className="explorer flex-1 flex flex-col">
       <RequestHistoryTabs />

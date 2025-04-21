@@ -5,6 +5,11 @@ import { useRequestService } from './use-service'
 
 export function Request() {
   const service = useRequestService()
+
+  if (!service.activeRequestHistory || !service.currentPageSelectedEndpoint) {
+    return null
+  }
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center px-2 py-1 border-b">
@@ -13,14 +18,19 @@ export function Request() {
         <Button
           variant="outline"
           className="cursor-pointer"
-          onClick={service.request}
+          onClick={service.handleSendRequest}
           disabled={service.isPending}
         >
           {service.isPending ? <Loader2 className="animate-spin" /> : null}
           Run
         </Button>
       </div>
-      <QueryEditor onChange={service.setQuery} />
+      <QueryEditor
+        onChange={service.handleQueryUpdate}
+        endpointUrl={service.currentPageSelectedEndpoint.url ?? ''}
+        initialValue={service.activeRequestHistory.query ?? ''}
+        value={service.activeRequestHistory.query ?? ''}
+      />
     </div>
   )
 }

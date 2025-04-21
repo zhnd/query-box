@@ -1,4 +1,4 @@
-import { GraphQLBridge } from '@/bridges'
+import { GraphQLBridge, RequestHistoryBridge } from '@/bridges'
 import {
   useEndpointSelectedStateStore,
   useGraphQLExplorerPageStore,
@@ -6,9 +6,19 @@ import {
 import { useMutation } from '@tanstack/react-query'
 
 export const useRequestService = () => {
-  const setQuery = useGraphQLExplorerPageStore((state) => state.setQuery)
+  const activeRequestHistory = useGraphQLExplorerPageStore(
+    (state) => state.activeRequestHistory
+  )
+
+  const setActiveRequestHistory = useGraphQLExplorerPageStore(
+    (state) => state.setActiveRequestHistory
+  )
+
+  const setRequestHistories = useGraphQLExplorerPageStore(
+    (state) => state.setRequestHistories
+  )
+
   const setResponse = useGraphQLExplorerPageStore((state) => state.setResponse)
-  const query = useGraphQLExplorerPageStore((state) => state.query)
   const currentPageSelectedEndpoint = useEndpointSelectedStateStore(
     (state) => state.currentPageSelectedEndpoint
   )
@@ -20,16 +30,55 @@ export const useRequestService = () => {
     },
   })
 
-  const request = async () => {
-    mutate({
-      endpoint: currentPageSelectedEndpoint?.url ?? '',
+  const {
+    mutate: updateRequestHistoryMutate,
+    isPending: isRequestHistoryUpdating,
+  } = useMutation({
+    mutationFn: RequestHistoryBridge.updateRequestHistory,
+    onSuccess: (data) => {
+      setActiveRequestHistory(data)
+
+      const requestHistories = useGraphQLExplorerPageStore
+        .getState()
+        .requestHistories.map((item) => {
+          if (item.id === data.id) {
+            return {
+              ...item,
+              query: data.query,
+            }
+          }
+          return item
+        })
+
+      setRequestHistories(requestHistories)
+    },
+  })
+
+  const handleQueryUpdate = (query: string) => {
+    // monaco editor will trigger this function when the query is updated
+    // QueryEditor props.onChange function has been memoized
+    // so cannot get the latest state of activeRequestHistory
+    // should read latest state from zustand store
+    const latestActiveRequestHistory =
+      useGraphQLExplorerPageStore.getState().activeRequestHistory
+    updateRequestHistoryMutate({
+      id: latestActiveRequestHistory?.id ?? '',
       query,
     })
   }
 
+  const handleSendRequest = async () => {
+    mutate({
+      endpoint: currentPageSelectedEndpoint?.url ?? '',
+      query: activeRequestHistory?.query ?? '',
+    })
+  }
+
   return {
-    request,
-    setQuery,
-    isPending,
+    currentPageSelectedEndpoint,
+    isPending: isPending || isRequestHistoryUpdating,
+    activeRequestHistory,
+    handleSendRequest,
+    handleQueryUpdate,
   }
 }
