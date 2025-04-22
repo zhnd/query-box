@@ -1,4 +1,4 @@
-use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePool};
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePool};
 use std::{fs::create_dir_all, str::FromStr};
 use tauri::{AppHandle, Manager};
 
@@ -8,16 +8,20 @@ pub async fn initialize_db(app_handle: &AppHandle) -> Result<(), Box<dyn std::er
         .app_local_data_dir()
         .expect("Could not get app data directory");
 
-    create_dir_all(&app_data_dir).expect("Could not create app data directory");
+    if let Err(e) = create_dir_all(&app_data_dir) {
+        eprintln!("Error creating app data directory: {}", e);
+        return Err(Box::new(e));
+    }
     let db_path = app_data_dir.join("app.sqlite");
 
     let connection_string = format!("sqlite:{}", db_path.to_string_lossy());
 
-    let opts = SqliteConnectOptions::from_str(&connection_string)?
-        .journal_mode(SqliteJournalMode::Wal)
-        .create_if_missing(true);
+    let opts = SqliteConnectOptions::from_str(&connection_string)?.create_if_missing(true);
 
-    let pool = SqlitePool::connect_with(opts).await?;
+    let pool = SqlitePool::connect_with(opts).await.map_err(|e| {
+        eprintln!("Error connecting to database: {}", e);
+        e
+    })?;
 
     app_handle.manage(pool);
     println!("Database connection established successfully");
