@@ -74,7 +74,7 @@ export function OverflowTooltip({
             {text}
           </div>
         </TooltipTrigger>
-        <TooltipContent className="max-w-64">
+        <TooltipContent className="max-w-64 break-words">
           {tooltipContent || text}
         </TooltipContent>
       </Tooltip>
