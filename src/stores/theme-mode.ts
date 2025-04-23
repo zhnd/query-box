@@ -83,7 +83,7 @@ export const useThemeModeStore = create<ThemeModeStore>()(
   )
 )
 
-export const getCurrentSystemThemeMode = (): UIResolvedUIThemeMode => {
+const getCurrentSystemThemeMode = (): UIResolvedUIThemeMode => {
   return window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light'
