@@ -1,3 +1,4 @@
+import { OverflowTooltip } from '@/components/overflow-tooltip'
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -35,9 +36,13 @@ export function PageMenubar() {
               >
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-64 justify-between">
-                    {service.selectedEndpoint
-                      ? service.selectedEndpoint.name
-                      : 'Select Endpoint'}
+                    <OverflowTooltip
+                      text={
+                        service.selectedEndpoint
+                          ? service.selectedEndpoint.name
+                          : 'Select Endpoint'
+                      }
+                    />
                     <ChevronsUpDown className="opacity-50" />
                   </Button>
                 </PopoverTrigger>
