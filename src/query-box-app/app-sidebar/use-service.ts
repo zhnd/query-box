@@ -33,8 +33,6 @@ export const useAppSidebarService = () => {
     }
   }, [appSidebarCollapsed])
 
-  console.log('activeItemKey', activeItemKey)
-
   return {
     activeItemKey,
     updateActiveAppSidebarMenuItemKey,

@@ -67,8 +67,6 @@ export const useCreateEndpointService = () => {
   }
 
   const testConnection = async () => {
-    const values = form.getValues()
-    console.log('Testing connection:', values)
     setTestStatus('loading')
     try {
       // Mock API call - replace with actual implementation
