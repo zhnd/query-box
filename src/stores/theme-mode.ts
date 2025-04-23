@@ -74,8 +74,9 @@ export const useThemeModeStore = create<ThemeModeStore>()(
       onRehydrateStorage: () => (state) => {
         setupSystemThemeListener()
         if (state) {
-          const { resolvedThemeMode } = syncThemeModeToDom(state.themeMode)
-          useThemeModeStore.setState({ resolvedThemeMode })
+          const themeMode = state.themeMode || 'system'
+          const { resolvedThemeMode } = syncThemeModeToDom(themeMode)
+          useThemeModeStore.setState({ resolvedThemeMode, themeMode })
         }
       },
     }
