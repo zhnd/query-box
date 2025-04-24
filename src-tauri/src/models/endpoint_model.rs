@@ -59,6 +59,7 @@ impl CreateEndpointDto {
 #[typeshare]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UpdateEndpointDto {
+    pub id: String,
     /// Updated display name
     pub name: Option<String>,
     /// Updated description
@@ -73,10 +74,30 @@ pub struct UpdateEndpointDto {
     pub config: Option<EndpointConfig>,
     /// Updated custom HTTP headers
     pub headers: Option<Json<serde_json::Value>>,
-    /// Updated tags for categorizing and filtering endpoints
-    pub tags: Option<Vec<String>>,
-    /// Updated favorite status
-    pub favorite: Option<bool>,
+}
+
+impl UpdateEndpointDto {
+    pub fn status_str(&self) -> String {
+        self.status
+            .as_ref()
+            .map(|status| status.to_string())
+            .unwrap_or_default()
+    }
+    pub fn auth_str(&self) -> Option<String> {
+        self.auth
+            .as_ref()
+            .map(|auth| serde_json::to_string(auth).unwrap_or_default())
+    }
+    pub fn config_str(&self) -> Option<String> {
+        self.config
+            .as_ref()
+            .map(|config| serde_json::to_string(config).unwrap_or_default())
+    }
+    pub fn headers_str(&self) -> Option<String> {
+        self.headers
+            .as_ref()
+            .map(|headers| serde_json::to_string(headers).unwrap_or_default())
+    }
 }
 
 #[typeshare]
