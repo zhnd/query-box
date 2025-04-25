@@ -1,6 +1,7 @@
 import { CreateEndpoint } from './create'
 import { EndpointList } from './list'
 import { SearchEndpoint } from './search'
+import { UpdateEndpoint } from './update'
 
 export function Endpoint() {
   return (
@@ -8,6 +9,7 @@ export function Endpoint() {
       <SearchEndpoint />
       <EndpointList />
       <CreateEndpoint />
+      <UpdateEndpoint />
     </div>
   )
 }

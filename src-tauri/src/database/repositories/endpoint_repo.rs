@@ -1,7 +1,7 @@
 use crate::database::entities::endpoint_entity::{Endpoint, EndpointRow};
 use crate::models::common::pagination::{PaginatedResponse, PaginationParams};
-use crate::models::endpoint_model::{CreateEndpointDto, EndpointFilter};
-use sqlx::{Row, SqlitePool};
+use crate::models::endpoint_model::{CreateEndpointDto, EndpointFilter, UpdateEndpointDto};
+use sqlx::{Execute, QueryBuilder, Row, Sqlite, SqlitePool};
 use uuid::Uuid;
 
 pub struct EndpointRepository;
@@ -174,6 +174,66 @@ impl EndpointRepository {
             Err(e) => {
                 eprintln!("Error converting endpoint row: {}", e);
                 Err(sqlx::Error::RowNotFound)
+            }
+        }
+    }
+
+    pub async fn update(
+        pool: &SqlitePool,
+        dto: UpdateEndpointDto,
+    ) -> Result<Endpoint, anyhow::Error> {
+        let mut tx = pool.begin().await?;
+        let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(
+            r#"
+            UPDATE endpoint SET
+            "#,
+        );
+
+        let mut separated = builder.separated(", ");
+        let mut update_field_count = 0;
+
+        let fields: [(&str, Option<String>); 7] = [
+            ("name", dto.name.clone()),
+            ("description", dto.description.clone()),
+            ("url", dto.url.clone()),
+            ("status", dto.status.as_ref().map(|_| dto.status_str())),
+            ("auth", dto.auth.as_ref().and_then(|_| dto.auth_str())),
+            ("config", dto.config.as_ref().and_then(|_| dto.config_str())),
+            (
+                "headers",
+                dto.headers.as_ref().and_then(|_| dto.headers_str()),
+            ),
+        ];
+
+        for (col, val) in fields.iter() {
+            if let Some(v) = val {
+                separated.push(format!("{col} = ")).push_bind_unseparated(v);
+                update_field_count += 1;
+            }
+        }
+
+        if update_field_count == 0 {
+            return Err(anyhow::anyhow!("No fields to update"));
+        }
+
+        separated
+            .push_unseparated(" WHERE id = ")
+            .push_bind_unseparated(&dto.id);
+
+        let query = builder.build();
+        query.execute(&mut *tx).await?;
+
+        let endpoint_row = sqlx::query_as::<_, EndpointRow>("SELECT * FROM endpoint WHERE id = ?")
+            .bind(&dto.id)
+            .fetch_one(&mut *tx)
+            .await?;
+
+        tx.commit().await?;
+
+        match Endpoint::try_from(endpoint_row) {
+            Ok(endpoint) => Ok(endpoint),
+            Err(e) => {
+                anyhow::bail!(e.to_string());
             }
         }
     }

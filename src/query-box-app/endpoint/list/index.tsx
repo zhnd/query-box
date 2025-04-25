@@ -38,12 +38,12 @@ export function EndpointList() {
       meta: {
         className: 'w-[80px]',
       },
-      cell: () => (
+      cell: ({ row }) => (
         <DataTableRowActions
           actions={[
             {
               label: 'Edit',
-              onClick: () => {},
+              onClick: () => service.openUpdateDialog(row.original),
             },
             {
               label: 'Delete',
