@@ -3184,6 +3184,7 @@ name = "query-box"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "once_cell",
  "reqwest",
  "serde",
  "serde_json",

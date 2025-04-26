@@ -1,7 +1,9 @@
-use reqwest::{Client, Method};
+use reqwest::Method;
 use serde_json::Value;
 use std::collections::HashMap;
 use tauri::command;
+
+use crate::common::http_client::HTTP_CLIENT;
 
 #[derive(serde::Serialize)]
 struct GraphQLRequestBody {
@@ -44,9 +46,8 @@ pub async fn send_graphql_request(
         m => return Err(format!("Unsupported method: {}", m)),
     };
 
-    // Initialize an HTTP client and build the base request with default headers.
     // "Content-Type" and "Accept" are set to "application/json" for GraphQL compatibility.
-    let client = Client::new();
+    let client = &*HTTP_CLIENT;
     let mut request = client
         .request(method.clone(), endpoint)
         .header("Content-Type", "application/json")
