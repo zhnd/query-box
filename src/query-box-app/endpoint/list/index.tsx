@@ -47,7 +47,7 @@ export function EndpointList() {
             },
             {
               label: 'Delete',
-              onClick: () => {},
+              onClick: () => service.openDeleteDialog(row.original),
             },
           ]}
         />

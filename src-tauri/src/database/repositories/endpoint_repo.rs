@@ -1,6 +1,8 @@
 use crate::database::entities::endpoint_entity::{Endpoint, EndpointRow};
 use crate::models::common::pagination::{PaginatedResponse, PaginationParams};
-use crate::models::endpoint_model::{CreateEndpointDto, EndpointFilter, UpdateEndpointDto};
+use crate::models::endpoint_model::{
+    CreateEndpointDto, DeleteEndpointDto, EndpointFilter, UpdateEndpointDto,
+};
 use sqlx::{QueryBuilder, Row, Sqlite, SqlitePool};
 use uuid::Uuid;
 
@@ -236,5 +238,12 @@ impl EndpointRepository {
                 anyhow::bail!(e.to_string());
             }
         }
+    }
+
+    pub async fn delete(pool: &SqlitePool, dto: DeleteEndpointDto) -> Result<(), anyhow::Error> {
+        sqlx::query!("DELETE FROM endpoint WHERE id = ?", dto.id)
+            .execute(pool)
+            .await?;
+        Ok(())
     }
 }
