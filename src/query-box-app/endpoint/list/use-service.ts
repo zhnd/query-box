@@ -24,13 +24,23 @@ export const useEndpointListService = () => {
   const setUpdateDialogOpen = useEndpointPageStore(
     (state) => state.setUpdateDialogOpen
   )
-  const setOperateEndpointId = useEndpointPageStore(
-    (state) => state.setOperateId
+
+  const setDeleteDialogOpen = useEndpointPageStore(
+    (state) => state.setDeleteDialogOpen
+  )
+
+  const setOperateEndpoint = useEndpointPageStore(
+    (state) => state.setOperateEndpoint
   )
 
   const openUpdateDialog = (endpoint: Endpoint) => {
     setUpdateDialogOpen(true)
-    setOperateEndpointId(endpoint.id)
+    setOperateEndpoint(endpoint)
+  }
+
+  const openDeleteDialog = (endpoint: Endpoint) => {
+    setDeleteDialogOpen(true)
+    setOperateEndpoint(endpoint)
   }
 
   return {
@@ -38,5 +48,6 @@ export const useEndpointListService = () => {
     pagination,
     onPaginationChange: setPagination,
     openUpdateDialog,
+    openDeleteDialog,
   }
 }

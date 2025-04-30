@@ -1,5 +1,6 @@
 import {
   CreateEndpointDto,
+  DeleteEndpointDto,
   Endpoint,
   EndpointFilter,
   PaginatedResponse,
@@ -48,6 +49,17 @@ export class EndpointBridge {
       })
     } catch (error) {
       console.error('Failed to update endpoint:', error)
+      throw error
+    }
+  }
+
+  static async deleteEndpoint(dto: DeleteEndpointDto): Promise<void> {
+    try {
+      return await invoke<void>('delete_endpoint', {
+        dto,
+      })
+    } catch (error) {
+      console.error('Failed to delete endpoint:', error)
       throw error
     }
   }

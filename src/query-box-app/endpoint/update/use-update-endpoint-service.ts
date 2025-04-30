@@ -12,9 +12,9 @@ import {
 } from './update-endpoint-lib'
 
 export const useUpdateEndpointService = () => {
-  const endpointId = useEndpointPageStore((state) => state.operateId)
-  const setOperateEndpointId = useEndpointPageStore(
-    (state) => state.setOperateId
+  const operateEndpoint = useEndpointPageStore((state) => state.operateEndpoint)
+  const setOperateEndpoint = useEndpointPageStore(
+    (state) => state.setOperateEndpoint
   )
   const updateDialogOpen = useEndpointPageStore(
     (state) => state.updateDialogOpen
@@ -26,8 +26,8 @@ export const useUpdateEndpointService = () => {
   )
 
   const { data: endpoint } = useQuery({
-    queryKey: ['endpoint', endpointId],
-    queryFn: () => EndpointBridge.getEndpointById(endpointId ?? ''),
+    queryKey: ['endpoint', operateEndpoint?.id],
+    queryFn: () => EndpointBridge.getEndpointById(operateEndpoint?.id ?? ''),
   })
 
   const mutation = useMutation({
@@ -35,7 +35,7 @@ export const useUpdateEndpointService = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['endpoints'] })
       setUpdateDialogOpen(false)
-      setOperateEndpointId(null)
+      setOperateEndpoint(null)
     },
   })
 
@@ -57,7 +57,7 @@ export const useUpdateEndpointService = () => {
 
   const onSubmit = async (values: FormValues) => {
     mutation.mutate({
-      id: endpointId ?? '',
+      id: operateEndpoint?.id ?? '',
       name: values.name,
       url: values.url,
       headers: values.headers && JSON.stringify(values.headers),
