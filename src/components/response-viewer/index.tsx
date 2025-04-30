@@ -42,10 +42,15 @@ export function ResponseViewer(props: ResponseViewerProps) {
       </div>
 
       <div className="flex-1 overflow-auto">
-        {service.activeView === ResponseViewType.BODY ? (
-          <JsonViewer data={data} />
+        {!data ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <p>No response yet.</p>
+            <p>Please send a network request.</p>
+          </div>
+        ) : service.activeView === ResponseViewType.BODY ? (
+          <JsonViewer value={data} />
         ) : (
-          <JsonViewer data={data} />
+          <JsonViewer value={data} />
         )}
       </div>
     </div>
