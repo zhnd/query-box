@@ -4,11 +4,11 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { useEffect, useRef } from 'react'
 
 export interface JsonViewerProps {
-  data?: string
+  value?: string
 }
 
 export const useJsonViewerService = (props: JsonViewerProps) => {
-  const { data } = props
+  const { value } = props
   const viewContainerElementRef = useRef<HTMLDivElement>(null)
 
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
@@ -18,7 +18,7 @@ export const useJsonViewerService = (props: JsonViewerProps) => {
 
   const { resolvedThemeMode } = useThemeModeStore()
 
-  const init = async () => {
+  const init = () => {
     if (
       !viewContainerElementRef.current ||
       editorInstanceRef.current ||
@@ -30,18 +30,13 @@ export const useJsonViewerService = (props: JsonViewerProps) => {
     monaco.editor.defineTheme('github-light', githubLightTheme)
     monaco.editor.defineTheme('github-dark', githubDarkTheme)
 
+    // compute the initial value
+    const initialValue = formatJsonString(value)
+
     const editorInstance = monaco.editor.create(
       viewContainerElementRef.current,
       {
-        value: JSON.stringify(
-          {
-            name: 'GraphQL',
-            description: 'GraphQL API',
-            url: 'https://api.example.com/graphql',
-          },
-          null,
-          '\t'
-        ),
+        value: initialValue,
         language: 'json',
         readOnly: true,
         wordWrap: 'on',
@@ -62,7 +57,19 @@ export const useJsonViewerService = (props: JsonViewerProps) => {
     )
 
     editorInstanceRef.current = editorInstance
-    initializingRef.current = false
+
+    // check if the editor is initialized and layout is done
+    // if not, wait for the layout to be done
+    // and then set the initializingRef to false
+    const disposable = editorInstance.onDidLayoutChange(() => {
+      initializingRef.current = false
+
+      // dispose the event listener to avoid memory leaks
+      // and to avoid multiple calls to this function
+      // when the editor is resized or when the layout is changed
+      // this will be called only once when the editor is initialized
+      disposable.dispose()
+    })
   }
 
   useEffect(() => {
@@ -83,29 +90,38 @@ export const useJsonViewerService = (props: JsonViewerProps) => {
   }, [resolvedThemeMode])
 
   useEffect(() => {
-    if (editorInstanceRef.current && data) {
-      try {
-        // 如果 data 是 JSON 字符串，尝试格式化它
-        let formattedData = data
-        try {
-          const jsonObject = JSON.parse(data)
-          formattedData = JSON.stringify(jsonObject, null, '\t')
-        } catch {
-          // 如果解析失败，使用原始数据
-        }
+    // if the editor is not initialized or if it is still initializing, return
+    // this will avoid multiple calls to this function
+    if (!editorInstanceRef.current || initializingRef.current) return
 
-        // 使用 setValue 更新编辑器内容
-        editorInstanceRef.current.setValue(formattedData)
+    const formattedData = formatJsonString(value)
+    const currentValue = editorInstanceRef.current?.getValue()
 
-        // 可选：重置视图位置到顶部
-        editorInstanceRef.current.revealPosition({ lineNumber: 1, column: 1 })
-      } catch (error) {
-        console.error('Failed to update editor value:', error)
-      }
-    }
-  }, [data])
+    // if the current value is the same as the formatted data, return
+    if (currentValue === formattedData) return
+
+    editorInstanceRef.current?.setValue(formattedData ?? '')
+    editorInstanceRef.current.revealPosition({ lineNumber: 1, column: 1 })
+  }, [value])
 
   return {
     viewContainerElementRef,
+  }
+}
+
+/**
+ * Formats a JSON string.
+ *
+ * @param data The JSON string to format.
+ * @returns The formatted JSON string or the original data if parsing fails.
+ */
+const formatJsonString = (data?: string) => {
+  if (!data) return ''
+  try {
+    const jsonObject = JSON.parse(data)
+    return JSON.stringify(jsonObject, null, '\t')
+  } catch (error) {
+    console.error('Failed to parse JSON:', error)
+    return data
   }
 }

@@ -1,7 +1,7 @@
 use crate::database::entities::endpoint_entity::{Endpoint, EndpointRow};
 use crate::models::common::pagination::{PaginatedResponse, PaginationParams};
 use crate::models::endpoint_model::{CreateEndpointDto, EndpointFilter, UpdateEndpointDto};
-use sqlx::{Execute, QueryBuilder, Row, Sqlite, SqlitePool};
+use sqlx::{QueryBuilder, Row, Sqlite, SqlitePool};
 use uuid::Uuid;
 
 pub struct EndpointRepository;
