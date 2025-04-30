@@ -107,3 +107,9 @@ pub struct EndpointFilter {
     pub name: Option<String>,
     pub url: Option<String>,
 }
+
+#[typeshare]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeleteEndpointDto {
+    pub id: String,
+}

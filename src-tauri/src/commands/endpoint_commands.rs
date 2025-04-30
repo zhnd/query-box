@@ -5,7 +5,7 @@ use crate::{
     database::{entities::endpoint_entity::Endpoint, repositories::EndpointRepository},
     models::{
         common::pagination::PaginatedResponse,
-        endpoint_model::{CreateEndpointDto, EndpointFilter, UpdateEndpointDto},
+        endpoint_model::{CreateEndpointDto, DeleteEndpointDto, EndpointFilter, UpdateEndpointDto},
     },
 };
 
@@ -49,6 +49,14 @@ pub async fn update_endpoint(
 ) -> Result<Endpoint, String> {
     let pool = app_handle.state::<SqlitePool>();
     EndpointRepository::update(&pool, dto)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn delete_endpoint(app_handle: AppHandle, dto: DeleteEndpointDto) -> Result<(), String> {
+    let pool = app_handle.state::<SqlitePool>();
+    EndpointRepository::delete(&pool, dto)
         .await
         .map_err(|e| e.to_string())
 }

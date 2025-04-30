@@ -46,6 +46,7 @@ macro_rules! app_commands {
             commands::get_endpoint_by_id,
             commands::create_endpoint,
             commands::update_endpoint,
+            commands::delete_endpoint,
             commands::get_all_request_histories,
             commands::create_request_history,
             commands::update_request_history,
