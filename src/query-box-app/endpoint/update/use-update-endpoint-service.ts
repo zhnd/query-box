@@ -61,7 +61,6 @@ export const useUpdateEndpointService = () => {
       name: values.name,
       url: values.url,
       headers: values.headers && JSON.stringify(values.headers),
-      favorite: false,
     })
   }
 
