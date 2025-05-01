@@ -77,7 +77,7 @@ jobs:
 
       - name: install backend dependencies
         run: |
-          cargo install sqlx-cli typeshare-cli --if-not-installed
+          cargo install sqlx-cli typeshare-cli
 
       - name: setup database for SQLx
         if: matrix.platform != 'windows-latest'
