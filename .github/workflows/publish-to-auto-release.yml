@@ -1,11 +1,9 @@
 name: 'publish'
 
-on: push
-
-# on:
-#   push:
-#     branches:
-#       - release
+on:
+  push:
+    branches:
+      - release
 
 jobs:
   publish-tauri:
