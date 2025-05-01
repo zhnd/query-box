@@ -8,16 +8,16 @@
       "outputLogs": "new-only"
     },
     "build": {
-      "dependsOn": ["^generate-types"],
+      "dependsOn": ["generate-types"],
       "inputs": ["src/"],
       "outputs": ["dist/"],
       "outputLogs": "new-only"
     },
     "lint": {
-      "dependsOn": ["^generate-types"]
+      "dependsOn": ["generate-types"]
     },
     "check-types": {
-      "dependsOn": ["^generate-types"]
+      "dependsOn": ["generate-types"]
     }
   }
 }
