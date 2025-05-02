@@ -90,8 +90,8 @@ export const useRequestHistoryTabsService = () => {
     await RequestHistoryBridge.deleteRequestHistory({
       endpoint_id: selectedEndpoint?.id ?? '',
     })
-    setRequestHistories([])
-    await handleAddRequestHistory()
+    const newRequestHistory = await createEmptyRequestHistory()
+    setRequestHistories([newRequestHistory])
   }
 
   useEffect(() => {
