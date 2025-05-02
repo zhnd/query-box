@@ -1,3 +1,4 @@
+import { CreateEndpointButton } from '@/components/create-endpoint-button'
 import { OverflowTooltip } from '@/components/overflow-tooltip'
 import { Button } from '@/components/ui/button'
 import {
@@ -28,8 +29,8 @@ export function PageMenubar() {
             {service.activeAppSidebarMenuItem?.title}
           </span>
           {service.showEndpointSelector && (
-            <>
-              <span className="px-1 text-gray-500">/</span>
+            <div className="flex items-center gap-2 ml-4">
+              <span className="text-gray-500">/</span>
               <Popover
                 open={service.popoverOpen}
                 onOpenChange={service.updatePopoverOpen}
@@ -80,7 +81,9 @@ export function PageMenubar() {
                   </Command>
                 </PopoverContent>
               </Popover>
-            </>
+
+              <CreateEndpointButton />
+            </div>
           )}
         </div>
       )}

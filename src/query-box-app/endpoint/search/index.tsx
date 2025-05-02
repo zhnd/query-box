@@ -7,7 +7,7 @@ export function SearchEndpoint() {
   return (
     <div className="pb-2 flex justify-between items-center">
       <Input placeholder="Filter endpoints..." className="max-w-sm" />
-      <CreateButton onClick={() => service.openCreateDialog()} />
+      <CreateButton onClick={service.openCreateDialog} />
     </div>
   )
 }

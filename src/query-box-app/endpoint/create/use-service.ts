@@ -1,5 +1,5 @@
 import { EndpointBridge } from '@/bridges'
-import { EndpointType } from '@/generated/typeshare-types'
+import { Endpoint, EndpointType } from '@/generated/typeshare-types'
 import { useEndpointPageStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -7,6 +7,10 @@ import { nanoid } from 'nanoid'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+
+export interface CreateEndpointProps {
+  onCreateSuccess?: (data: { endpoint: Endpoint }) => void
+}
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -24,7 +28,8 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export const useCreateEndpointService = () => {
+export const useCreateEndpointService = (props: CreateEndpointProps) => {
+  const { onCreateSuccess } = props
   const createDialogOpen = useEndpointPageStore(
     (state) => state.createDialogOpen
   )
@@ -36,9 +41,12 @@ export const useCreateEndpointService = () => {
 
   const mutation = useMutation({
     mutationFn: EndpointBridge.createEndpoint,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['endpoints'] })
       setCreateDialogOpen(false)
+      onCreateSuccess?.({
+        endpoint: data,
+      })
     },
   })
 

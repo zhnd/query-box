@@ -40,13 +40,13 @@ export const useRequestHistoryTabsService = () => {
   }
 
   const getInitialRequestHistories = async () => {
-    const initialRequestHistories =
+    let initialRequestHistories =
       await RequestHistoryBridge.listRequestHistories({
         endpoint_id: selectedEndpoint?.id ?? '',
       })
     if (initialRequestHistories.length === 0) {
-      await handleAddRequestHistory()
-      return
+      const newRequestHistory = await createEmptyRequestHistory()
+      initialRequestHistories = [newRequestHistory]
     }
     setRequestHistories(initialRequestHistories)
     setActiveRequestHistory(initialRequestHistories[0])

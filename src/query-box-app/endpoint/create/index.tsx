@@ -20,10 +20,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Play, Plus, Save, Trash } from 'lucide-react'
-import { useCreateEndpointService } from './use-service'
+import { CreateEndpointProps, useCreateEndpointService } from './use-service'
 
-export function CreateEndpoint() {
-  const service = useCreateEndpointService()
+export function CreateEndpoint(props: CreateEndpointProps) {
+  const service = useCreateEndpointService(props)
 
   return (
     <Dialog
