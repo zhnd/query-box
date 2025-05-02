@@ -1,17 +1,18 @@
+import { cn } from '@/lib/utils'
 import { Plus } from 'lucide-react'
+import { ComponentPropsWithoutRef } from 'react'
 import { Button } from '../ui/button'
 
-export interface CreateButtonProps {
+export interface CreateButtonProps
+  extends ComponentPropsWithoutRef<typeof Button> {
   children?: React.ReactNode
-  onClick?: () => void | Promise<void>
-  disabled?: boolean
 }
 
 export function CreateButton(props: CreateButtonProps) {
-  const { onClick, children, disabled } = props
+  const { className, children, ...buttonProps } = props
 
   return (
-    <Button disabled={disabled} onClick={onClick} className="cursor-pointer">
+    <Button className={cn('cursor-pointer', className)} {...buttonProps}>
       {children ? (
         children
       ) : (
