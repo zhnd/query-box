@@ -1,20 +1,14 @@
 import { githubDarkTheme, githubLightTheme } from '@/constants'
 import { useThemeModeStore } from '@/stores'
-import { createGraphiQLFetcher } from '@graphiql/toolkit'
-import {
-  buildClientSchema,
-  getIntrospectionQuery,
-  GraphQLSchema,
-  IntrospectionQuery,
-} from 'graphql'
 import { debounce } from 'lodash'
 import { Uri } from 'monaco-editor'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-import { initializeMode } from 'monaco-graphql/initializeMode'
+import { MonacoGraphQLAPI } from 'monaco-graphql/esm/api.js'
 import parserGraphql from 'prettier/parser-graphql'
 import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
 import { QUERY_EXAMPLE } from './constants'
+import { setupGraphQLSchemaInMonaco, updateGraphQLSchema } from './utils'
 
 export interface QueryEditorProps {
   endpointUrl: string
@@ -31,6 +25,7 @@ export function useService(props: QueryEditorProps) {
     null
   )
   const initializingRef = useRef(false)
+  const monacoGraphQLApiRef = useRef<MonacoGraphQLAPI | null>(null)
 
   const { resolvedThemeMode } = useThemeModeStore()
 
@@ -103,29 +98,9 @@ export function useService(props: QueryEditorProps) {
       },
     })
 
-    initializeMode({
-      diagnosticSettings: {
-        validateVariablesJSON: {
-          [Uri.file('operation.graphql').toString()]: [
-            Uri.file('variables.json').toString(),
-          ],
-        },
-        jsonDiagnosticSettings: {
-          validate: true,
-          schemaValidation: 'error',
-          // set these again, because we are entirely re-setting them here
-          allowComments: true,
-          trailingCommas: 'ignore',
-        },
-      },
-      schemas: [
-        {
-          schema: await getSchema({
-            endpointUrl,
-          }),
-          uri: 'myschema.graphql',
-        },
-      ],
+    // Initialize GraphQL mode with the endpoint URL
+    monacoGraphQLApiRef.current = await setupGraphQLSchemaInMonaco({
+      endpointUrl,
     })
 
     editorInstanceRef.current = editorInstance
@@ -155,28 +130,21 @@ export function useService(props: QueryEditorProps) {
     editorInstanceRef.current?.setValue(value ?? '')
   }, [value])
 
+  useEffect(() => {
+    const monacoGraphQLApi = monacoGraphQLApiRef.current
+    if (
+      !endpointUrl ||
+      initializingRef.current ||
+      !editorInstanceRef.current ||
+      !monacoGraphQLApi
+    ) {
+      return
+    }
+
+    updateGraphQLSchema({ endpointUrl, monacoGraphQLApi }).catch((error) => {
+      console.error('Error updating GraphQL schema:', error)
+    })
+  }, [endpointUrl])
+
   return { editorContainerElementRef }
-}
-
-async function getSchema(params: {
-  endpointUrl: string
-}): Promise<GraphQLSchema> {
-  const { endpointUrl } = params
-  const fetcher = createGraphiQLFetcher({
-    url: endpointUrl,
-  })
-
-  const data = await fetcher({
-    query: getIntrospectionQuery(),
-    operationName: 'IntrospectionQuery',
-  })
-  const introspectionJSON =
-    'data' in data && (data.data as unknown as IntrospectionQuery)
-
-  if (!introspectionJSON) {
-    throw new Error(
-      'this demo does not support subscriptions or http multipart yet'
-    )
-  }
-  return buildClientSchema(introspectionJSON)
 }
