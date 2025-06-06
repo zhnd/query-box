@@ -28,11 +28,9 @@ export const useRequestService = () => {
     (state) => state.currentPageSelectedEndpoint
   )
 
-  useGraphQLSchema({
+  const { schema } = useGraphQLSchema({
     endpoint: currentPageSelectedEndpoint,
   })
-
-  console.log('useRequestService schema')
 
   const { mutate, isPending } = useMutation({
     mutationFn: GraphQLBridge.send_graphql_request,
@@ -86,6 +84,7 @@ export const useRequestService = () => {
   }
 
   return {
+    schema,
     currentPageSelectedEndpoint,
     isPending: isPending || isRequestHistoryUpdating,
     activeRequestHistory,

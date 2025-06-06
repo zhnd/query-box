@@ -44,7 +44,8 @@ export async function fetchGraphqlSchema(params: {
     )
   }
 
-  const introspectionData = result as unknown as IntrospectionQuery
+  const introspectionData =
+    'data' in result && (result.data as unknown as IntrospectionQuery)
   if (!introspectionData || !introspectionData.__schema) {
     throw new Error('Invalid introspection response: schema data missing')
   }

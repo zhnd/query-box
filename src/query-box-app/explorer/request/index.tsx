@@ -27,8 +27,8 @@ export function Request() {
       </div>
       <QueryEditor
         className="h-full"
+        schema={service.schema}
         onChange={service.handleQueryUpdate}
-        endpointUrl={service.currentPageSelectedEndpoint.url ?? ''}
         initialValue={service.activeRequestHistory.query ?? ''}
         value={service.activeRequestHistory.query ?? ''}
       />
