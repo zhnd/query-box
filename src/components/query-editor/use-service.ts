@@ -15,6 +15,7 @@ export interface QueryEditorProps {
   initialValue?: string
   value?: string
   onChange?: (value: string) => void
+  className?: string
 }
 
 export function useService(props: QueryEditorProps) {
