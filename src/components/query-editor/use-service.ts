@@ -1,5 +1,6 @@
 import { githubDarkTheme, githubLightTheme } from '@/constants'
 import { useThemeModeStore } from '@/stores'
+import { GraphQLSchema } from 'graphql'
 import { debounce } from 'lodash'
 import { Uri } from 'monaco-editor'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
@@ -11,14 +12,15 @@ import { QUERY_EXAMPLE } from './constants'
 import { setupGraphQLSchemaInMonaco, updateGraphQLSchema } from './utils'
 
 export interface QueryEditorProps {
-  endpointUrl: string
   initialValue?: string
   value?: string
   onChange?: (value: string) => void
+  className?: string
+  schema: GraphQLSchema | null
 }
 
 export function useService(props: QueryEditorProps) {
-  const { onChange, initialValue, value, endpointUrl } = props
+  const { onChange, initialValue, value, schema } = props
 
   const editorContainerElementRef = useRef<HTMLDivElement>(null)
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
@@ -100,7 +102,7 @@ export function useService(props: QueryEditorProps) {
 
     // Initialize GraphQL mode with the endpoint URL
     monacoGraphQLApiRef.current = await setupGraphQLSchemaInMonaco({
-      endpointUrl,
+      schema,
     })
 
     editorInstanceRef.current = editorInstance
@@ -133,7 +135,7 @@ export function useService(props: QueryEditorProps) {
   useEffect(() => {
     const monacoGraphQLApi = monacoGraphQLApiRef.current
     if (
-      !endpointUrl ||
+      !schema ||
       initializingRef.current ||
       !editorInstanceRef.current ||
       !monacoGraphQLApi
@@ -141,10 +143,10 @@ export function useService(props: QueryEditorProps) {
       return
     }
 
-    updateGraphQLSchema({ endpointUrl, monacoGraphQLApi }).catch((error) => {
+    updateGraphQLSchema({ schema, monacoGraphQLApi }).catch((error) => {
       console.error('Error updating GraphQL schema:', error)
     })
-  }, [endpointUrl])
+  }, [schema])
 
   return { editorContainerElementRef }
 }

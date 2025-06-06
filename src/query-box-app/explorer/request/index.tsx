@@ -11,7 +11,7 @@ export function Request() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="h-full flex flex-col">
       <div className="flex justify-between items-center px-2 py-1 border-b">
         <div className="flex items-center text-sm font-medium">Operation</div>
 
@@ -26,8 +26,9 @@ export function Request() {
         </Button>
       </div>
       <QueryEditor
+        className="h-full"
+        schema={service.schema}
         onChange={service.handleQueryUpdate}
-        endpointUrl={service.currentPageSelectedEndpoint.url ?? ''}
         initialValue={service.activeRequestHistory.query ?? ''}
         value={service.activeRequestHistory.query ?? ''}
       />
