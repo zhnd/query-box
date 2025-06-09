@@ -1,4 +1,5 @@
 import { GraphQLBridge, RequestHistoryBridge } from '@/bridges'
+import { useGraphQLSchema } from '@/hooks'
 import {
   useEndpointSelectedStateStore,
   useGraphQLExplorerPageStore,
@@ -19,9 +20,17 @@ export const useRequestService = () => {
   )
 
   const setResponse = useGraphQLExplorerPageStore((state) => state.setResponse)
+
+  // Get the currently selected endpoint for the current page
+  // This is used to send the GraphQL request
+  // and to fetch the schema for the current endpoint
   const currentPageSelectedEndpoint = useEndpointSelectedStateStore(
     (state) => state.currentPageSelectedEndpoint
   )
+
+  const { schema } = useGraphQLSchema({
+    endpoint: currentPageSelectedEndpoint,
+  })
 
   const { mutate, isPending } = useMutation({
     mutationFn: GraphQLBridge.send_graphql_request,
@@ -75,6 +84,7 @@ export const useRequestService = () => {
   }
 
   return {
+    schema,
     currentPageSelectedEndpoint,
     isPending: isPending || isRequestHistoryUpdating,
     activeRequestHistory,

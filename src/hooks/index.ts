@@ -1,1 +1,1 @@
-export * from './use-fetch-schema'
+export * from './use-graphql-schema'

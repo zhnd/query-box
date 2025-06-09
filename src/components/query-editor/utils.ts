@@ -10,11 +10,10 @@ import { MonacoGraphQLAPI } from 'monaco-graphql/esm/api.js'
 import { initializeMode } from 'monaco-graphql/initializeMode'
 
 export async function updateGraphQLSchema(params: {
-  endpointUrl: string
+  schema: GraphQLSchema
   monacoGraphQLApi: MonacoGraphQLAPI
 }): Promise<void> {
-  const { endpointUrl, monacoGraphQLApi } = params
-  const schema = await getGraphQLSchema({ endpointUrl })
+  const { schema, monacoGraphQLApi } = params
 
   monacoGraphQLApi.setSchemaConfig([
     {
@@ -25,10 +24,9 @@ export async function updateGraphQLSchema(params: {
 }
 
 export async function setupGraphQLSchemaInMonaco(params: {
-  endpointUrl: string
+  schema: GraphQLSchema | null
 }): Promise<MonacoGraphQLAPI> {
-  const { endpointUrl } = params
-  const schema = await getGraphQLSchema({ endpointUrl })
+  const { schema } = params
 
   const monacoGraphQLApi = initializeMode({
     diagnosticSettings: {
@@ -44,12 +42,14 @@ export async function setupGraphQLSchemaInMonaco(params: {
         trailingCommas: 'ignore',
       },
     },
-    schemas: [
-      {
-        schema,
-        uri: 'schema.graphql',
-      },
-    ],
+    schemas: schema
+      ? [
+          {
+            schema,
+            uri: 'schema.graphql',
+          },
+        ]
+      : undefined,
   })
 
   return monacoGraphQLApi
