@@ -1,8 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { ChevronRight, FileText, Hash, Info, MousePointer2 } from 'lucide-react'
+import { ChevronRight, FileText, Hash, Info } from 'lucide-react'
 import { useService } from './use-service'
 import { CurrentTypeFields, DocumentationField } from './utils'
 
@@ -16,24 +15,24 @@ export function Documentation() {
   } = useService()
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex-1 h-full flex flex-col min-h-0 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b bg-muted/30">
+      <div className="flex items-center gap-2 px-4 py-3 border-b">
         <FileText className="h-4 w-4" />
         <h2 className="font-semibold">Documentation</h2>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
-          {/* Breadcrumb Navigation */}
-          {path.length > 0 && (
-            <>
-              <Breadcrumb path={path} onNavigate={navigateToBreadcrumb} />
-              <Separator />
-            </>
-          )}
+      {/* Breadcrumb Navigation */}
+      {path.length > 0 && (
+        <div className="px-4 pt-4 pb-2">
+          <Breadcrumb path={path} onNavigate={navigateToBreadcrumb} />
+          <Separator className="mt-4" />
+        </div>
+      )}
 
-          {/* Type Fields */}
+      {/* Type Fields Container */}
+      <div className="flex-1 min-h-0 h-0 pr-4">
+        <div className="h-full overflow-y-auto">
           {currentTypeFields ? (
             <TypeContent
               fields={currentTypeFields}
@@ -43,7 +42,7 @@ export function Documentation() {
             <EmptyState typeName={currentTypeName} />
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   )
 }
@@ -96,9 +95,6 @@ const FieldItem = ({
         {field.type.name}
       </Badge>
     </div>
-    {field.isObjectType && (
-      <MousePointer2 className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-    )}
   </div>
 )
 
