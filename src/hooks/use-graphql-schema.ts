@@ -62,7 +62,6 @@ export function useGraphQLSchema(data: {
     clearAutoRefreshTimer()
 
     autoRefreshTimerRef.current = setTimeout(() => {
-      console.log(`Auto-refreshing schema for endpoint: ${endpoint?.id}`)
       fetchSchemaFromNetwork(true)
     }, AUTO_REFRESH_INTERVAL)
   }, [endpoint, enableAutoRefresh, clearAutoRefreshTimer])
@@ -110,7 +109,6 @@ export function useGraphQLSchema(data: {
             err
           )
           if (err instanceof DOMException && err.name === 'AbortError') {
-            console.log('Schema fetch request was aborted')
             return
           }
 

@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { usePageGraphQLSchemaStore } from '@/stores/page-graphql-schema-state'
+import { useState } from 'react'
 import { getCurrentTypeFields, isValidObjectType } from './utils'
 
 export function useService() {
@@ -18,8 +18,6 @@ export function useService() {
   const navigateToBreadcrumb = (index: number) => {
     setPath(path.slice(0, index + 1))
   }
-
-  console.log('useService schema', schema)
 
   return {
     schema,
