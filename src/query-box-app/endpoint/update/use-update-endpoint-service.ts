@@ -1,9 +1,10 @@
 import { EndpointBridge } from '@/bridges'
+import { useEndpointConnectivity } from '@/hooks'
 import { useEndpointPageStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   formSchema,
@@ -39,10 +40,11 @@ export const useUpdateEndpointService = () => {
     },
   })
 
-  const [testStatus, setTestStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle')
-  const [testMessage, setTestMessage] = useState('')
+  const {
+    loading: checkConnectivityLoading,
+    result: checkConnectivityResult,
+    checkConnectivity,
+  } = useEndpointConnectivity()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -65,19 +67,18 @@ export const useUpdateEndpointService = () => {
   }
 
   const testConnection = async () => {
-    setTestStatus('loading')
-    try {
-      // Mock API call - replace with actual implementation
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setTestStatus('success')
-      setTestMessage('Successfully connected to the GraphQL endpoint!')
-    } catch (error) {
-      console.error('Failed to connect:', error)
-      setTestStatus('error')
-      setTestMessage(
-        'Failed to connect to the endpoint. Please check the URL and headers.'
-      )
-    }
+    await checkConnectivity({
+      url: form.getValues('url'),
+      headers: form.getValues('headers')?.reduce(
+        (acc, header) => {
+          if (header.key && header.value) {
+            acc[header.key] = header.value
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      ),
+    })
   }
 
   const addHeader = () => {
@@ -99,12 +100,13 @@ export const useUpdateEndpointService = () => {
   return {
     updateDialogOpen,
     setUpdateDialogOpen,
-    testStatus,
-    testMessage,
+    checkConnectivityLoading,
+    checkConnectivityResult,
     form,
     onSubmit,
     testConnection,
     addHeader,
     removeHeader,
+    disableTestConnection: !form.watch('url') || checkConnectivityLoading,
   }
 }
