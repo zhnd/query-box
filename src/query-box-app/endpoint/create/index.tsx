@@ -1,4 +1,3 @@
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -20,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Play, Plus, Save, Trash } from 'lucide-react'
+import { ConnectivityCheckInfo } from '../connectivity-check-info'
 import { CreateEndpointProps, useCreateEndpointService } from './use-service'
 
 export function CreateEndpoint(props: CreateEndpointProps) {
@@ -114,23 +114,10 @@ export function CreateEndpoint(props: CreateEndpointProps) {
                 </div>
               </div>
 
-              {service.testStatus !== 'idle' && (
-                <Alert
-                  className={
-                    service.testStatus === 'success'
-                      ? 'bg-green-50 text-green-800 border-green-200'
-                      : service.testStatus === 'error'
-                        ? 'bg-red-50 text-red-800 border-red-200'
-                        : 'bg-blue-50 text-blue-800 border-blue-200'
-                  }
-                >
-                  <AlertDescription>
-                    {service.testStatus === 'loading'
-                      ? 'Testing connection...'
-                      : service.testMessage}
-                  </AlertDescription>
-                </Alert>
-              )}
+              <ConnectivityCheckInfo
+                checkResult={service.checkConnectivityResult}
+                loading={service.checkConnectivityLoading}
+              />
             </div>
 
             <DialogFooter className="flex-none justify-between items-center pt-4 border-t mt-4">
@@ -140,7 +127,7 @@ export function CreateEndpoint(props: CreateEndpointProps) {
                   variant="outline"
                   onClick={service.testConnection}
                   className="mr-2"
-                  disabled={service.testStatus === 'loading'}
+                  disabled={service.disableTestConnection}
                 >
                   <Play className="h-4 w-4 mr-2" />
                   Test Connection

@@ -1,10 +1,10 @@
 import { EndpointBridge } from '@/bridges'
 import { Endpoint, EndpointType } from '@/generated/typeshare-types'
+import { useEndpointConnectivity } from '@/hooks'
 import { useEndpointPageStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -39,6 +39,12 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
     (state) => state.setCreateDialogOpen
   )
 
+  const {
+    loading: checkConnectivityLoading,
+    result: checkConnectivityResult,
+    checkConnectivity,
+  } = useEndpointConnectivity()
+
   const mutation = useMutation({
     mutationFn: EndpointBridge.createEndpoint,
     onSuccess: (data) => {
@@ -49,11 +55,6 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
       })
     },
   })
-
-  const [testStatus, setTestStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle')
-  const [testMessage, setTestMessage] = useState('')
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -75,19 +76,18 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
   }
 
   const testConnection = async () => {
-    setTestStatus('loading')
-    try {
-      // Mock API call - replace with actual implementation
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setTestStatus('success')
-      setTestMessage('Successfully connected to the GraphQL endpoint!')
-    } catch (error) {
-      console.error('Failed to connect:', error)
-      setTestStatus('error')
-      setTestMessage(
-        'Failed to connect to the endpoint. Please check the URL and headers.'
-      )
-    }
+    await checkConnectivity({
+      url: form.getValues('url'),
+      headers: form.getValues('headers')?.reduce(
+        (acc, header) => {
+          if (header.key && header.value) {
+            acc[header.key] = header.value
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      ),
+    })
   }
 
   const addHeader = () => {
@@ -109,12 +109,13 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
   return {
     createDialogOpen,
     setCreateDialogOpen,
-    testStatus,
-    testMessage,
+    checkConnectivityLoading,
+    checkConnectivityResult,
     form,
     onSubmit,
     testConnection,
     addHeader,
     removeHeader,
+    disableTestConnection: !form.watch('url') || checkConnectivityLoading,
   }
 }

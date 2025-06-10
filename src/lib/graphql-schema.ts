@@ -1,10 +1,10 @@
-import { createGraphiQLFetcher } from '@graphiql/toolkit'
 import {
   buildClientSchema,
   getIntrospectionQuery,
   GraphQLSchema,
   IntrospectionQuery,
 } from 'graphql'
+import { createGraphQLFetcher } from './fetch'
 
 export async function fetchGraphqlSchema(params: {
   endpointUrl: string
@@ -13,21 +13,13 @@ export async function fetchGraphqlSchema(params: {
 }): Promise<GraphQLSchema> {
   const { endpointUrl, timeout, signal } = params
 
-  const fetcher = createGraphiQLFetcher({
+  const fetcher = createGraphQLFetcher({
     url: endpointUrl,
-    fetch: (url, options) => {
-      return Promise.race([
-        fetch(url, {
-          ...options,
-          signal,
-        }),
-        new Promise<never>((_, reject) => {
-          setTimeout(
-            () => reject(new Error(`Request timeout after ${timeout}ms`)),
-            timeout
-          )
-        }),
-      ])
+    timeout,
+    signal,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
   })
 
