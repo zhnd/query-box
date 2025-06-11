@@ -21,6 +21,10 @@ export const useRequestService = () => {
 
   const setResponse = useGraphQLExplorerPageStore((state) => state.setResponse)
 
+  const setViewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
+    (state) => state.setViewGraphQLDefinitionFieldType
+  )
+
   // Get the currently selected endpoint for the current page
   // This is used to send the GraphQL request
   // and to fetch the schema for the current endpoint
@@ -83,6 +87,11 @@ export const useRequestService = () => {
     })
   }
 
+  const handleGoToGraphqlFieldDefinition = (field: string) => {
+    if (!field) return
+    setViewGraphQLDefinitionFieldType(field)
+  }
+
   return {
     schema,
     currentPageSelectedEndpoint,
@@ -90,5 +99,6 @@ export const useRequestService = () => {
     activeRequestHistory,
     handleSendRequest,
     handleQueryUpdate,
+    handleGoToGraphqlFieldDefinition,
   }
 }

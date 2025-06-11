@@ -6,6 +6,17 @@ import {
   isNonNullType,
   isObjectType,
 } from 'graphql'
+import { nanoid } from 'nanoid'
+
+export interface BreadcrumbPathType {
+  name: string
+  id: string
+}
+
+export const DEFAULT_PATH: BreadcrumbPathType = {
+  name: 'Root',
+  id: nanoid(),
+}
 
 export function unwrapType(type: GraphQLType): GraphQLNamedType {
   while (isNonNullType(type) || isListType(type)) {
