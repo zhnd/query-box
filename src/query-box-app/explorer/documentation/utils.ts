@@ -1,4 +1,5 @@
 import {
+  GraphQLFieldMap,
   GraphQLNamedType,
   GraphQLSchema,
   GraphQLType,
@@ -13,8 +14,10 @@ export interface BreadcrumbPathType {
   id: string
 }
 
+const ROOT_TYPE_NAME = 'Root'
+
 export const DEFAULT_PATH: BreadcrumbPathType = {
-  name: 'Root',
+  name: ROOT_TYPE_NAME,
   id: nanoid(),
 }
 
@@ -27,80 +30,84 @@ export function unwrapType(type: GraphQLType): GraphQLNamedType {
 
 export interface DocumentationField {
   name: string
-  type: GraphQLNamedType
-  isObjectType: boolean
+  description: string | null
+  type?: GraphQLNamedType
+  subFields?: DocumentationField[]
 }
 
-interface RootTypeFields {
-  query: DocumentationField[]
-  mutation: DocumentationField[]
+export type CurrentTypeField = {
+  name: string
+  description: string | null
+  subFields?: DocumentationField[]
+  operations?: DocumentationField[]
 }
 
-type SubTypeFields = DocumentationField[]
-
-export type CurrentTypeFields = RootTypeFields | SubTypeFields | null
+function getAllSubFields(params: {
+  fields: GraphQLFieldMap<unknown, unknown>
+}) {
+  const { fields } = params
+  return Object.entries(fields).map(([fieldName, field]) => {
+    const fieldType = unwrapType(field.type)
+    return {
+      name: fieldName,
+      type: fieldType,
+      description: field.description ?? null,
+    }
+  })
+}
 
 export function getCurrentTypeFields(
   schema: GraphQLSchema | null,
   currentTypeName: string
-): CurrentTypeFields {
+): CurrentTypeField | null {
   if (!schema) return null
 
-  // 如果是根类型，显示 Query 和 Mutation
   if (currentTypeName === 'Root') {
-    const fields: RootTypeFields = {
-      query: [],
-      mutation: [],
+    return {
+      name: ROOT_TYPE_NAME,
+      description: null,
+      operations: [
+        {
+          name: 'Query',
+          description: 'GraphQL Query operations',
+          subFields: getAllSubFields({
+            fields: schema.getQueryType()?.getFields() || {},
+          }),
+        },
+        {
+          name: 'Mutation',
+          description: 'GraphQL Mutation operations',
+          subFields: getAllSubFields({
+            fields: schema.getMutationType()?.getFields() || {},
+          }),
+        },
+        {
+          name: 'Subscription',
+          description: 'GraphQL Subscription operations',
+          subFields: getAllSubFields({
+            fields: schema.getSubscriptionType()?.getFields() || {},
+          }),
+        },
+      ],
     }
-
-    // 添加 Query 字段
-    const queryType = schema.getQueryType()
-    if (queryType) {
-      const queryFields = queryType.getFields()
-      Object.entries(queryFields).forEach(([fieldName, field]) => {
-        const fieldType = unwrapType(field.type)
-        fields.query.push({
-          name: fieldName,
-          type: fieldType,
-          isObjectType: isObjectType(fieldType),
-        })
-      })
-    }
-
-    // 添加 Mutation 字段
-    const mutationType = schema.getMutationType()
-    if (mutationType) {
-      const mutationFields = mutationType.getFields()
-      Object.entries(mutationFields).forEach(([fieldName, field]) => {
-        const fieldType = unwrapType(field.type)
-        fields.mutation.push({
-          name: fieldName,
-          type: fieldType,
-          isObjectType: isObjectType(fieldType),
-        })
-      })
-    }
-
-    return fields
   }
 
-  // 处理具体类型
   const typeMap = schema.getTypeMap()
   const currentType = typeMap[currentTypeName]
 
   if (isObjectType(currentType)) {
     const fields = currentType.getFields()
-    return Object.entries(fields).map(([fieldName, field]) => {
-      const fieldType = unwrapType(field.type)
-      return {
-        name: fieldName,
-        type: fieldType,
-        isObjectType: isObjectType(fieldType),
-      }
-    })
+    return {
+      name: currentType.name,
+      description: currentType.description ?? null,
+      subFields: getAllSubFields({ fields }),
+    }
+  } else {
+    return {
+      name: currentType.name,
+      description: currentType.description ?? null,
+    }
   }
-
-  return null
 }
 
 export function isValidObjectType(
@@ -109,7 +116,7 @@ export function isValidObjectType(
 ): boolean {
   if (!schema) return false
 
-  // Root 是特殊情况，总是有效的
+  // Root type is considered valid always
   if (typeName === 'Root') return true
 
   const typeMap = schema.getTypeMap()
