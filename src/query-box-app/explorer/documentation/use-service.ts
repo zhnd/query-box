@@ -1,17 +1,45 @@
+import { useGraphQLExplorerPageStore } from '@/stores'
 import { usePageGraphQLSchemaStore } from '@/stores/page-graphql-schema-state'
-import { useState } from 'react'
-import { getCurrentTypeFields, isValidObjectType } from './utils'
+import { nanoid } from 'nanoid'
+import { useEffect, useState } from 'react'
+import {
+  BreadcrumbPathType,
+  DEFAULT_PATH,
+  getCurrentTypeFields,
+  isValidObjectType,
+} from './utils'
 
 export function useService() {
-  const schema = usePageGraphQLSchemaStore((state) => state.schema)
-  const [path, setPath] = useState<string[]>(['Root'])
+  const [path, setPath] = useState<BreadcrumbPathType[]>([DEFAULT_PATH])
 
-  const currentTypeName = path[path.length - 1]
+  const schema = usePageGraphQLSchemaStore((state) => state.schema)
+  const viewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
+    (state) => state.viewGraphQLDefinitionFieldType
+  )
+
+  useEffect(() => {
+    if (!viewGraphQLDefinitionFieldType) return
+    setPath([
+      DEFAULT_PATH,
+      {
+        name: viewGraphQLDefinitionFieldType,
+        id: nanoid(),
+      },
+    ])
+  }, [viewGraphQLDefinitionFieldType])
+
+  const currentTypeName = path[path.length - 1].name
   const currentTypeFields = getCurrentTypeFields(schema, currentTypeName)
 
   const navigateToType = (typeName: string) => {
     if (isValidObjectType(schema, typeName)) {
-      setPath([...path, typeName])
+      setPath([
+        ...path,
+        {
+          name: typeName,
+          id: nanoid(),
+        },
+      ])
     }
   }
 

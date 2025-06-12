@@ -3,7 +3,11 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { ChevronRight, FileText, Hash, Info } from 'lucide-react'
 import { useService } from './use-service'
-import { CurrentTypeFields, DocumentationField } from './utils'
+import {
+  BreadcrumbPathType,
+  CurrentTypeFields,
+  DocumentationField,
+} from './utils'
 
 export function Documentation() {
   const {
@@ -52,19 +56,19 @@ const Breadcrumb = ({
   path,
   onNavigate,
 }: {
-  path: string[]
+  path: BreadcrumbPathType[]
   onNavigate: (index: number) => void
 }) => (
   <div className="flex items-center gap-1 flex-wrap">
-    {path.map((typeName, idx) => (
-      <div key={typeName} className="flex items-center gap-1">
+    {path.map((breadcrumb, idx) => (
+      <div key={breadcrumb.id} className="flex items-center gap-1">
         <Button
           variant="ghost"
           size="sm"
           className="h-7 px-2 text-xs hover:bg-accent"
           onClick={() => onNavigate(idx)}
         >
-          {typeName}
+          {breadcrumb.name}
         </Button>
         {idx < path.length - 1 && (
           <ChevronRight className="h-3 w-3 text-muted-foreground" />

@@ -31,6 +31,7 @@ export function Request() {
         onChange={service.handleQueryUpdate}
         initialValue={service.activeRequestHistory.query ?? ''}
         value={service.activeRequestHistory.query ?? ''}
+        onViewDefinition={service.handleGoToGraphqlFieldDefinition}
       />
     </div>
   )
