@@ -2,12 +2,7 @@ import { useGraphQLExplorerPageStore } from '@/stores'
 import { usePageGraphQLSchemaStore } from '@/stores/page-graphql-schema-state'
 import { nanoid } from 'nanoid'
 import { useEffect, useState } from 'react'
-import {
-  BreadcrumbPathType,
-  DEFAULT_PATH,
-  getCurrentTypeFields,
-  isValidObjectType,
-} from './utils'
+import { BreadcrumbPathType, DEFAULT_PATH, getCurrentTypeFields } from './utils'
 
 export function useService() {
   const [path, setPath] = useState<BreadcrumbPathType[]>([DEFAULT_PATH])
@@ -32,15 +27,13 @@ export function useService() {
   const currentTypeFields = getCurrentTypeFields(schema, currentTypeName)
 
   const navigateToType = (typeName: string) => {
-    if (isValidObjectType(schema, typeName)) {
-      setPath([
-        ...path,
-        {
-          name: typeName,
-          id: nanoid(),
-        },
-      ])
-    }
+    setPath([
+      ...path,
+      {
+        name: typeName,
+        id: nanoid(),
+      },
+    ])
   }
 
   const navigateToBreadcrumb = (index: number) => {
