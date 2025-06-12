@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChevronRight, Code2, FileText, Zap } from 'lucide-react'
+import { useMemo } from 'react'
 import { useService } from './use-service'
 import {
   BreadcrumbPathType,
@@ -157,7 +158,7 @@ const TypeContent = (props: {
         </div>
         {fields.description && (
           <p className="text-sm text-muted-foreground leading-relaxed pl-10">
-            {fields.description}
+            <ParsedDescription text={fields.description} />
           </p>
         )}
       </div>
@@ -240,3 +241,23 @@ const EmptyState = ({ typeName }: { typeName: string }) => (
     </div>
   </div>
 )
+
+const ParsedDescription = (props: { text: string }) => {
+  const { text } = props
+  const parts = useMemo(() => text.split(/(`[^`]+`)/g), [text])
+
+  return parts.map((part, index) => {
+    if (part.startsWith('`') && part.endsWith('`')) {
+      const code = part.slice(1, -1)
+      return (
+        <code
+          key={index}
+          className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
+        >
+          {code}
+        </code>
+      )
+    }
+    return <span key={index}>{part}</span>
+  })
+}
