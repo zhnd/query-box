@@ -22,6 +22,7 @@
     "@graphiql/toolkit": "^0.11.3",
     "@hookform/resolvers": "^5.1.1",
     "@monaco-editor/react": "^4.7.0",
+    "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.7",
