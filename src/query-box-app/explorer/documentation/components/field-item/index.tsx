@@ -10,13 +10,13 @@ export function FieldItem(props: {
   return (
     <div
       className="group relative flex items-center justify-between py-2.5 px-3 rounded border border-border bg-card transition-all duration-150 hover:bg-accent hover:border-accent-foreground/20 cursor-pointer active:scale-[0.98]"
-      onClick={() => onNavigate(field.type?.name ?? '')}
+      onClick={() => onNavigate(field.type?.namedType.name ?? '')}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
-          onNavigate(field.type?.name ?? '')
+          onNavigate(field.type?.namedType.name ?? '')
         }
       }}
     >
@@ -32,9 +32,9 @@ export function FieldItem(props: {
           <Badge
             variant="secondary"
             className="text-xs font-mono bg-muted/60 hover:bg-muted/80 transition-colors border-0 px-1.5 py-0.5 flex-shrink-0 max-w-[50%]"
-            title={field.type?.name ?? ''}
+            title={field.type?.displayName ?? ''}
           >
-            <span className="truncate">{field.type?.name ?? ''}</span>
+            <span className="truncate">{field.type?.displayName ?? ''}</span>
           </Badge>
         </div>
       </div>

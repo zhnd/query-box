@@ -21,17 +21,62 @@ export const DEFAULT_PATH: BreadcrumbPathType = {
   id: nanoid(),
 }
 
-export function unwrapType(type: GraphQLType): GraphQLNamedType {
-  while (isNonNullType(type) || isListType(type)) {
-    type = type.ofType
+export interface ParsedTypeInfo {
+  namedType: GraphQLNamedType
+  isNonNull: boolean
+  isList: boolean
+  isNonNullList: boolean
+  displayName: string
+}
+
+export function parseTypeInfo(type: GraphQLType): ParsedTypeInfo {
+  let currentType = type
+  let isNonNull = false
+  let isList = false
+  let isNonNullList = false
+
+  if (isNonNullType(currentType)) {
+    isNonNull = true
+    currentType = currentType.ofType
   }
-  return type as GraphQLNamedType
+  if (isListType(currentType)) {
+    isList = true
+    currentType = currentType.ofType
+
+    if (isNonNullType(currentType)) {
+      isNonNullList = true
+      currentType = currentType.ofType
+    }
+  }
+
+  const namedType = currentType as GraphQLNamedType
+  let displayName = namedType.name
+
+  if (isList) {
+    if (isNonNullList) {
+      displayName = `[${displayName}!]`
+    } else {
+      displayName = `[${displayName}]`
+    }
+  }
+
+  if (isNonNull) {
+    displayName = `${displayName}!`
+  }
+
+  return {
+    namedType,
+    isNonNull,
+    isList,
+    isNonNullList,
+    displayName,
+  }
 }
 
 export interface DocumentationField {
   name: string
   description: string | null
-  type?: GraphQLNamedType
+  type?: ParsedTypeInfo
   subFields?: DocumentationField[]
 }
 
@@ -47,7 +92,7 @@ function getAllSubFields(params: {
 }) {
   const { fields } = params
   return Object.entries(fields).map(([fieldName, field]) => {
-    const fieldType = unwrapType(field.type)
+    const fieldType = parseTypeInfo(field.type)
     return {
       name: fieldName,
       type: fieldType,
