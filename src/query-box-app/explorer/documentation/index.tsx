@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ChevronRight, Code2, FileText, Zap } from 'lucide-react'
+import { ChevronRight, FileText, Hash, Zap } from 'lucide-react'
 import { useMemo } from 'react'
 import { useService } from './use-service'
 import {
@@ -103,19 +103,25 @@ const FieldItem = ({
         }
       }}
     >
-      <div className="flex items-center gap-3 min-w-0 flex-1">
+      <div className="flex items-center gap-3 min-w-0 flex-1 mr-2">
         <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary/80" />
-        <span className="font-medium text-sm text-foreground truncate">
-          {field.name}
-        </span>
-        <Badge
-          variant="secondary"
-          className="text-xs font-mono bg-muted/60 hover:bg-muted/80 transition-colors border-0 px-1.5 py-0.5 ml-auto"
-        >
-          {field.type?.name ?? ''}
-        </Badge>
+        <div className="flex items-center justify-between min-w-0 flex-1 gap-3">
+          <span
+            className="font-medium text-sm text-foreground truncate max-w-[50%]"
+            title={field.name}
+          >
+            {field.name}
+          </span>
+          <Badge
+            variant="secondary"
+            className="text-xs font-mono bg-muted/60 hover:bg-muted/80 transition-colors border-0 px-1.5 py-0.5 flex-shrink-0 max-w-[50%]"
+            title={field.type?.name ?? ''}
+          >
+            <span className="truncate">{field.type?.name ?? ''}</span>
+          </Badge>
+        </div>
       </div>
-      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-all duration-150 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 flex-shrink-0 ml-2" />
+      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-all duration-150 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 flex-shrink-0" />
     </div>
   )
 }
@@ -152,7 +158,7 @@ const TypeContent = (props: {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center w-8 h-8 rounded bg-primary/10">
-            <Code2 className="h-4 w-4 text-primary" />
+            <Hash className="h-4 w-4 text-primary" />
           </div>
           <h1 className="text-xl font-bold text-foreground">{fields.name}</h1>
         </div>
@@ -165,7 +171,7 @@ const TypeContent = (props: {
 
       {/* Operations Section */}
       {fields.operations?.some((op) => op.subFields?.length) && (
-        <Card className="shadow-sm">
+        <Card className="shadow-sm gap-2">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
               <div className="flex items-center justify-center w-6 h-6 rounded bg-primary/10">
@@ -201,7 +207,7 @@ const TypeContent = (props: {
 
       {/* Fields Section */}
       {fields.subFields?.length ? (
-        <Card className="shadow-sm">
+        <Card className="shadow-sm gap-2">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
               <div className="flex items-center justify-center w-6 h-6 rounded bg-primary/10">
