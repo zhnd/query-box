@@ -48,9 +48,9 @@ export function ResponseViewer(props: ResponseViewerProps) {
             <p>Please send a network request.</p>
           </div>
         ) : service.activeView === ResponseViewType.BODY ? (
-          <JsonViewer value={data} />
+          <JsonViewer value={data.body} />
         ) : (
-          <JsonViewer value={data} />
+          <JsonViewer value={JSON.stringify(data.headers)} />
         )}
       </div>
     </div>

@@ -1,7 +1,9 @@
 use reqwest::Method;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::time::Instant;
 use tauri::command;
+use typeshare::typeshare;
 
 use crate::common::http_client::HTTP_CLIENT;
 
@@ -12,6 +14,20 @@ struct GraphQLRequestBody {
     operation_name: Option<String>,
 }
 
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+#[typeshare]
+pub struct GraphQLResponse {
+    /// The response body as a string
+    body: String,
+    /// HTTP response headers
+    headers: HashMap<String, String>,
+    /// Request duration in milliseconds
+    duration_ms: u128,
+    /// HTTP status code
+    status_code: u16,
+}
+
 #[command]
 pub async fn send_graphql_request(
     endpoint: String,
@@ -19,7 +35,7 @@ pub async fn send_graphql_request(
     method: Option<String>,
     query: String,
     variables: Option<String>,
-) -> Result<String, String> {
+) -> Result<GraphQLResponse, String> {
     // Parse the variables string into a JSON Value, if provided and non-empty.
     // Filter out empty or whitespace-only strings, then attempt JSON parsing.
     // Errors are propagated as strings using the `?` operator.
@@ -64,6 +80,8 @@ pub async fn send_graphql_request(
     // - For GET: Attach query and variables as URL parameters.
     // - For POST: Send the request body as JSON.
     // Errors are mapped to strings for consistent error handling.
+    let start_time = Instant::now();
+
     let response = match method {
         Method::GET => {
             // Prepare query parameters for GET request.
@@ -84,6 +102,24 @@ pub async fn send_graphql_request(
     }
     .map_err(|e| e.to_string())?;
 
+    let duration_ms = start_time.elapsed().as_millis();
+    let status_code = response.status().as_u16();
+
+    // Extract response headers
+    let mut response_headers = HashMap::new();
+    for (name, value) in response.headers() {
+        if let Ok(value_str) = value.to_str() {
+            response_headers.insert(name.to_string(), value_str.to_string());
+        }
+    }
+
     // Extract the response text, propagating any errors as strings.
-    response.text().await.map_err(|e| e.to_string())
+    let body = response.text().await.map_err(|e| e.to_string())?;
+
+    Ok(GraphQLResponse {
+        body,
+        headers: response_headers,
+        duration_ms,
+        status_code,
+    })
 }
