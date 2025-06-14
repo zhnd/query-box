@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
 import { JsonViewer } from '../json-viewer'
+import { RequestStatusIndicator } from './components/request-status-indicator'
 import { ResponseViewType, viewLabels, ViewTypeMenuItems } from './constants'
 import { ResponseViewerProps, useResponseViewerService } from './use-service'
 
@@ -39,6 +40,7 @@ export function ResponseViewer(props: ResponseViewerProps) {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+        <RequestStatusIndicator response={data} />
       </div>
 
       <div className="flex-1 overflow-auto">
