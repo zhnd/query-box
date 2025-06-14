@@ -2,3 +2,4 @@
 "DateTime" = "string"
 "Uuid" = "string"
 "Json" = "string"
+"u128" = "number"

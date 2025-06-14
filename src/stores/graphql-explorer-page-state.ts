@@ -1,15 +1,15 @@
-import { RequestHistory } from '@/generated/typeshare-types'
+import { GraphQLResponse, RequestHistory } from '@/generated/typeshare-types'
 import { create } from 'zustand'
 
 interface GraphQLExplorerPageState {
-  response: string
+  response: GraphQLResponse | null
   requestHistories: RequestHistory[]
   activeRequestHistory: RequestHistory | null
   viewGraphQLDefinitionFieldType: string | null
 }
 
 interface GraphQLExplorerPageActions {
-  setResponse: (response: string) => void
+  setResponse: (response: GraphQLResponse | null) => void
   setRequestHistories: (histories: RequestHistory[]) => void
   setActiveRequestHistory: (requestHistory: RequestHistory | null) => void
   setViewGraphQLDefinitionFieldType: (field: string | null) => void
@@ -21,7 +21,7 @@ export const useGraphQLExplorerPageStore = create<GraphQLExplorerPageStore>()(
   (set) => ({
     requestHistories: [],
     activeRequestHistory: null,
-    response: '',
+    response: null,
     viewGraphQLDefinitionFieldType: null,
     setResponse: (response) => set(() => ({ response })),
     setRequestHistories: (histories) =>
