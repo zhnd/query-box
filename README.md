@@ -4,6 +4,10 @@ A modern, intelligent GraphQL request playground.
 
 QueryBox is a powerful network request management tool, designed to provide a seamless and smart GraphQL playground experience. It’s an alternative to GraphiQL, but with a more intuitive UI and enhanced features.
 
+Preview image:
+
+![预览图](docs/images/screenshot.png)
+
 🚧 Currently under active development. More features are coming soon!
 
 ✨ Features
@@ -22,9 +26,9 @@ Installation
 
 📅 Roadmap
 
-- GraphQL Request Execution (MVP)
-- Schema Explorer & Documentation
-- History & Collection Management
+- GraphQL Request Execution (✅ DONE)
+- Schema Explorer & Documentation (✅ DONE)
+- History & Collection Management (✅ DONE)
 - RESTful API Support
 - AI-Powered Query Suggestions
 
