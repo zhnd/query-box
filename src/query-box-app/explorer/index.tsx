@@ -1,44 +1,40 @@
 import { ResponseViewer } from '@/components/response-viewer'
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '@/components/ui/resizable'
+import Split from 'react-split'
 import { Documentation } from './documentation'
 import { RequestHistoryTabs } from './history-tabs'
 import { Request } from './request'
-import { useExplorerService } from './use-explorer-sevice'
+import { splitComponentProps, useExplorerService } from './use-explorer-sevice'
 
 export function Explorer() {
   const service = useExplorerService()
+
   return (
-    <div className="explorer flex-1 flex flex-col">
-      <div className="flex-1 flex min-h-0">
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={30} minSize={30}>
-            <Documentation />
-          </ResizablePanel>
-          <ResizableHandle />
-          <ResizablePanel
-            defaultSize={70}
-            minSize={40}
-            className="flex flex-col"
+    <div className="explorer bg-white flex-1 flex flex-col">
+      <Split
+        className="flex-1 flex min-h-0"
+        {...splitComponentProps}
+        sizes={[30, 70]}
+      >
+        <div className=" p-4 h-full">
+          <Documentation />
+        </div>
+        <div className="flex flex-col pt-4 h-full">
+          <RequestHistoryTabs />
+
+          <Split
+            className="flex-1 flex min-h-0"
+            {...splitComponentProps}
+            sizes={[50, 50]}
           >
-            <RequestHistoryTabs />
-            <div className="flex-1 min-h-0">
-              <ResizablePanelGroup direction="horizontal">
-                <ResizablePanel defaultSize={50} minSize={20}>
-                  <Request />
-                </ResizablePanel>
-                <ResizableHandle />
-                <ResizablePanel defaultSize={50} minSize={20}>
-                  <ResponseViewer data={service.response} />
-                </ResizablePanel>
-              </ResizablePanelGroup>
+            <div className="pt-4 h-full">
+              <Request />
             </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
+            <div className="pt-4 h-full">
+              <ResponseViewer data={service.response} />
+            </div>
+          </Split>
+        </div>
+      </Split>
     </div>
   )
 }
