@@ -28,18 +28,31 @@ pub struct GraphQLResponse {
     status_code: u16,
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[typeshare]
+pub struct SendGraphQLRequestPayload {
+    /// The GraphQL endpoint URL
+    pub endpoint: String,
+    /// Optional headers to include in the request
+    pub headers: Option<HashMap<String, String>>,
+    /// HTTP method to use for the request (GET or POST)
+    pub method: Option<String>,
+    /// The GraphQL query string
+    pub query: String,
+    /// Optional JSON string of variables for the GraphQL query
+    pub variables: Option<String>,
+}
+
 #[command]
 pub async fn send_graphql_request(
-    endpoint: String,
-    headers: Option<HashMap<String, String>>,
-    method: Option<String>,
-    query: String,
-    variables: Option<String>,
+    data: SendGraphQLRequestPayload,
 ) -> Result<GraphQLResponse, String> {
     // Parse the variables string into a JSON Value, if provided and non-empty.
     // Filter out empty or whitespace-only strings, then attempt JSON parsing.
     // Errors are propagated as strings using the `?` operator.
-    let variables_json = variables
+    let variables_json = data
+        .variables
         .filter(|v| !v.trim().is_empty())
         .map(|v| serde_json::from_str(&v))
         .transpose()
@@ -48,7 +61,7 @@ pub async fn send_graphql_request(
     // Construct the GraphQL request body with the query and parsed variables.
     // The operation_name is set to None as it's not used in this implementation.
     let request_body = GraphQLRequestBody {
-        query,
+        query: data.query,
         variables: variables_json,
         operation_name: None,
     };
@@ -56,7 +69,13 @@ pub async fn send_graphql_request(
     // Determine the HTTP method, defaulting to "POST" if not specified.
     // Convert to uppercase to make it case-insensitive (e.g., "post" -> "POST").
     // Return an error for unsupported methods.
-    let method = match method.as_deref().unwrap_or("POST").to_uppercase().as_str() {
+    let method = match data
+        .method
+        .as_deref()
+        .unwrap_or("POST")
+        .to_uppercase()
+        .as_str()
+    {
         "GET" => Method::GET,
         "POST" => Method::POST,
         m => return Err(format!("Unsupported method: {}", m)),
@@ -65,12 +84,13 @@ pub async fn send_graphql_request(
     // "Content-Type" and "Accept" are set to "application/json" for GraphQL compatibility.
     let client = &*HTTP_CLIENT;
     let mut request = client
-        .request(method.clone(), endpoint)
+        .request(method.clone(), data.endpoint)
         .header("Content-Type", "application/json")
-        .header("Accept", "application/json");
+        .header("Accept", "application/json")
+        .header("User-Agent", "Query box GraphQL Client");
 
     // Apply custom headers if provided, iterating over the HashMap.
-    if let Some(headers) = headers {
+    if let Some(headers) = data.headers {
         for (key, value) in headers {
             request = request.header(&key, value);
         }

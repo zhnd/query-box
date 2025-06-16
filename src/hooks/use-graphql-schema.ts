@@ -87,7 +87,7 @@ export function useGraphQLSchema(data: {
       const attemptFetch = async (): Promise<void> => {
         try {
           const parsedSchema = await fetchGraphqlSchema({
-            endpointUrl: endpoint.url,
+            endpoint,
             timeout,
             signal: abortControllerRef.current?.signal,
           })

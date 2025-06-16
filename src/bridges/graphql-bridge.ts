@@ -1,10 +1,16 @@
-import { GraphQLResponse } from '@/generated/typeshare-types'
+import {
+  GraphQLResponse,
+  SendGraphQLRequestPayload,
+} from '@/generated/typeshare-types'
 import { invoke } from '@tauri-apps/api/core'
 
 export class GraphQLBridge {
-  static async send_graphql_request(data: { endpoint: string; query: string }) {
+  static async send_graphql_request(data: SendGraphQLRequestPayload) {
+    console.debug('Sending GraphQL request:', data)
     try {
-      return await invoke<GraphQLResponse>('send_graphql_request', data)
+      return await invoke<GraphQLResponse>('send_graphql_request', {
+        data,
+      })
     } catch (error) {
       console.error('Failed to send GraphQL request:', error)
       throw error
