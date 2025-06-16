@@ -1,5 +1,6 @@
 import { TitleBar } from '@/components/titlebar'
 import { SidebarProvider } from '@/components/ui/sidebar'
+import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppSidebarMenuItemKeys } from '@/constants'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -16,6 +17,7 @@ export function QueryBoxApp() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="flex flex-col h-screen">
+          <Toaster richColors />
           <TitleBar />
           <SidebarProvider
             className="flex-1 min-h-0"

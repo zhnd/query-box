@@ -45,6 +45,7 @@ export function useGraphQLSchema(data: {
     (state) => state.setLastFetchTime
   )
 
+  const prevEndpointUrl = useRef<string | null>(null)
   const autoRefreshTimerRef = useRef<NodeJS.Timeout | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const initializingRef = useRef(false)
@@ -67,14 +68,14 @@ export function useGraphQLSchema(data: {
   }, [endpoint, enableAutoRefresh, clearAutoRefreshTimer])
 
   const fetchSchemaFromNetwork = useCallback(
-    async (isAutoRefresh = false): Promise<void> => {
+    async (isFirstFetch = false): Promise<void> => {
       if (!endpoint?.url) return
 
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
 
-      if (!isAutoRefresh) {
+      if (!isFirstFetch) {
         setLoading(true)
         setError(null)
       } else {
@@ -119,18 +120,9 @@ export function useGraphQLSchema(data: {
           }
 
           const errorMessage = err instanceof Error ? err.message : String(err)
-          console.error('Error fetching GraphQL schema:', err)
 
-          if (isAutoRefresh && schema) {
-            setError(`Auto-refresh failed: ${errorMessage}`)
-            console.warn(
-              'Auto-refresh failed, keeping existing schema:',
-              errorMessage
-            )
-
-            if (enableAutoRefresh) {
-              setupAutoRefreshTimer()
-            }
+          if (!schema) {
+            setError(errorMessage)
           }
         }
       }
@@ -157,14 +149,15 @@ export function useGraphQLSchema(data: {
   }, [fetchSchemaFromNetwork, clearAutoRefreshTimer])
 
   useEffect(() => {
-    if (schema || !endpoint?.url || initializingRef.current) return
-    initializingRef.current = true
-
-    if (!schema) {
-      fetchSchemaFromNetwork(false)
-    } else if (enableAutoRefresh) {
-      setupAutoRefreshTimer()
+    if (schema && prevEndpointUrl.current === endpoint?.url) {
+      return
     }
+
+    prevEndpointUrl.current = endpoint?.url || null
+    initializingRef.current = true
+    setSchema(null)
+
+    fetchSchemaFromNetwork(false)
 
     return () => {
       if (abortControllerRef.current) {
@@ -173,7 +166,7 @@ export function useGraphQLSchema(data: {
       clearAutoRefreshTimer()
       initializingRef.current = false
     }
-  }, [endpoint?.url, schema, loading, enableAutoRefresh])
+  }, [endpoint?.url, schema])
 
   return {
     schema,
