@@ -1,3 +1,4 @@
+import { Endpoint } from '@/generated/typeshare-types'
 import {
   buildClientSchema,
   getIntrospectionQuery,
@@ -5,21 +6,22 @@ import {
   IntrospectionQuery,
 } from 'graphql'
 import { createGraphQLFetcher } from './fetch'
+import { formatHeadersStringToObject } from './request'
 
 export async function fetchGraphqlSchema(params: {
-  endpointUrl: string
+  endpoint: Endpoint
   timeout?: number // Request timeout in milliseconds
   signal?: AbortSignal
 }): Promise<GraphQLSchema> {
-  const { endpointUrl, timeout, signal } = params
+  const { endpoint, timeout, signal } = params
 
   const fetcher = createGraphQLFetcher({
-    url: endpointUrl,
+    url: endpoint.url,
     timeout,
     signal,
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'User-Agent': navigator.userAgent,
+      ...formatHeadersStringToObject(endpoint.headers),
     },
   })
 
