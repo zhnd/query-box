@@ -57,19 +57,7 @@ export const useJsonViewerService = (props: JsonViewerProps) => {
     )
 
     editorInstanceRef.current = editorInstance
-
-    // check if the editor is initialized and layout is done
-    // if not, wait for the layout to be done
-    // and then set the initializingRef to false
-    const disposable = editorInstance.onDidLayoutChange(() => {
-      initializingRef.current = false
-
-      // dispose the event listener to avoid memory leaks
-      // and to avoid multiple calls to this function
-      // when the editor is resized or when the layout is changed
-      // this will be called only once when the editor is initialized
-      disposable.dispose()
-    })
+    initializingRef.current = false
   }
 
   useEffect(() => {
