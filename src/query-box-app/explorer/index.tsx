@@ -3,7 +3,7 @@ import { SplitResizable } from '@/components/split-resizable'
 import { Documentation } from './documentation'
 import { RequestHistoryTabs } from './history-tabs'
 import { Request } from './request'
-import { useExplorerService } from './use-explorer-sevice'
+import { useExplorerService } from './use-explorer-service'
 
 export function Explorer() {
   const service = useExplorerService()
