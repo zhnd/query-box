@@ -33,11 +33,12 @@ export function useService(props: QueryEditorProps) {
   )
   const initializingRef = useRef(false)
   const monacoGraphQLApiRef = useRef<MonacoGraphQLAPI | null>(null)
+  const schemaRef = useRef<GraphQLSchema | null>(schema)
 
   const { resolvedThemeMode } = useThemeModeStore()
 
   const init = async () => {
-    if (editorInstanceRef.current || initializingRef.current || !schema) return
+    if (editorInstanceRef.current || initializingRef.current) return
     initializingRef.current = true
 
     monaco.editor.defineTheme('github-light', githubLightTheme)
@@ -112,7 +113,11 @@ export function useService(props: QueryEditorProps) {
       contextMenuGroupId: 'navigation',
       contextMenuOrder: 1,
       run: (editor) => {
-        handleGoToGraphqlFieldDefinition({ schema, editor, onViewDefinition })
+        handleGoToGraphqlFieldDefinition({
+          schema: schemaRef.current,
+          editor,
+          onViewDefinition,
+        })
       },
     })
 
@@ -120,7 +125,7 @@ export function useService(props: QueryEditorProps) {
     // This allows users to use F12 on field names to navigate to their definitions
     editorInstance.addCommand(monaco.KeyCode.F12, () => {
       handleGoToGraphqlFieldDefinition({
-        schema,
+        schema: schemaRef.current,
         editor: editorInstance,
         onViewDefinition,
       })
@@ -137,7 +142,7 @@ export function useService(props: QueryEditorProps) {
         target.type === monaco.editor.MouseTargetType.CONTENT_TEXT
       ) {
         handleGoToGraphqlFieldDefinition({
-          schema,
+          schema: schemaRef.current,
           editor: editorInstance,
           position: target.position,
           onViewDefinition,
@@ -163,7 +168,7 @@ export function useService(props: QueryEditorProps) {
         initializingRef.current = false
       }
     }
-  }, [schema])
+  }, [])
 
   useEffect(() => {
     editorInstanceRef.current?.updateOptions({
@@ -187,7 +192,7 @@ export function useService(props: QueryEditorProps) {
     ) {
       return
     }
-
+    schemaRef.current = schema
     updateGraphQLSchema({ schema, monacoGraphQLApi }).catch((error) => {
       console.error('Error updating GraphQL schema:', error)
     })
