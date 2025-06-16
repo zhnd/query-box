@@ -6,6 +6,8 @@ import {
   useGraphQLExplorerPageStore,
 } from '@/stores'
 import { useMutation } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 export const useRequestService = () => {
   const activeRequestHistory = useGraphQLExplorerPageStore(
@@ -21,6 +23,9 @@ export const useRequestService = () => {
   )
 
   const setResponse = useGraphQLExplorerPageStore((state) => state.setResponse)
+  const setPageLoadState = useGraphQLExplorerPageStore(
+    (state) => state.setPageLoadState
+  )
 
   const setViewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
     (state) => state.setViewGraphQLDefinitionFieldType
@@ -33,14 +38,30 @@ export const useRequestService = () => {
     (state) => state.currentPageSelectedEndpoint
   )
 
-  const { schema } = useGraphQLSchema({
+  const { schema, loading, error } = useGraphQLSchema({
     endpoint: currentPageSelectedEndpoint,
   })
+
+  useEffect(() => {
+    setPageLoadState({
+      loading: loading,
+      error: error ?? null,
+    })
+  }, [loading, error])
+
+  useEffect(() => {
+    setResponse(null)
+  }, [currentPageSelectedEndpoint])
 
   const { mutate, isPending } = useMutation({
     mutationFn: GraphQLBridge.send_graphql_request,
     onSuccess: (data) => {
       setResponse(data)
+    },
+    onError: (error) => {
+      toast.error('Request failed: ', {
+        description: error instanceof Error ? error.message : String(error),
+      })
     },
   })
 

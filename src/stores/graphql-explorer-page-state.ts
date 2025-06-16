@@ -1,7 +1,13 @@
 import { GraphQLResponse, RequestHistory } from '@/generated/typeshare-types'
 import { create } from 'zustand'
 
+interface PageLoadState {
+  loading: boolean
+  error: string | null
+}
+
 interface GraphQLExplorerPageState {
+  pageLoadState: PageLoadState
   response: GraphQLResponse | null
   requestHistories: RequestHistory[]
   activeRequestHistory: RequestHistory | null
@@ -9,6 +15,7 @@ interface GraphQLExplorerPageState {
 }
 
 interface GraphQLExplorerPageActions {
+  setPageLoadState: (state: PageLoadState) => void
   setResponse: (response: GraphQLResponse | null) => void
   setRequestHistories: (histories: RequestHistory[]) => void
   setActiveRequestHistory: (requestHistory: RequestHistory | null) => void
@@ -19,10 +26,18 @@ type GraphQLExplorerPageStore = GraphQLExplorerPageState &
 
 export const useGraphQLExplorerPageStore = create<GraphQLExplorerPageStore>()(
   (set) => ({
+    pageLoadState: {
+      loading: true,
+      error: null,
+    },
     requestHistories: [],
     activeRequestHistory: null,
     response: null,
     viewGraphQLDefinitionFieldType: null,
+    setPageLoadState: (state) =>
+      set(() => ({
+        pageLoadState: state,
+      })),
     setResponse: (response) => set(() => ({ response })),
     setRequestHistories: (histories) =>
       set(() => ({ requestHistories: histories })),
