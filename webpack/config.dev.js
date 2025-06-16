@@ -22,6 +22,9 @@ module.exports = {
   devServer: {
     port: 3000,
     hot: true,
+    client: {
+      overlay: false,
+    },
   },
   optimization: {
     splitChunks: {
