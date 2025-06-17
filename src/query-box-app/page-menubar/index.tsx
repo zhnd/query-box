@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { ThemeModeToggle } from '../theme-mode-toggle'
+import { PageMenubarUpdater } from './components/updater'
 import { usePageMenubarService } from './use-service'
 
 export function PageMenubar() {
@@ -87,7 +88,8 @@ export function PageMenubar() {
           )}
         </div>
       )}
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
+        <PageMenubarUpdater />
         <ThemeModeToggle />
       </div>
     </div>

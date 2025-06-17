@@ -40,6 +40,7 @@
     "@tauri-apps/plugin-fs": "^2.3.0",
     "@tauri-apps/plugin-opener": "^2.2.7",
     "@tauri-apps/plugin-os": "^2.2.1",
+    "@tauri-apps/plugin-process": "~2.2.2",
     "@tauri-apps/plugin-updater": "~2.8.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
