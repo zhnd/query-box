@@ -35,6 +35,18 @@
     ],
     "resources": [
       "migrations/*"
-    ]
+    ],
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEZCOTc3ODQ4QTA5NjVFNUYKUldSZlhwYWdTSGlYKzdqeWcxVWtyRHRIYWJsaWUyOWNibndKblJSVUJBZDF4UzM3N0F3ekFPQisK",
+      "endpoints": [
+        "https://github.com/zhnd/query-box/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "basicUi"
+      }
+    }
   }
 }
