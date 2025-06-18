@@ -32,8 +32,15 @@ pub async fn initialize_db(app_handle: &AppHandle) -> Result<(), Box<dyn std::er
 pub async fn run_migrations(app_handle: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let pool = app_handle.state::<SqlitePool>();
 
-    let current_dir = std::env::current_dir()?;
-    let migrations_path = current_dir.join("migrations");
+    let resource_dir = app_handle.path().resource_dir().or_else(|err| {
+        println!("Failed to get resource directory: {}", err);
+        Err(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "Resource directory not found",
+        ))
+    })?;
+
+    let migrations_path = resource_dir.join("migrations");
 
     if migrations_path.exists() {
         match sqlx::migrate::Migrator::new(migrations_path).await {
