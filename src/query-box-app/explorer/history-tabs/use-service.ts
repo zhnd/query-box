@@ -92,6 +92,7 @@ export const useRequestHistoryTabsService = () => {
     })
     const newRequestHistory = await createEmptyRequestHistory()
     setRequestHistories([newRequestHistory])
+    setActiveRequestHistory(newRequestHistory)
   }
 
   useEffect(() => {
