@@ -107,3 +107,5 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           args: ${{ matrix.args }}
+          tagName: ${{ github.event.release.tag_name }}
+          prerelease: ${{ github.event.release.prerelease }}
