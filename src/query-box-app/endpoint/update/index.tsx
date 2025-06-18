@@ -21,9 +21,10 @@ import { Label } from '@/components/ui/label'
 import { Play, Plus, Save, Trash } from 'lucide-react'
 import { ConnectivityCheckInfo } from '../connectivity-check-info'
 import { useUpdateEndpointService } from './use-update-endpoint-service'
+import { UpdateEndpointProps } from './update-endpoint-lib'
 
-export function UpdateEndpoint() {
-  const service = useUpdateEndpointService()
+export function UpdateEndpoint(props: UpdateEndpointProps) {
+  const service = useUpdateEndpointService(props)
 
   return (
     <Dialog

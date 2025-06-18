@@ -10,10 +10,11 @@ import {
   formSchema,
   FormValues,
   getUpdateEndpointFormInitialValues,
+  UpdateEndpointProps,
 } from './update-endpoint-lib'
 
-export const useUpdateEndpointService = () => {
-  const operateEndpoint = useEndpointPageStore((state) => state.operateEndpoint)
+export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
+  const { endpointId, onUpdateSuccess, onUpdateError } = data
   const setOperateEndpoint = useEndpointPageStore(
     (state) => state.setOperateEndpoint
   )
@@ -27,8 +28,8 @@ export const useUpdateEndpointService = () => {
   )
 
   const { data: endpoint } = useQuery({
-    queryKey: ['endpoint', operateEndpoint?.id],
-    queryFn: () => EndpointBridge.getEndpointById(operateEndpoint?.id ?? ''),
+    queryKey: ['endpoint', endpointId],
+    queryFn: () => EndpointBridge.getEndpointById(endpointId),
   })
 
   const mutation = useMutation({
@@ -37,6 +38,10 @@ export const useUpdateEndpointService = () => {
       queryClient.invalidateQueries({ queryKey: ['endpoints'] })
       setUpdateDialogOpen(false)
       setOperateEndpoint(null)
+      onUpdateSuccess?.()
+    },
+    onError: (error: Error) => {
+      onUpdateError?.(error)
     },
   })
 
@@ -59,7 +64,7 @@ export const useUpdateEndpointService = () => {
 
   const onSubmit = async (values: FormValues) => {
     mutation.mutate({
-      id: operateEndpoint?.id ?? '',
+      id: endpointId,
       name: values.name,
       url: values.url,
       headers: values.headers && JSON.stringify(values.headers),
