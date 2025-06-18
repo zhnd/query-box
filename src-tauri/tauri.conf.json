@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "query-box",
-        "width": 800,
-        "height": 600,
+        "minWidth": 1366,
+        "minHeight": 768,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true
       }
