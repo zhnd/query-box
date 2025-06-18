@@ -1,3 +1,4 @@
+import { EmptyState } from '@/components/empty-state'
 import LoadErrorArea from '@/components/load-error-area'
 import LoadingSpinnerArea from '@/components/loading-spinner-area'
 import { ResponseViewer } from '@/components/response-viewer'
@@ -9,6 +10,15 @@ import { useExplorerService } from './use-explorer-service'
 
 export function Explorer() {
   const service = useExplorerService()
+
+  if (!service.currentPageSelectedEndpoint) {
+    return (
+      <EmptyState
+        title="No endpoint selected"
+        description="Select an endpoint to view its schema and send a request."
+      />
+    )
+  }
 
   return (
     <div className="explorer relative flex-1 flex flex-col">
