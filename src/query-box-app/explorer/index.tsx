@@ -31,17 +31,17 @@ export function Explorer() {
         message="Error fetching or parsing schema, please check your endpoint URL and headers."
       />
       <SplitResizable className="flex-1 flex min-h-0" sizes={[30, 70]}>
-        <div className=" p-4 h-full">
+        <div className="h-full">
           <Documentation />
         </div>
-        <div className="flex flex-col pt-4 h-full">
+        <div className="flex flex-col h-full">
           <RequestHistoryTabs />
 
           <SplitResizable className="flex-1 flex min-h-0" sizes={[50, 50]}>
-            <div className="pt-4 h-full">
+            <div className="h-full">
               <Request />
             </div>
-            <div className="pt-4 h-full">
+            <div className="h-full">
               <ResponseViewer data={service.response} />
             </div>
           </SplitResizable>

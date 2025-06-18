@@ -16,7 +16,7 @@ export function Documentation() {
   return (
     <div className="flex-1 h-full flex flex-col min-h-0 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b">
+      <div className="flex items-center gap-3 px-4 pb-3 border-b">
         <div className="flex items-center justify-center w-6 h-6 rounded">
           <FileText className="h-3.5 w-3.5 text-primary" />
         </div>
