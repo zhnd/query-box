@@ -102,6 +102,7 @@ export const useRequestHistoryTabsService = () => {
       if (activeTabElement) {
         activeTabElement.scrollIntoView({
           behavior: 'smooth',
+          inline: 'center',
         })
       }
     }
