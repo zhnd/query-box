@@ -14,7 +14,7 @@ export function RequestHistoryTabs() {
   return (
     <div className="tab-bar flex flex-row gap-2 items-center">
       <div
-        className="flex-1 flex space-x-4 min-w-0 overflow-x-auto scrollbar-hide bg-muted text-muted-foreground items-center rounded-lg p-1"
+        className="flex-1 flex space-x-4 min-w-0 overflow-x-auto scrollbar-hide bg-muted text-muted-foreground items-center rounded-lg p-1 scroll-px-1"
         ref={service.tabsContainerRef}
       >
         {service.requestHistories.map((record, index) => (
