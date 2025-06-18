@@ -45,6 +45,21 @@ export const usePageMenubarService = () => {
   const updatePopoverOpen = (value: boolean) => {
     setPopoverOpen(value)
   }
+
+  const handleUpdateSelectedEndpointSuccess = async () => {
+    try {
+      const endpoint = await EndpointBridge.getEndpointById(
+        selectedEndpoint?.id || ''
+      )
+      setSelectedEndpoint({
+        menuItem: activeItemKey,
+        endpoint: endpoint || null,
+      })
+    } catch (error) {
+      console.error('Error fetching updated endpoint:', error)
+    }
+  }
+
   return {
     activeAppSidebarMenuItem,
     updateEndpointId,
@@ -53,5 +68,6 @@ export const usePageMenubarService = () => {
     showEndpointSelector,
     endpoints: endpointsData?.items || [],
     selectedEndpoint,
+    handleUpdateSelectedEndpointSuccess,
   }
 }

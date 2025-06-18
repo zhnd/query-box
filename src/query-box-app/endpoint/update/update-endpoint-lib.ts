@@ -4,6 +4,8 @@ import { z } from 'zod'
 
 export interface UpdateEndpointProps {
   endpointId: string
+  onUpdateSuccess?: () => void
+  onUpdateError?: (error: Error) => void
 }
 
 export const formSchema = z.object({

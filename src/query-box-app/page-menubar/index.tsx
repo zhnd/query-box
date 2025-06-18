@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { UpdateEndpointButton } from '@/components/update-endpoint-button'
 import { cn } from '@/lib/utils'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { ThemeModeToggle } from '../theme-mode-toggle'
@@ -84,6 +85,10 @@ export function PageMenubar() {
               </Popover>
 
               <CreateEndpointButton />
+              <UpdateEndpointButton
+                endpointId={service.selectedEndpoint?.id ?? ''}
+                onUpdateSuccess={service.handleUpdateSelectedEndpointSuccess}
+              />
             </div>
           )}
         </div>
