@@ -1,5 +1,5 @@
 export enum AppSidebarMenuItemKeys {
   ENDPOINT = 'endpoint',
-  DOCUMENTATION = 'documentation',
+  RESOURCE_TOPOLOGY = 'resource_topology',
   EXPLORER = 'explorer',
 }
