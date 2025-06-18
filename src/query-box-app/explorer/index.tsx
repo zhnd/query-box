@@ -11,7 +11,7 @@ export function Explorer() {
   const service = useExplorerService()
 
   return (
-    <div className="explorer relative bg-white flex-1 flex flex-col">
+    <div className="explorer relative flex-1 flex flex-col">
       <LoadingSpinnerArea
         loading={service.pageLoadState.loading}
         message="schema fetching and parsing..."
