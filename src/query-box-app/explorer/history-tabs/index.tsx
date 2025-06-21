@@ -39,7 +39,10 @@ export function RequestHistoryTabs() {
                 variant="ghost"
                 size="icon"
                 className="flex items-center cursor-pointer w-5 h-5"
-                onClick={() => service.handleDeleteRequestHistory(record.id)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  service.handleDeleteRequestHistory(record.id)
+                }}
               >
                 <X />
                 <span className="sr-only">Close tab</span>
