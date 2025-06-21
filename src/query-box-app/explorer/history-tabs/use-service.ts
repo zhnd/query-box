@@ -81,9 +81,11 @@ export const useRequestHistoryTabsService = () => {
       return
     }
     setRequestHistories(newRequestHistories)
-    setActiveRequestHistory(
-      requestHistories[targetRequestHistoryIndex - 1] ?? null
-    )
+    if (activeRequestHistory?.id === id) {
+      const nextActiveRequestHistory =
+        newRequestHistories[Math.max(targetRequestHistoryIndex - 1, 0)]
+      setActiveRequestHistory(nextActiveRequestHistory)
+    }
   }
 
   const handleDeleteAllRequestHistories = async () => {
