@@ -1,4 +1,5 @@
 import { EndpointBridge } from '@/bridges'
+import { AuthType } from '@/generated/typeshare-types'
 import { useEndpointConnectivity } from '@/hooks'
 import { useEndpointPageStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -67,6 +68,7 @@ export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
       id: endpointId,
       name: values.name,
       url: values.url,
+      auth: values.auth?.auth_type !== AuthType.None ? values.auth : undefined,
       headers: values.headers && JSON.stringify(values.headers),
     })
   }
@@ -74,6 +76,7 @@ export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
   const testConnection = async () => {
     await checkConnectivity({
       url: form.getValues('url'),
+      auth: form.getValues('auth'),
       headers: form.getValues('headers')?.reduce(
         (acc, header) => {
           if (header.key && header.value) {

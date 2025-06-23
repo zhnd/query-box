@@ -1,3 +1,4 @@
+import { AuthType } from '@/generated/typeshare-types'
 import {
   checkGraphQLEndpointConnectivity,
   ConnectivityCheckOptions,
@@ -8,6 +9,11 @@ export interface UseGraphQLConnectivityOptions {
   url?: string
   headers?: Record<string, string>
   timeout?: number
+  auth?: {
+    auth_type: AuthType
+    username: string
+    password: string
+  }
 }
 
 export function useEndpointConnectivity(
@@ -36,6 +42,11 @@ export function useEndpointConnectivity(
         url: options?.url || '',
         ...options,
         ...params,
+        headers: {
+          ...options?.headers,
+          ...params?.headers,
+        },
+        auth: params?.auth || options?.auth,
         signal: abortControllerRef.current?.signal,
       }
 

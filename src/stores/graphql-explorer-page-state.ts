@@ -1,4 +1,4 @@
-import { GraphQLResponse, RequestHistory } from '@/generated/typeshare-types'
+import { HttpResponse, RequestHistory } from '@/generated/typeshare-types'
 import { create } from 'zustand'
 
 interface PageLoadState {
@@ -8,7 +8,7 @@ interface PageLoadState {
 
 interface GraphQLExplorerPageState {
   pageLoadState: PageLoadState
-  response: GraphQLResponse | null
+  response: HttpResponse | null
   requestHistories: RequestHistory[]
   activeRequestHistory: RequestHistory | null
   viewGraphQLDefinitionFieldType: string | null
@@ -16,7 +16,7 @@ interface GraphQLExplorerPageState {
 
 interface GraphQLExplorerPageActions {
   setPageLoadState: (state: PageLoadState) => void
-  setResponse: (response: GraphQLResponse | null) => void
+  setResponse: (response: HttpResponse | null) => void
   setRequestHistories: (histories: RequestHistory[]) => void
   setActiveRequestHistory: (requestHistory: RequestHistory | null) => void
   setViewGraphQLDefinitionFieldType: (field: string | null) => void

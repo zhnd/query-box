@@ -53,7 +53,7 @@ export const usePageMenubarService = () => {
       )
       setSelectedEndpoint({
         menuItem: activeItemKey,
-        endpoint: endpoint || null,
+        endpoint: endpoint ? { ...endpoint } : null,
       })
     } catch (error) {
       console.error('Error fetching updated endpoint:', error)

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogClose,
@@ -18,6 +19,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { AuthType } from '@/generated/typeshare-types'
 import { Play, Plus, Save, Trash } from 'lucide-react'
 import { ConnectivityCheckInfo } from '../connectivity-check-info'
 import { CreateEndpointProps, useCreateEndpointService } from './use-service'
@@ -75,6 +77,74 @@ export function CreateEndpoint(props: CreateEndpointProps) {
                   </FormItem>
                 )}
               />
+
+              <div className="space-y-4 rounded-lg border p-4">
+                <FormField
+                  control={service.form.control}
+                  name="auth.auth_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label className="flex items-start gap-3">
+                        <Checkbox
+                          {...field}
+                          checked={field.value === AuthType.Basic}
+                          onCheckedChange={(checked) => {
+                            field.onChange(
+                              checked ? AuthType.Basic : AuthType.None
+                            )
+                          }}
+                          id="toggle-2"
+                        />
+                        <div className="grid gap-1.5 font-normal">
+                          <p className="text-sm leading-none font-medium">
+                            Authentication (Optional)
+                          </p>
+                          <p className="text-muted-foreground text-sm">
+                            Currently, only Basic Authorization is supported for
+                            retrieving schema content.
+                          </p>
+                        </div>
+                      </Label>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {service.form.watch('auth.auth_type') === AuthType.Basic && (
+                  <div className="space-y-2">
+                    <FormField
+                      control={service.form.control}
+                      name="auth.username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter username" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={service.form.control}
+                      name="auth.password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Enter password"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+              </div>
 
               <div className="space-y-2">
                 <Label>Headers (Optional)</Label>

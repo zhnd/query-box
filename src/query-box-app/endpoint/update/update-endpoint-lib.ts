@@ -1,4 +1,4 @@
-import { Endpoint } from '@/generated/typeshare-types'
+import { AuthType, Endpoint } from '@/generated/typeshare-types'
 import { nanoid } from 'nanoid'
 import { z } from 'zod'
 
@@ -19,6 +19,13 @@ export const formSchema = z.object({
         value: z.string(),
       })
     )
+    .optional(),
+  auth: z
+    .object({
+      auth_type: z.nativeEnum(AuthType),
+      username: z.string(),
+      password: z.string(),
+    })
     .optional(),
 })
 
@@ -47,6 +54,13 @@ export const getUpdateEndpointFormInitialValues = (params: {
   return {
     name: endpoint?.name ?? '',
     url: endpoint?.url ?? '',
+    auth: endpoint?.auth
+      ? {
+          auth_type: endpoint.auth.auth_type,
+          username: endpoint.auth.username ?? '',
+          password: endpoint.auth.password ?? '',
+        }
+      : undefined,
     headers: getInitialHeaders({ endpoint }),
   }
 }

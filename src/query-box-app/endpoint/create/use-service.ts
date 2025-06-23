@@ -1,5 +1,5 @@
 import { EndpointBridge } from '@/bridges'
-import { Endpoint, EndpointType } from '@/generated/typeshare-types'
+import { AuthType, Endpoint, EndpointType } from '@/generated/typeshare-types'
 import { useEndpointConnectivity } from '@/hooks'
 import { useEndpointPageStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -23,6 +23,13 @@ const formSchema = z.object({
         value: z.string(),
       })
     )
+    .optional(),
+  auth: z
+    .object({
+      auth_type: z.nativeEnum(AuthType),
+      username: z.string(),
+      password: z.string(),
+    })
     .optional(),
 })
 
@@ -70,6 +77,7 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
       name: values.name,
       url: values.url,
       endpoint_type: EndpointType.GraphQL,
+      auth: values.auth?.auth_type !== AuthType.None ? values.auth : undefined,
       headers: values.headers && JSON.stringify(values.headers),
       favorite: false,
     })
@@ -78,6 +86,7 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
   const testConnection = async () => {
     await checkConnectivity({
       url: form.getValues('url'),
+      auth: form.getValues('auth'),
       headers: form.getValues('headers')?.reduce(
         (acc, header) => {
           if (header.key && header.value) {
