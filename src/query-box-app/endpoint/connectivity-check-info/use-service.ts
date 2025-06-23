@@ -13,13 +13,12 @@ export function useConnectivityCheckService(props: ConnectivityCheckInfoProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (checkResult?.error) {
-      // Scroll to the top of the wrapper when there is an error
-      wrapperRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
-    }
+    // Scroll to the top of the wrapper when there is a new check result
+    if (!checkResult) return
+    wrapperRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
   }, [checkResult])
 
   return {

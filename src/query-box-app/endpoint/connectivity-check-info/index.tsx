@@ -23,8 +23,12 @@ export function ConnectivityCheckInfo(props: {
       <AlertDescription>
         {loading ? (
           'Testing connection...'
+        ) : checkResult.status === 'connected' ? (
+          <span className="text-green-800">
+            Connection successful! The endpoint is reachable.
+          </span>
         ) : (
-          <span>
+          <span className="text-red-800">
             Endpoint Error, please try again later: {checkResult.error}
           </span>
         )}
