@@ -22,7 +22,7 @@ interface UseGraphQLSchemaResult {
 }
 
 export function useGraphQLSchema(data: {
-  endpoint: Endpoint | null
+  endpoint?: Endpoint | null
   options?: SchemaFetchOptions
   page?: 'explorer' | 'doc' | 'query-editor'
 }): UseGraphQLSchemaResult {

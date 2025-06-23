@@ -15,11 +15,12 @@ interface setSelectedEndpointParams {
 
 interface EndpointSelectedStateStoreState {
   selectedEndpoints: Record<string, string | null> // active menu item key -> endpointId
-  currentPageSelectedEndpoint: Endpoint | null
+  currentPageSelectedEndpoint?: Endpoint | null
 }
 
 interface EndpointSelectedStateStoreActions {
   setSelectedEndpoint: (params: setSelectedEndpointParams) => void
+  resetCurrentPageSelectedEndpoint: () => void
 }
 type EndpointStateStore = EndpointSelectedStateStoreState &
   EndpointSelectedStateStoreActions
@@ -42,6 +43,9 @@ export const useEndpointSelectedStateStore = create<EndpointStateStore>()(
             currentPageSelectedEndpoint: endpoint,
           }))
         },
+        resetCurrentPageSelectedEndpoint: () => {
+          set({ currentPageSelectedEndpoint: null })
+        },
       }
     },
     {
@@ -54,6 +58,9 @@ export const useEndpointSelectedStateStore = create<EndpointStateStore>()(
           description: 'Selected endpoint ID in the application state',
         },
       }),
+      partialize: (state) => ({
+        selectedEndpoints: state.selectedEndpoints,
+      }),
       onRehydrateStorage: () => (state) => {
         if (!state) return
         // Rehydrate the current page selected endpoint based on the active menu item
@@ -63,12 +70,13 @@ export const useEndpointSelectedStateStore = create<EndpointStateStore>()(
         useAppSidebarMenuStore.subscribe(
           (menuState) => menuState.activeItemKey,
           async (activeItemKey) => {
+            // Get the current state of the endpoint selected store
+            const currentState = useEndpointSelectedStateStore.getState()
             const currentPageSelectedEndpoint =
               await getCurrentPageSelectedEndpoint({
                 activeItemKey: activeItemKey,
-                selectedEndpoints: state.selectedEndpoints,
+                selectedEndpoints: currentState.selectedEndpoints,
               })
-
             if (currentPageSelectedEndpoint) {
               useEndpointSelectedStateStore.setState({
                 currentPageSelectedEndpoint,
@@ -76,8 +84,10 @@ export const useEndpointSelectedStateStore = create<EndpointStateStore>()(
             }
           }
         )
+
         // Initial fetch for the current page selected endpoint
         const activeItemKey = useAppSidebarMenuStore.getState().activeItemKey
+
         if (activeItemKey) {
           getCurrentPageSelectedEndpoint({
             activeItemKey,
