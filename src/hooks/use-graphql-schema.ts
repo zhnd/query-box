@@ -1,5 +1,5 @@
 import { Endpoint } from '@/generated/typeshare-types'
-import { fetchGraphqlSchema } from '@/lib'
+import { fetchGraphqlSchema, formatHeadersStringToObject } from '@/lib'
 import { usePageGraphQLSchemaStore } from '@/stores/page-graphql-schema-state'
 import { GraphQLSchema } from 'graphql'
 import { useCallback, useEffect, useRef } from 'react'
@@ -45,7 +45,6 @@ export function useGraphQLSchema(data: {
     (state) => state.setLastFetchTime
   )
 
-  const prevEndpointUrl = useRef<string | null>(null)
   const autoRefreshTimerRef = useRef<NodeJS.Timeout | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const initializingRef = useRef(false)
@@ -63,19 +62,22 @@ export function useGraphQLSchema(data: {
     clearAutoRefreshTimer()
 
     autoRefreshTimerRef.current = setTimeout(() => {
-      fetchSchemaFromNetwork(true)
+      fetchSchemaFromNetwork({
+        isTriggerByAutoRefresh: true,
+      })
     }, AUTO_REFRESH_INTERVAL)
   }, [endpoint, enableAutoRefresh, clearAutoRefreshTimer])
 
   const fetchSchemaFromNetwork = useCallback(
-    async (isFirstFetch = false): Promise<void> => {
+    async (params: { isTriggerByAutoRefresh?: boolean }): Promise<void> => {
+      const { isTriggerByAutoRefresh = false } = params
       if (!endpoint?.url) return
 
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
 
-      if (!isFirstFetch) {
+      if (!isTriggerByAutoRefresh) {
         setLoading(true)
         setError(null)
       } else {
@@ -84,13 +86,13 @@ export function useGraphQLSchema(data: {
 
       abortControllerRef.current = new AbortController()
       let retries = 0
-
       const attemptFetch = async (): Promise<void> => {
         try {
           const parsedSchema = await fetchGraphqlSchema({
-            endpoint,
-            timeout,
-            signal: abortControllerRef.current?.signal,
+            endpoint: {
+              ...endpoint,
+              headers: formatHeadersStringToObject(endpoint.headers || ''),
+            },
           })
           if (!parsedSchema) {
             throw new Error('Fetched schema is null or undefined')
@@ -121,7 +123,8 @@ export function useGraphQLSchema(data: {
 
           const errorMessage = err instanceof Error ? err.message : String(err)
 
-          if (!schema) {
+          if (!isTriggerByAutoRefresh) {
+            setLoading(false)
             setError(errorMessage)
           }
         }
@@ -145,19 +148,22 @@ export function useGraphQLSchema(data: {
 
   const refetch = useCallback(async () => {
     clearAutoRefreshTimer()
-    await fetchSchemaFromNetwork(false)
+    await fetchSchemaFromNetwork({
+      isTriggerByAutoRefresh: false,
+    })
   }, [fetchSchemaFromNetwork, clearAutoRefreshTimer])
 
   useEffect(() => {
-    if (schema && prevEndpointUrl.current === endpoint?.url) {
+    if (initializingRef.current) {
       return
     }
 
-    prevEndpointUrl.current = endpoint?.url || null
     initializingRef.current = true
     setSchema(null)
 
-    fetchSchemaFromNetwork(false)
+    fetchSchemaFromNetwork({
+      isTriggerByAutoRefresh: false,
+    })
 
     return () => {
       if (abortControllerRef.current) {
@@ -166,7 +172,7 @@ export function useGraphQLSchema(data: {
       clearAutoRefreshTimer()
       initializingRef.current = false
     }
-  }, [endpoint?.url, schema])
+  }, [endpoint])
 
   return {
     schema,

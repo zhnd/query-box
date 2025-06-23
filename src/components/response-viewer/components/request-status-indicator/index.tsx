@@ -1,10 +1,10 @@
 import { Badge } from '@/components/ui/badge'
-import { GraphQLResponse } from '@/generated/typeshare-types'
+import { HttpResponse } from '@/generated/typeshare-types'
 import { cn } from '@/lib/utils'
 import { CheckCircle, Clock, XCircle } from 'lucide-react'
 
 interface RequestStatusIndicatorProps {
-  response: GraphQLResponse | null
+  response: HttpResponse | null
   isLoading?: boolean
 }
 
@@ -24,9 +24,10 @@ export function RequestStatusIndicator(props: RequestStatusIndicatorProps) {
     return null
   }
 
-  const isSuccess = response.statusCode >= 200 && response.statusCode < 300
-  const isClientError = response.statusCode >= 400 && response.statusCode < 500
-  const isServerError = response.statusCode >= 500
+  const isSuccess = response.status_code >= 200 && response.status_code < 300
+  const isClientError =
+    response.status_code >= 400 && response.status_code < 500
+  const isServerError = response.status_code >= 500
 
   const formatDuration = (ms: number) => {
     if (ms < 1000) {
@@ -55,13 +56,13 @@ export function RequestStatusIndicator(props: RequestStatusIndicatorProps) {
         ) : (
           <XCircle className="h-3 w-3" />
         )}
-        {response.statusCode}
+        {response.status_code}
       </Badge>
 
       {/* Duration */}
       <div className="flex items-center gap-1 text-sm text-muted-foreground">
         <Clock className="h-3 w-3" />
-        <span>{formatDuration(response.durationMs)}</span>
+        <span>{formatDuration(response.duration_ms)}</span>
       </div>
     </div>
   )

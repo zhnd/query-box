@@ -10,6 +10,9 @@ pub use endpoint_commands::*;
 pub mod request_history_commands;
 pub use request_history_commands::*;
 
+pub mod proxy_http_commands;
+pub use proxy_http_commands::*;
+
 ///
 /// # Command Registration Macro
 ///
@@ -51,6 +54,7 @@ macro_rules! app_commands {
             commands::create_request_history,
             commands::update_request_history,
             commands::delete_request_history,
+            commands::proxy_http_request,
         ]
     };
 }

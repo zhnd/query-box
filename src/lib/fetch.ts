@@ -1,7 +1,8 @@
+import { ProxyHttpBridge } from '@/bridges'
 import { createGraphiQLFetcher } from '@graphiql/toolkit'
 
 export function timeoutFetch(params: {
-  url: Parameters<typeof fetch>[0]
+  url: string
   options?: RequestInit
   timeout?: number
   signal?: AbortSignal
@@ -24,10 +25,20 @@ export function timeoutFetch(params: {
 
     signal?.addEventListener('abort', onAbort)
 
-    fetch(url, options)
+    ProxyHttpBridge.proxy_http_request({
+      url,
+      method: options?.method || 'GET',
+      headers: options?.headers as Record<string, string>,
+      body: typeof options?.body === 'string' ? options.body : undefined,
+    })
       .then((res) => {
         clearListeners()
-        resolve(res)
+        const response = new Response(res.body, {
+          status: res.status_code,
+          statusText: '',
+          headers: new Headers(res.headers),
+        })
+        resolve(response)
       })
       .catch((err) => {
         clearListeners()
@@ -46,7 +57,7 @@ export function createGraphQLFetcher(params: {
   const { url, headers, timeout, signal } = params
   return createGraphiQLFetcher({
     url,
-    fetch: (url, options) =>
+    fetch: (_, options) =>
       timeoutFetch({
         url,
         options: {
