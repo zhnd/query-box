@@ -1,6 +1,10 @@
 import { useSidebar } from '@/components/ui/sidebar'
 import { AppSidebarMenuItemKeys } from '@/constants'
-import { useAppSidebarCollapsedStore, useAppSidebarMenuStore } from '@/stores'
+import {
+  useAppSidebarCollapsedStore,
+  useAppSidebarMenuStore,
+  useEndpointSelectedStateStore,
+} from '@/stores'
 import { useEffect, useRef } from 'react'
 
 export const useAppSidebarService = () => {
@@ -11,9 +15,15 @@ export const useAppSidebarService = () => {
     useAppSidebarCollapsedStore()
 
   const { activeItemKey, setActiveItemKey } = useAppSidebarMenuStore()
+  const resetCurrentPageSelectedEndpoint = useEndpointSelectedStateStore(
+    (state) => state.resetCurrentPageSelectedEndpoint
+  )
 
   const updateActiveAppSidebarMenuItemKey = (key: AppSidebarMenuItemKeys) => {
     setActiveItemKey(key)
+    if (key !== activeItemKey) {
+      resetCurrentPageSelectedEndpoint()
+    }
   }
 
   useEffect(() => {
