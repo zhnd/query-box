@@ -30,7 +30,7 @@ export function CreateEndpoint(props: CreateEndpointProps) {
   return (
     <Dialog
       open={service.createDialogOpen}
-      onOpenChange={service.setCreateDialogOpen}
+      onOpenChange={service.handleSetCreateDialogOpen}
     >
       <DialogContent className="sm:max-w-md md:max-w-lg flex flex-col max-h-[85vh] overflow-auto">
         <DialogHeader>

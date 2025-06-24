@@ -42,6 +42,15 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
   )
   const queryClient = useQueryClient()
 
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      url: '',
+      headers: [{ id: nanoid(), key: '', value: '' }],
+    },
+  })
+
   const setCreateDialogOpen = useEndpointPageStore(
     (state) => state.setCreateDialogOpen
   )
@@ -49,26 +58,24 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
   const {
     loading: checkConnectivityLoading,
     result: checkConnectivityResult,
+    cancel: cancelCheckConnectivity,
     checkConnectivity,
   } = useEndpointConnectivity()
+
+  const resetState = () => {
+    cancelCheckConnectivity()
+    form.reset()
+  }
 
   const mutation = useMutation({
     mutationFn: EndpointBridge.createEndpoint,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['endpoints'] })
       setCreateDialogOpen(false)
+      resetState()
       onCreateSuccess?.({
         endpoint: data,
       })
-    },
-  })
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      url: '',
-      headers: [{ id: nanoid(), key: '', value: '' }],
     },
   })
 
@@ -115,9 +122,16 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
     )
   }
 
+  const handleSetCreateDialogOpen = (open: boolean) => {
+    setCreateDialogOpen(open)
+    if (!open) {
+      resetState()
+    }
+  }
+
   return {
     createDialogOpen,
-    setCreateDialogOpen,
+    handleSetCreateDialogOpen,
     checkConnectivityLoading,
     checkConnectivityResult,
     form,

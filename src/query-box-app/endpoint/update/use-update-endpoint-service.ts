@@ -38,7 +38,7 @@ export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['endpoints'] })
       setUpdateDialogOpen(false)
-      setOperateEndpoint(null)
+      resetState()
       onUpdateSuccess?.()
     },
     onError: (error: Error) => {
@@ -49,12 +49,18 @@ export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
   const {
     loading: checkConnectivityLoading,
     result: checkConnectivityResult,
+    cancel: cancelCheckConnectivity,
     checkConnectivity,
   } = useEndpointConnectivity()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   })
+
+  const resetState = () => {
+    cancelCheckConnectivity()
+    setOperateEndpoint(null)
+  }
 
   useEffect(() => {
     const initialValues = getUpdateEndpointFormInitialValues({
@@ -105,9 +111,16 @@ export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
     )
   }
 
+  const handleSetUpdateDialogOpen = (open: boolean) => {
+    setUpdateDialogOpen(open)
+    if (!open) {
+      resetState()
+    }
+  }
+
   return {
     updateDialogOpen,
-    setUpdateDialogOpen,
+    handleSetUpdateDialogOpen,
     checkConnectivityLoading,
     checkConnectivityResult,
     form,
