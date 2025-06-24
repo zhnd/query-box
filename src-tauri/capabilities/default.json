@@ -28,6 +28,8 @@
     "core:window:allow-set-always-on-top",
     "core:window:allow-set-focus",
     "process:default",
-    "process:allow-restart"
+    "process:allow-restart",
+    "log:default",
+    "log:allow-log"
   ]
 }

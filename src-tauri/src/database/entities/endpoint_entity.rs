@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use log::{debug, error, warn};
 use serde::{Deserialize, Serialize};
 use sqlx::{types::Json, FromRow};
 use strum_macros::{Display, EnumString};
@@ -156,27 +157,48 @@ pub struct EndpointRow {
 impl TryFrom<EndpointRow> for Endpoint {
     type Error = Box<dyn std::error::Error>;
     fn try_from(row: EndpointRow) -> Result<Self, Self::Error> {
-        let id = Uuid::parse_str(&row.id)?;
+        let id = Uuid::parse_str(&row.id).map_err(|e| {
+            error!("Failed to parse UUID: {}", e);
+            e
+        })?;
 
-        let endpoint_type = EndpointType::from_str(&row.endpoint_type.to_lowercase())
-            .map_err(|_| "unknown endpoint type")?;
+        let endpoint_type =
+            EndpointType::from_str(&row.endpoint_type.to_lowercase()).map_err(|_| {
+                error!("Invalid endpoint type: {}", row.endpoint_type);
+                format!("Unknown endpoint type: {}", row.endpoint_type)
+            })?;
 
-        let status =
-            EndpointStatus::from_str(&row.status.to_lowercase()).unwrap_or(EndpointStatus::Active);
+        let status = EndpointStatus::from_str(&row.status.to_lowercase()).unwrap_or_else(|_| {
+            warn!(
+                "Unknown endpoint status '{}', defaulting to Active",
+                row.status
+            );
+            EndpointStatus::Active
+        });
 
         let auth: Option<AuthConfig> = if let Some(json) = row.auth {
-            Some(serde_json::from_str(&json)?)
+            match serde_json::from_str(&json) {
+                Ok(auth) => Some(auth),
+                Err(e) => {
+                    error!("Failed to parse auth config for endpoint {}: {}", row.id, e);
+                    return Err(Box::new(e));
+                }
+            }
         } else {
             None
         };
 
         let config: Option<EndpointConfig> = if row.config.trim().is_empty() {
+            debug!("Empty config for endpoint {}", row.id);
             None
         } else {
             match serde_json::from_str(&row.config) {
                 Ok(config) => Some(config),
                 Err(e) => {
-                    println!("parse endpoint config error: {}", e);
+                    warn!(
+                        "Failed to parse endpoint config for {}: {}, using default GraphQL config",
+                        row.id, e
+                    );
                     Some(EndpointConfig {
                         graphql: Some(GraphQLConfig {
                             introspection_enabled: true,
@@ -190,13 +212,25 @@ impl TryFrom<EndpointRow> for Endpoint {
         };
 
         let headers = if let Some(json) = row.headers {
-            Some(sqlx::types::Json(serde_json::from_str(&json)?))
+            match serde_json::from_str(&json) {
+                Ok(headers) => Some(sqlx::types::Json(headers)),
+                Err(e) => {
+                    error!("Failed to parse headers for endpoint {}: {}", row.id, e);
+                    return Err(Box::new(e));
+                }
+            }
         } else {
             None
         };
 
         let tags = if let Some(tags_str) = row.tags {
-            Some(serde_json::from_str(&tags_str)?)
+            match serde_json::from_str(&tags_str) {
+                Ok(tags) => Some(tags),
+                Err(e) => {
+                    error!("Failed to parse tags for endpoint {}: {}", row.id, e);
+                    return Err(Box::new(e));
+                }
+            }
         } else {
             None
         };

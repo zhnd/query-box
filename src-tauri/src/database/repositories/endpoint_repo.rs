@@ -3,6 +3,7 @@ use crate::models::common::pagination::{PaginatedResponse, PaginationParams};
 use crate::models::endpoint_model::{
     CreateEndpointDto, DeleteEndpointDto, EndpointFilter, UpdateEndpointDto,
 };
+use log::{debug, error, warn};
 use sqlx::{QueryBuilder, Row, Sqlite, SqlitePool};
 use uuid::Uuid;
 
@@ -37,6 +38,10 @@ impl EndpointRepository {
             params.push(format!("%{}%", url));
         }
 
+        debug!(
+            "Built filter conditions: {:?}, params: {:?}",
+            conditions, params
+        );
         (conditions, params)
     }
 
@@ -55,6 +60,14 @@ impl EndpointRepository {
 
         sql.push_str(" ORDER BY name LIMIT ? OFFSET ?");
 
+        debug!(
+            "Executing query: {} with params: {:?}, limit: {}, offset: {}",
+            sql,
+            params,
+            pagination.per_page(),
+            pagination.offset()
+        );
+
         let mut query = sqlx::query_as::<_, EndpointRow>(&sql);
 
         for param in params {
@@ -65,14 +78,20 @@ impl EndpointRepository {
 
         let endpoint_rows = query.fetch_all(pool).await?;
 
-        Ok(endpoint_rows
+        let endpoints: Vec<Endpoint> = endpoint_rows
             .into_iter()
             .filter_map(|row| {
                 Endpoint::try_from(row)
-                    .map_err(|e| println!("Conversion error: {}", e))
+                    .map_err(|e| {
+                        error!("Failed to convert endpoint row: {}", e);
+                        e
+                    })
                     .ok()
             })
-            .collect())
+            .collect();
+
+        debug!("Retrieved {} endpoints", endpoints.len());
+        Ok(endpoints)
     }
 
     async fn execute_count_query(
@@ -87,6 +106,8 @@ impl EndpointRepository {
             sql.push_str(&conditions.join(" AND "));
         }
 
+        debug!("Executing count query: {} with params: {:?}", sql, params);
+
         let mut query = sqlx::query(&sql);
 
         for param in params {
@@ -96,9 +117,13 @@ impl EndpointRepository {
         let row = query.fetch_one(pool).await?;
         let total: u32 = row.get(0);
 
+        debug!("Total count: {}", total);
         Ok(total)
     }
+
     pub async fn find_by_id(pool: &SqlitePool, id: &str) -> Result<Option<Endpoint>, sqlx::Error> {
+        debug!("Finding endpoint by id: {}", id);
+
         let endpoint_row = sqlx::query_as::<_, EndpointRow>("SELECT * FROM endpoint WHERE id = ?")
             .bind(id)
             .fetch_optional(pool)
@@ -106,20 +131,29 @@ impl EndpointRepository {
 
         match endpoint_row {
             Some(row) => match Endpoint::try_from(row) {
-                Ok(endpoint) => Ok(Some(endpoint)),
+                Ok(endpoint) => {
+                    debug!("Found endpoint: {}", endpoint.name);
+                    Ok(Some(endpoint))
+                }
                 Err(e) => {
-                    eprintln!("Error converting endpoint row: {}", e);
+                    error!("Error converting endpoint row for id {}: {}", id, e);
                     Err(sqlx::Error::RowNotFound)
                 }
             },
-            None => Ok(None),
+            None => {
+                warn!("Endpoint not found for id: {}", id);
+                Ok(None)
+            }
         }
     }
+
     pub async fn create(
         pool: &SqlitePool,
         dto: CreateEndpointDto,
     ) -> Result<Endpoint, sqlx::Error> {
         let id = Uuid::new_v4().to_string();
+        debug!("Creating endpoint with id: {}, name: {}", id, dto.name);
+
         let config_str = dto.config_str();
         let headers_str = dto.headers_str();
         let auth_str = dto.auth_str();
@@ -166,15 +200,20 @@ impl EndpointRepository {
         .execute(pool)
         .await?;
 
+        debug!("Endpoint created successfully, fetching created endpoint");
+
         let endpoint_row = sqlx::query_as::<_, EndpointRow>("SELECT * FROM endpoint WHERE id = ?")
             .bind(&id)
             .fetch_one(pool)
             .await?;
 
         match Endpoint::try_from(endpoint_row) {
-            Ok(endpoint) => Ok(endpoint),
+            Ok(endpoint) => {
+                debug!("Successfully created endpoint: {}", endpoint.name);
+                Ok(endpoint)
+            }
             Err(e) => {
-                eprintln!("Error converting endpoint row: {}", e);
+                error!("Error converting created endpoint row: {}", e);
                 Err(sqlx::Error::RowNotFound)
             }
         }
@@ -184,6 +223,8 @@ impl EndpointRepository {
         pool: &SqlitePool,
         dto: UpdateEndpointDto,
     ) -> Result<Endpoint, anyhow::Error> {
+        debug!("Updating endpoint with id: {}", dto.id);
+
         let mut tx = pool.begin().await?;
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(
             r#"
@@ -215,8 +256,14 @@ impl EndpointRepository {
         }
 
         if update_field_count == 0 {
+            warn!("No fields to update for endpoint id: {}", dto.id);
             return Err(anyhow::anyhow!("No fields to update"));
         }
+
+        debug!(
+            "Updating {} fields for endpoint id: {}",
+            update_field_count, dto.id
+        );
 
         separated
             .push_unseparated(" WHERE id = ")
@@ -233,17 +280,25 @@ impl EndpointRepository {
         tx.commit().await?;
 
         match Endpoint::try_from(endpoint_row) {
-            Ok(endpoint) => Ok(endpoint),
+            Ok(endpoint) => {
+                debug!("Successfully updated endpoint: {}", endpoint.name);
+                Ok(endpoint)
+            }
             Err(e) => {
+                error!("Error converting updated endpoint row: {}", e);
                 anyhow::bail!(e.to_string());
             }
         }
     }
 
     pub async fn delete(pool: &SqlitePool, dto: DeleteEndpointDto) -> Result<(), anyhow::Error> {
+        debug!("Deleting endpoint with id: {}", dto.id);
+
         sqlx::query!("DELETE FROM endpoint WHERE id = ?", dto.id)
             .execute(pool)
             .await?;
+
+        debug!("Successfully deleted endpoint with id: {}", dto.id);
         Ok(())
     }
 }
