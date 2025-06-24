@@ -31,7 +31,7 @@ export function UpdateEndpoint(props: UpdateEndpointProps) {
   return (
     <Dialog
       open={service.updateDialogOpen}
-      onOpenChange={service.setUpdateDialogOpen}
+      onOpenChange={service.handleSetUpdateDialogOpen}
     >
       <DialogContent className="sm:max-w-md md:max-w-lg flex flex-col max-h-[85vh] overflow-auto">
         <DialogHeader>
