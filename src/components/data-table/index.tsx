@@ -2,7 +2,6 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  OnChangeFn,
   PaginationState,
   RowData,
   useReactTable,
@@ -28,7 +27,7 @@ declare module '@tanstack/react-table' {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  onPaginationChange: OnChangeFn<PaginationState>
+  onPaginationChange: (pagination: PaginationState) => void
   paginationState: PaginationState
 }
 
@@ -42,7 +41,13 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    onPaginationChange,
+    onPaginationChange: (updater) => {
+      if (typeof updater === 'function') {
+        onPaginationChange(updater(paginationState))
+      } else {
+        onPaginationChange(updater)
+      }
+    },
     manualPagination: true,
     state: {
       pagination: paginationState,

@@ -6,7 +6,11 @@ export function SearchEndpoint() {
   const service = useEndpointSearchService()
   return (
     <div className="pb-2 flex justify-between items-center">
-      <Input placeholder="Filter endpoints..." className="max-w-sm" />
+      <Input
+        placeholder="Filter endpoints..."
+        className="max-w-sm"
+        onChange={service.handleSearchQueryStringOnChange}
+      />
       <CreateButton onClick={service.openCreateDialog} />
     </div>
   )

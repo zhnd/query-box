@@ -3,23 +3,47 @@ import { Endpoint } from '@/generated/typeshare-types'
 import { useEndpointPageStore } from '@/stores'
 import { useQuery } from '@tanstack/react-query'
 import { PaginationState } from '@tanstack/react-table'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+interface EndpointListParams {
+  pagination: PaginationState
+  searchQuery?: {
+    filterString?: string
+  }
+}
 
 export const useEndpointListService = () => {
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
+  const [listParams, setListParams] = useState<EndpointListParams>({
+    pagination: {
+      pageIndex: 0,
+      pageSize: 10,
+    },
   })
+
+  const searchQuery = useEndpointPageStore((state) => state.searchQuery)
+
   const { data } = useQuery({
-    queryKey: ['endpoints', pagination],
+    queryKey: ['endpoints', listParams],
     queryFn: () =>
       EndpointBridge.listEndpoints({
         pagination: {
-          page: pagination.pageIndex + 1,
-          per_page: pagination.pageSize,
+          page: listParams.pagination.pageIndex + 1,
+          per_page: listParams.pagination.pageSize,
         },
+        name: listParams.searchQuery?.filterString,
       }),
   })
+
+  useEffect(() => {
+    setListParams((prev) => ({
+      ...prev,
+      searchQuery,
+      pagination: {
+        ...prev.pagination,
+        pageIndex: 0, // Reset to first page when search query changes
+      },
+    }))
+  }, [searchQuery])
 
   const setUpdateDialogOpen = useEndpointPageStore(
     (state) => state.setUpdateDialogOpen
@@ -43,10 +67,17 @@ export const useEndpointListService = () => {
     setOperateEndpoint(endpoint)
   }
 
+  const onPaginationChange = (pagination: PaginationState) => {
+    setListParams((prev) => ({
+      ...prev,
+      pagination,
+    }))
+  }
+
   return {
     endpointsInfo: data,
-    pagination,
-    onPaginationChange: setPagination,
+    pagination: listParams.pagination,
+    onPaginationChange,
     openUpdateDialog,
     openDeleteDialog,
   }
