@@ -39,6 +39,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tauri-apps/api": "^2.5.0",
     "@tauri-apps/plugin-fs": "^2.3.0",
+    "@tauri-apps/plugin-log": "~2.5.0",
     "@tauri-apps/plugin-opener": "^2.2.7",
     "@tauri-apps/plugin-os": "^2.2.1",
     "@tauri-apps/plugin-process": "~2.2.2",

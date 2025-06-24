@@ -1,4 +1,5 @@
 export * from './connectivity'
 export * from './fetch'
 export * from './graphql-schema'
+export * from './log'
 export * from './request'
