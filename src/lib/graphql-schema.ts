@@ -5,6 +5,7 @@ import {
   getIntrospectionQuery,
   GraphQLSchema,
 } from 'graphql'
+import { getGraphQLRequestHeaders } from './request'
 
 export async function fetchGraphqlSchema(params: {
   endpoint: {
@@ -16,24 +17,17 @@ export async function fetchGraphqlSchema(params: {
 }): Promise<GraphQLSchema | null> {
   const { endpoint, isCheckConnectivity } = params
 
-  const customHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    'User-Agent': navigator.userAgent,
-    ...endpoint.headers,
-  }
-
-  if (endpoint.auth) {
-    customHeaders['Authorization'] = `Basic ${btoa(
-      `${endpoint.auth?.username || ''}:${endpoint.auth?.password || ''}`
-    )}`
-  }
-
   try {
     const schemaResponse = await ProxyHttpBridge.proxy_http_request({
       url: endpoint.url,
       method: 'POST',
-      headers: customHeaders,
+      headers: getGraphQLRequestHeaders({
+        endpoint: {
+          url: endpoint.url,
+          auth: endpoint.auth,
+        },
+        customHeaders: endpoint.headers,
+      }),
       body: JSON.stringify({
         query: getIntrospectionQuery(),
         operationName: 'IntrospectionQuery',

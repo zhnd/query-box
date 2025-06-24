@@ -1,6 +1,6 @@
 import { GraphQLBridge, RequestHistoryBridge } from '@/bridges'
 import { useGraphQLSchema } from '@/hooks'
-import { formatHeadersStringToObject } from '@/lib'
+import { getGraphQLRequestHeaders } from '@/lib'
 import {
   useEndpointSelectedStateStore,
   useGraphQLExplorerPageStore,
@@ -106,9 +106,9 @@ export const useRequestService = () => {
     mutate({
       endpoint: currentPageSelectedEndpoint?.url ?? '',
       query: activeRequestHistory?.query ?? '',
-      headers: formatHeadersStringToObject(
-        currentPageSelectedEndpoint?.headers
-      ),
+      headers: getGraphQLRequestHeaders({
+        endpoint: currentPageSelectedEndpoint,
+      }),
     })
   }
 
