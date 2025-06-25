@@ -1,6 +1,7 @@
-import { AuthType, Endpoint } from '@/generated/typeshare-types'
+import { Endpoint } from '@/generated/typeshare-types'
 import { nanoid } from 'nanoid'
 import { z } from 'zod'
+import { createAuthField } from '../common/utils'
 
 export interface UpdateEndpointProps {
   endpointId: string
@@ -20,13 +21,7 @@ export const formSchema = z.object({
       })
     )
     .optional(),
-  auth: z
-    .object({
-      auth_type: z.nativeEnum(AuthType),
-      username: z.string(),
-      password: z.string(),
-    })
-    .optional(),
+  auth: createAuthField(),
 })
 
 export type FormValues = z.infer<typeof formSchema>

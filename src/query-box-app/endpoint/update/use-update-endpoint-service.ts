@@ -1,5 +1,4 @@
 import { EndpointBridge } from '@/bridges'
-import { AuthType } from '@/generated/typeshare-types'
 import { useEndpointConnectivity } from '@/hooks'
 import { useEndpointPageStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { transformAuthValues } from '../common/utils'
 import {
   formSchema,
   FormValues,
@@ -74,7 +74,7 @@ export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
       id: endpointId,
       name: values.name,
       url: values.url,
-      auth: values.auth?.auth_type !== AuthType.None ? values.auth : undefined,
+      auth: transformAuthValues(values.auth),
       headers: values.headers && JSON.stringify(values.headers),
     })
   }
@@ -82,7 +82,7 @@ export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
   const testConnection = async () => {
     await checkConnectivity({
       url: form.getValues('url'),
-      auth: form.getValues('auth'),
+      auth: transformAuthValues(form.getValues('auth')),
       headers: form.getValues('headers')?.reduce(
         (acc, header) => {
           if (header.key && header.value) {
