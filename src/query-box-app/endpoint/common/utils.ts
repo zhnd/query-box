@@ -43,3 +43,26 @@ export function createAuthField() {
       }
     })
 }
+
+export interface HeaderItem {
+  id: string
+  key: string
+  value: string
+}
+
+export function transformHeadersToRecord(
+  headers?: HeaderItem[]
+): Record<string, string> | undefined {
+  if (!headers || headers.length === 0) {
+    return undefined
+  }
+
+  const result = headers.reduce<Record<string, string>>((acc, header) => {
+    if (header.key && header.value) {
+      acc[header.key] = header.value
+    }
+    return acc
+  }, {})
+
+  return Object.keys(result).length > 0 ? result : undefined
+}

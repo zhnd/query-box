@@ -7,7 +7,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { createAuthField, transformAuthValues } from '../common/utils'
+import {
+  createAuthField,
+  transformAuthValues,
+  transformHeadersToRecord,
+} from '../common/utils'
 
 export interface CreateEndpointProps {
   onCreateSuccess?: (data: { endpoint: Endpoint }) => void
@@ -88,15 +92,7 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
     await checkConnectivity({
       url: form.getValues('url'),
       auth: transformAuthValues(form.getValues('auth')),
-      headers: form.getValues('headers')?.reduce(
-        (acc, header) => {
-          if (header.key && header.value) {
-            acc[header.key] = header.value
-          }
-          return acc
-        },
-        {} as Record<string, string>
-      ),
+      headers: transformHeadersToRecord(form.getValues('headers')),
     })
   }
 
