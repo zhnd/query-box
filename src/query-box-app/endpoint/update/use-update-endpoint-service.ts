@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { transformAuthValues } from '../common/utils'
+import { transformAuthValues, transformHeadersToRecord } from '../common/utils'
 import {
   formSchema,
   FormValues,
@@ -83,15 +83,7 @@ export const useUpdateEndpointService = (data: UpdateEndpointProps) => {
     await checkConnectivity({
       url: form.getValues('url'),
       auth: transformAuthValues(form.getValues('auth')),
-      headers: form.getValues('headers')?.reduce(
-        (acc, header) => {
-          if (header.key && header.value) {
-            acc[header.key] = header.value
-          }
-          return acc
-        },
-        {} as Record<string, string>
-      ),
+      headers: transformHeadersToRecord(form.getValues('headers')),
     })
   }
 
