@@ -1,5 +1,5 @@
 import { EndpointBridge } from '@/bridges'
-import { AuthType, Endpoint, EndpointType } from '@/generated/typeshare-types'
+import { Endpoint, EndpointType } from '@/generated/typeshare-types'
 import { useEndpointConnectivity } from '@/hooks'
 import { useEndpointPageStore } from '@/stores'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { nanoid } from 'nanoid'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { createAuthField, transformAuthValues } from '../common/utils'
 
 export interface CreateEndpointProps {
   onCreateSuccess?: (data: { endpoint: Endpoint }) => void
@@ -24,13 +25,7 @@ const formSchema = z.object({
       })
     )
     .optional(),
-  auth: z
-    .object({
-      auth_type: z.nativeEnum(AuthType),
-      username: z.string(),
-      password: z.string(),
-    })
-    .optional(),
+  auth: createAuthField(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -41,7 +36,6 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
     (state) => state.createDialogOpen
   )
   const queryClient = useQueryClient()
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -84,7 +78,7 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
       name: values.name,
       url: values.url,
       endpoint_type: EndpointType.GraphQL,
-      auth: values.auth?.auth_type !== AuthType.None ? values.auth : undefined,
+      auth: transformAuthValues(values.auth),
       headers: values.headers && JSON.stringify(values.headers),
       favorite: false,
     })
@@ -93,7 +87,7 @@ export const useCreateEndpointService = (props: CreateEndpointProps) => {
   const testConnection = async () => {
     await checkConnectivity({
       url: form.getValues('url'),
-      auth: form.getValues('auth'),
+      auth: transformAuthValues(form.getValues('auth')),
       headers: form.getValues('headers')?.reduce(
         (acc, header) => {
           if (header.key && header.value) {
