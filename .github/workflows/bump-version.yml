@@ -84,4 +84,4 @@ jobs:
             --title "chore: bump version to v${{ steps.current_version.outputs.current }}" \
             --body "Auto-generated PR for ${{ steps.extract_type.outputs.type }} version bump to v${{ steps.current_version.outputs.current }}"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.BUMP_VERSION_ACTION }}
