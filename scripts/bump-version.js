@@ -33,13 +33,11 @@ if (!newVersion) {
 
 // update package.json with new version
 try {
-  const output = execSync(`npm version ${newVersion} --no-git-tag-version`, {
+  execSync(`npm version ${newVersion} --no-git-tag-version`, {
     stdio: 'inherit',
   })
 
-  console.log(
-    `✅ Updated to version ${newVersion}， ${output.toString().trim()}`
-  )
+  console.log(`✅ Updated to version ${newVersion}`)
 } catch (err) {
   console.error(`❌ Failed to update version: ${err.message}`)
   process.exit(1)
