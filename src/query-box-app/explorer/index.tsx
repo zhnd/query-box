@@ -1,6 +1,4 @@
 import { EmptyState } from '@/components/empty-state'
-import LoadErrorArea from '@/components/load-error-area'
-import LoadingSpinnerArea from '@/components/loading-spinner-area'
 import { ResponseViewer } from '@/components/response-viewer'
 import { SplitResizable } from '@/components/split-resizable'
 import { Documentation } from './documentation'
@@ -22,14 +20,6 @@ export function Explorer() {
 
   return (
     <div className="explorer relative flex-1 flex flex-col">
-      <LoadingSpinnerArea
-        loading={service.pageLoadState.loading}
-        message="schema fetching and parsing..."
-      />
-      <LoadErrorArea
-        error={service.pageLoadState.error}
-        message="Error fetching or parsing schema, please check your endpoint URL and headers."
-      />
       <SplitResizable className="flex-1 flex min-h-0" sizes={[30, 70]}>
         <div className="h-full">
           <Documentation />

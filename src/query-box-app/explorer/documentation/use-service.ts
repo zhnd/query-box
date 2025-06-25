@@ -8,6 +8,9 @@ export function useService() {
   const [path, setPath] = useState<BreadcrumbPathType[]>([DEFAULT_PATH])
 
   const schema = usePageGraphQLSchemaStore((state) => state.schema)
+  const schemaLoading = usePageGraphQLSchemaStore((state) => state.loading)
+  const schemaError = usePageGraphQLSchemaStore((state) => state.error)
+
   const viewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
     (state) => state.viewGraphQLDefinitionFieldType
   )
@@ -22,6 +25,11 @@ export function useService() {
       },
     ])
   }, [viewGraphQLDefinitionFieldType])
+
+  // Reset path when schema changes
+  useEffect(() => {
+    setPath([DEFAULT_PATH])
+  }, [schema])
 
   const currentTypeName = path[path.length - 1].name
   const currentTypeFields = getCurrentTypeFields(schema, currentTypeName)
@@ -42,6 +50,8 @@ export function useService() {
 
   return {
     schema,
+    schemaLoading,
+    schemaError,
     path,
     currentTypeName,
     currentTypeFields,

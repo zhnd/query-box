@@ -23,9 +23,6 @@ export const useRequestService = () => {
   )
 
   const setResponse = useGraphQLExplorerPageStore((state) => state.setResponse)
-  const setPageLoadState = useGraphQLExplorerPageStore(
-    (state) => state.setPageLoadState
-  )
 
   const setViewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
     (state) => state.setViewGraphQLDefinitionFieldType
@@ -37,17 +34,10 @@ export const useRequestService = () => {
   const currentPageSelectedEndpoint = useEndpointSelectedStateStore(
     (state) => state.currentPageSelectedEndpoint
   )
-
-  const { schema, loading, error } = useGraphQLSchema({
+  // Fetch the GraphQL schema for the current endpoint
+  const { schema } = useGraphQLSchema({
     endpoint: currentPageSelectedEndpoint,
   })
-
-  useEffect(() => {
-    setPageLoadState({
-      loading: loading,
-      error: error ?? null,
-    })
-  }, [loading, error])
 
   useEffect(() => {
     setResponse(null)
