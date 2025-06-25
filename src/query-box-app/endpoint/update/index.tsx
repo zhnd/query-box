@@ -47,7 +47,7 @@ export function UpdateEndpoint(props: UpdateEndpointProps) {
             onSubmit={service.form.handleSubmit(service.onSubmit)}
             className="flex flex-col flex-1 min-h-0"
           >
-            <div className="flex-1 min-h-0 overflow-y-auto pr-2 -mr-2 space-y-4">
+            <div className="flex-1 min-h-0 overflow-y-auto px-2 -mx-2 space-y-4">
               <FormField
                 control={service.form.control}
                 name="name"
