@@ -1,0 +1,84 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type: patch / minor / major'
+        required: true
+        default: 'patch (1.0.0 -> 1.0.1) - Bug fixes'
+        type: choice
+        options:
+          - 'major (1.0.0 -> 2.0.0) - Breaking changes'
+          - 'premajor (1.0.0 -> 2.0.0-0) - Pre-release major'
+          - 'minor (1.0.0 -> 1.1.0) - New features'
+          - 'preminor (1.0.0 -> 1.1.0-0) - Pre-release minor'
+          - 'patch (1.0.0 -> 1.0.1) - Bug fixes'
+          - 'prepatch (1.0.0 -> 1.0.1-0) - Pre-release patch'
+          - 'prerelease (1.0.0-0 -> 1.0.0-1) - Next pre-release'
+      branch:
+        description: 'Target branch'
+        required: true
+        default: 'main'
+        type: string
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Install GitHub CLI
+        run: sudo apt install gh -y
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install tools
+        run: |
+          npm install -g semver
+          sudo apt-get install -y jq
+
+      - name: Extract release type
+        id: extract_type
+        run: |
+          FULL_TYPE="${{ github.event.inputs.release_type }}"
+          RELEASE_TYPE=$(echo "$FULL_TYPE" | cut -d' ' -f1)
+          echo "type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        id: bump_version
+        run: |
+          node scripts/bump-version.js ${{ steps.extract_type.outputs.type }}
+
+      - name: Get current version
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit version change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BRANCH_NAME="bump/v${{ steps.bump_version.outputs.new_version }}"
+          git checkout -b $BRANCH_NAME
+          git add package.json
+          git commit -m "chore: bump ${{ steps.extract_type.outputs.type }} version to v${{ steps.bump_version.outputs.new_version }}"
+          git push origin $BRANCH_NAME
+
+      - name: Create PR
+        run: |
+          gh pr create \
+            --head bump/v${{ steps.bump_version.outputs.new_version }} \
+            --base ${{ github.event.inputs.branch }} \
+            --title "chore: bump version to v${{ steps.bump_version.outputs.new_version }}" \
+            --body "Auto-generated PR for ${{ steps.extract_type.outputs.type }} version bump to v${{ steps.bump_version.outputs.new_version }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
