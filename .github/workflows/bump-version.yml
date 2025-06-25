@@ -6,16 +6,16 @@ on:
       release_type:
         description: 'Type: patch / minor / major'
         required: true
-        default: 'patch (1.0.0 -> 1.0.1) - Bug fixes'
+        default: 'patch | Bug fixes (e.g. 1.0.0 -> 1.0.1)'
         type: choice
         options:
-          - 'major (1.0.0 -> 2.0.0) - Breaking changes'
-          - 'premajor (1.0.0 -> 2.0.0-0) - Pre-release major'
-          - 'minor (1.0.0 -> 1.1.0) - New features'
-          - 'preminor (1.0.0 -> 1.1.0-0) - Pre-release minor'
-          - 'patch (1.0.0 -> 1.0.1) - Bug fixes'
-          - 'prepatch (1.0.0 -> 1.0.1-0) - Pre-release patch'
-          - 'prerelease (1.0.0-0 -> 1.0.0-1) - Next pre-release'
+          - 'major | Breaking changes (e.g. 1.0.0 -> 2.0.0)'
+          - 'premajor | Pre-release major (e.g. 1.0.0 -> 2.0.0-0)'
+          - 'minor | New features (e.g. 1.0.0 -> 1.1.0)'
+          - 'preminor | Pre-release minor (e.g. 1.0.0 -> 1.1.0-0)'
+          - 'patch | Bug fixes (e.g. 1.0.0 -> 1.0.1)'
+          - 'prepatch | Pre-release patch (e.g. 1.0.0 -> 1.0.1-0)'
+          - 'prerelease | Next pre-release (e.g. 1.0.0-0 -> 1.0.0-1)'
       branch:
         description: 'Target branch'
         required: true
