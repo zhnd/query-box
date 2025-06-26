@@ -386,5 +386,7 @@ export const githubDarkTheme: monaco.editor.IStandaloneThemeData = {
     'editorBracketHighlight.unexpectedBracket.foreground': '#7d8590',
     'editor.stackFrameHighlightBackground': '#bb800966',
     'editor.focusedStackFrameHighlightBackground': '#2ea04366',
+    'editorCodeLens.foreground': '#e6edf3',
+    'editorLink.activeForeground': '#e6edf3',
   },
 }

@@ -10,6 +10,8 @@ import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
 import { QUERY_EXAMPLE } from './constants'
 import {
+  RunGraphQLQueryArguments,
+  getProvideCodeLenses,
   handleGoToGraphqlFieldDefinition,
   setupGraphQLSchemaInMonaco,
   updateGraphQLSchema,
@@ -22,10 +24,18 @@ export interface QueryEditorProps {
   className?: string
   schema: GraphQLSchema | null
   onViewDefinition?: (fieldName: string) => void
+  runGraphQLQuery?: (args: RunGraphQLQueryArguments) => void
 }
 
 export function useService(props: QueryEditorProps) {
-  const { onChange, initialValue, value, schema, onViewDefinition } = props
+  const {
+    onChange,
+    initialValue,
+    value,
+    schema,
+    onViewDefinition,
+    runGraphQLQuery,
+  } = props
 
   const editorContainerElementRef = useRef<HTMLDivElement>(null)
   const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(
@@ -106,6 +116,26 @@ export function useService(props: QueryEditorProps) {
       },
     })
 
+    monaco.languages.registerCodeLensProvider('graphql', {
+      provideCodeLenses(model) {
+        const lenses = getProvideCodeLenses({ model })
+        return {
+          lenses,
+          dispose: () => {},
+        }
+      },
+      resolveCodeLens(_, codeLens) {
+        return codeLens
+      },
+    })
+
+    monaco.editor.registerCommand(
+      'runGraphQLQuery',
+      (_, args: RunGraphQLQueryArguments) => {
+        runGraphQLQuery?.(args)
+        return null
+      }
+    )
     // add Go to Definition action
     editorInstance.addAction({
       id: 'graphql-provide-definition',

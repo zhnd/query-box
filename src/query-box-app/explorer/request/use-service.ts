@@ -1,4 +1,6 @@
 import { GraphQLBridge, RequestHistoryBridge } from '@/bridges'
+import { RunGraphQLQueryArguments } from '@/components/query-editor/utils'
+import { Endpoint } from '@/generated/typeshare-types'
 import { useGraphQLSchema } from '@/hooks'
 import { getGraphQLRequestHeaders } from '@/lib'
 import {
@@ -6,7 +8,7 @@ import {
   useGraphQLExplorerPageStore,
 } from '@/stores'
 import { useMutation } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 export const useRequestService = () => {
@@ -34,6 +36,10 @@ export const useRequestService = () => {
   const currentPageSelectedEndpoint = useEndpointSelectedStateStore(
     (state) => state.currentPageSelectedEndpoint
   )
+  const currentEndpointRef = useRef<Endpoint | undefined>(
+    currentPageSelectedEndpoint
+  )
+
   // Fetch the GraphQL schema for the current endpoint
   const { schema } = useGraphQLSchema({
     endpoint: currentPageSelectedEndpoint,
@@ -41,6 +47,7 @@ export const useRequestService = () => {
 
   useEffect(() => {
     setResponse(null)
+    currentEndpointRef.current = currentPageSelectedEndpoint
   }, [currentPageSelectedEndpoint])
 
   const { mutate, isPending } = useMutation({
@@ -102,6 +109,19 @@ export const useRequestService = () => {
     })
   }
 
+  const handleRunGraphQLQuery = (params: RunGraphQLQueryArguments) => {
+    const { codeString } = params
+    const endpoint = currentEndpointRef.current
+    if (!endpoint || !codeString) return
+    mutate({
+      endpoint: endpoint.url ?? '',
+      query: codeString,
+      headers: getGraphQLRequestHeaders({
+        endpoint,
+      }),
+    })
+  }
+
   const handleGoToGraphqlFieldDefinition = (field: string) => {
     if (!field) return
     setViewGraphQLDefinitionFieldType(field)
@@ -115,5 +135,6 @@ export const useRequestService = () => {
     handleSendRequest,
     handleQueryUpdate,
     handleGoToGraphqlFieldDefinition,
+    handleRunGraphQLQuery,
   }
 }
