@@ -36,4 +36,7 @@ module.exports = [
     filename: '[name].[chunkhash].css',
     chunkFilename: '[name].[chunkhash].chunk.css',
   }),
+  new webpack.DefinePlugin({
+    PRODUCTION: !inDev(),
+  }),
 ].filter(Boolean)

@@ -34,6 +34,7 @@ function forwardConsole(
   }
 }
 export function setupConsoleLogForwarding() {
+  if (!PRODUCTION) return
   forwardConsole('log', trace)
   forwardConsole('debug', debug)
   forwardConsole('info', info)
