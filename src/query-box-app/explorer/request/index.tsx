@@ -33,6 +33,7 @@ export const Request = memo(function Request() {
         initialValue={service.activeRequestHistory.query ?? ''}
         value={service.activeRequestHistory.query ?? ''}
         onViewDefinition={service.handleGoToGraphqlFieldDefinition}
+        runGraphQLQuery={service.handleRunGraphQLQuery}
       />
     </div>
   )

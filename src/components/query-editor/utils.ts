@@ -5,14 +5,16 @@ import {
   getNamedType,
   GraphQLSchema,
   IntrospectionQuery,
+  OperationDefinitionNode,
   parse,
   TypeInfo,
   visit,
   visitWithTypeInfo,
 } from 'graphql'
-import { editor, Position, Uri } from 'monaco-editor'
+import { editor, languages, Position, Uri } from 'monaco-editor'
 import { MonacoGraphQLAPI } from 'monaco-graphql/esm/api.js'
 import { initializeMode } from 'monaco-graphql/initializeMode'
+import { CODE_LENS_EXECUTE_OPERATIONS } from './constants'
 
 export async function updateGraphQLSchema(params: {
   schema: GraphQLSchema
@@ -144,4 +146,82 @@ export function handleGoToGraphqlFieldDefinition(params: {
     word,
   })
   onViewDefinition?.(fieldType ?? '')
+}
+
+export function getProvideCodeLenses(params: {
+  model: editor.ITextModel
+}): languages.CodeLens[] {
+  const { model } = params
+  const code = model.getValue()
+
+  const lenses: languages.CodeLens[] = []
+  try {
+    const parsed = parse(code)
+
+    for (const definition of parsed.definitions) {
+      if (
+        definition.kind !== 'OperationDefinition' ||
+        !definition.name ||
+        !CODE_LENS_EXECUTE_OPERATIONS.includes(definition.operation)
+      ) {
+        continue
+      }
+
+      const pos = model.getPositionAt(definition.loc?.start ?? 0)
+      const runQueryArguments = getCodeLensRunGraphQLQueryArguments({
+        definition,
+        model,
+      })
+      lenses.push({
+        range: {
+          startLineNumber: pos.lineNumber,
+          startColumn: 1,
+          endLineNumber: pos.lineNumber,
+          endColumn: 1,
+        },
+        id: `run-${definition.operation}-${definition.name?.value}`,
+        command: {
+          id: 'runGraphQLQuery',
+          title: '▶ Run',
+          tooltip: `Run ${definition.operation}`,
+          arguments: runQueryArguments,
+        },
+      })
+    }
+  } catch (e) {
+    console.error('Error parsing GraphQL code:', e)
+  }
+  return lenses
+}
+
+export type RunGraphQLQueryArguments = {
+  operationName: string
+  codeString: string
+}
+
+function getCodeLensRunGraphQLQueryArguments(params: {
+  definition: OperationDefinitionNode
+  model: editor.ITextModel
+}): RunGraphQLQueryArguments[] {
+  const { definition, model } = params
+  const operationName = definition.name?.value || ''
+
+  const range = {
+    start: model.getPositionAt(definition.loc?.start ?? 0),
+    end: model.getPositionAt(definition.loc?.end ?? 0),
+  }
+
+  const codeInRange = model.getValueInRange({
+    startColumn: range.start.column,
+    startLineNumber: range.start.lineNumber,
+    endColumn: range.end.column,
+    endLineNumber: range.end.lineNumber,
+  })
+
+  return [
+    {
+      operationName,
+      codeString: codeInRange,
+    },
+  ]
 }

@@ -1,3 +1,5 @@
+import { OperationTypeNode } from 'graphql'
+
 export const QUERY_EXAMPLE = `
 # GraphQL Editor - Quick Start
 #
@@ -17,3 +19,8 @@ export const QUERY_EXAMPLE = `
 # }
 # Select a query and press Ctrl+Enter to execute
 `
+
+export const CODE_LENS_EXECUTE_OPERATIONS: OperationTypeNode[] = [
+  OperationTypeNode.QUERY,
+  OperationTypeNode.MUTATION,
+]
