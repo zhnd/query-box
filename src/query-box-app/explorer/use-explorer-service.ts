@@ -1,5 +1,6 @@
 import {
   useEndpointSelectedStateStore,
+  useExplorerDocumentationCollapsedStore,
   useGraphQLExplorerPageStore,
 } from '@/stores'
 
@@ -9,5 +10,9 @@ export const useExplorerService = () => {
     (state) => state.currentPageSelectedEndpoint
   )
 
-  return { response, currentPageSelectedEndpoint }
+  const documentationCollapsed = useExplorerDocumentationCollapsedStore(
+    (state) => state.isCollapsed
+  )
+
+  return { response, currentPageSelectedEndpoint, documentationCollapsed }
 }

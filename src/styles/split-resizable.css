@@ -1,3 +1,7 @@
 .split-resizable .gutter {
   cursor: ew-resize;
 }
+
+.split-resizable.hidden-gutter > .gutter {
+  visibility: hidden;
+}

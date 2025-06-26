@@ -1,4 +1,7 @@
-import { useGraphQLExplorerPageStore } from '@/stores'
+import {
+  useExplorerDocumentationCollapsedStore,
+  useGraphQLExplorerPageStore,
+} from '@/stores'
 import { usePageGraphQLSchemaStore } from '@/stores/page-graphql-schema-state'
 import { nanoid } from 'nanoid'
 import { useEffect, useState } from 'react'
@@ -13,6 +16,10 @@ export function useService() {
 
   const viewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
     (state) => state.viewGraphQLDefinitionFieldType
+  )
+
+  const documentationCollapsed = useExplorerDocumentationCollapsedStore(
+    (state) => state.isCollapsed
   )
 
   useEffect(() => {
@@ -57,5 +64,6 @@ export function useService() {
     currentTypeFields,
     navigateToType,
     navigateToBreadcrumb,
+    documentationCollapsed,
   }
 }
