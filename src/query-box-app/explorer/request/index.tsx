@@ -1,9 +1,10 @@
 import { QueryEditor } from '@/components/query-editor'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
+import { memo } from 'react'
 import { useRequestService } from './use-service'
 
-export function Request() {
+export const Request = memo(function Request() {
   const service = useRequestService()
 
   if (!service.activeRequestHistory || !service.currentPageSelectedEndpoint) {
@@ -35,4 +36,4 @@ export function Request() {
       />
     </div>
   )
-}
+})

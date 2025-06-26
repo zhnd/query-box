@@ -11,6 +11,8 @@ export const SettingsKeys = {
   },
   APP_STATE: {
     SELECTED_ENDPOINT: 'app_state.selected_endpoint',
+    EXPLORER_DOCUMENTATION_COLLAPSED:
+      'app_state.explorer_documentation_collapsed',
   },
 }
 

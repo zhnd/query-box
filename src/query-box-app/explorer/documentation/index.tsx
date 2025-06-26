@@ -3,6 +3,7 @@ import { Separator } from '@/components/ui/separator'
 import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
 import { Breadcrumb } from './components/breadcrumb'
 import { EmptyState } from './components/empty-state'
+import { ToggleDocumentationCollapsedButton } from './components/toggle-documentation-collapsed'
 import { TypeContent } from './components/type-content'
 import { useService } from './use-service'
 
@@ -72,13 +73,16 @@ export function Documentation() {
 
   return (
     <div className="flex-1 h-full flex flex-col min-h-0 overflow-hidden">
-      <div className="flex items-center gap-3 px-4 pb-3 border-b">
-        <div className="flex items-center justify-center w-6 h-6 rounded">
-          <BookOpen className="h-3.5 w-3.5 text-primary" />
+      <div className="flex items-center justify-between px-4 pb-3 border-b">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-6 h-6 rounded">
+            <BookOpen className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <h2 className="font-semibold text-base text-foreground">
+            Documentation
+          </h2>
         </div>
-        <h2 className="font-semibold text-base text-foreground">
-          Documentation
-        </h2>
+        <ToggleDocumentationCollapsedButton />
       </div>
 
       {path.length > 0 && !schemaLoading && !schemaError && (
