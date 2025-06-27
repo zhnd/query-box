@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE request_history\n            SET active = FALSE\n            WHERE endpoint_id = ? AND active = TRUE\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "d0f21fbf1ba05a1dd67b2771e7f2dbc8408b3dce10ed0c2ce5501c379d757950"
+}

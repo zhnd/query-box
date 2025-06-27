@@ -1,7 +1,6 @@
 import { QueryEditor } from '@/components/query-editor'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
 import { memo } from 'react'
+import { RunGraphQLQuery } from '../run-graphql-query'
 import { useRequestService } from './use-service'
 
 export const Request = memo(function Request() {
@@ -16,15 +15,11 @@ export const Request = memo(function Request() {
       <div className="flex justify-between items-center px-2 py-1 border-b">
         <div className="flex items-center text-sm font-medium">Operation</div>
 
-        <Button
-          variant="outline"
-          className="cursor-pointer"
-          onClick={service.handleSendRequest}
-          disabled={service.isPending}
-        >
-          {service.isPending ? <Loader2 className="animate-spin" /> : null}
-          Run
-        </Button>
+        <RunGraphQLQuery
+          isPending={service.isPending}
+          codelensOperations={service.codeLensOperations}
+          handleRunGraphQLQuery={service.handleRunGraphQLQuery}
+        />
       </div>
       <QueryEditor
         className="h-full"
@@ -34,6 +29,7 @@ export const Request = memo(function Request() {
         value={service.activeRequestHistory.query ?? ''}
         onViewDefinition={service.handleGoToGraphqlFieldDefinition}
         runGraphQLQuery={service.handleRunGraphQLQuery}
+        onUpdateLensOperations={service.handleUpdateCodeLensOperations}
       />
     </div>
   )

@@ -7,7 +7,7 @@ use crate::{
     },
     models::request_history_model::{
         CreateRequestHistoryDto, DeleteRequestHistoryDto, RequestHistoryFilter,
-        UpdateRequestHistoryDto,
+        SetActiveRequestHistoryDto, UpdateRequestHistoryDto,
     },
 };
 
@@ -51,6 +51,17 @@ pub async fn delete_request_history(
 ) -> Result<(), String> {
     let pool = app_handle.state::<SqlitePool>();
     RequestHistoryRepository::delete(&pool, dto)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn set_active_request_history(
+    app_handle: AppHandle,
+    dto: SetActiveRequestHistoryDto,
+) -> Result<(), String> {
+    let pool = app_handle.state::<SqlitePool>();
+    RequestHistoryRepository::set_active(&pool, dto)
         .await
         .map_err(|e| e.to_string())
 }

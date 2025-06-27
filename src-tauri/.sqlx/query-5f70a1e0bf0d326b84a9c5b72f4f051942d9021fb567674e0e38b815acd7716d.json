@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO request_history (\n                id,\n                endpoint_id,\n                name,\n                is_custom_name,\n                active,\n                method,\n                headers,\n                body,\n                query\n            )\n            VALUES (\n                ?,  -- id\n                ?,  -- endpoint_id\n                ?,  -- name\n                ?,  -- is_custom_name\n                ?,  -- active\n                ?,  -- method\n                ?,  -- headers\n                ?,  -- body\n                ?   -- query\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 9
+    },
+    "nullable": []
+  },
+  "hash": "5f70a1e0bf0d326b84a9c5b72f4f051942d9021fb567674e0e38b815acd7716d"
+}

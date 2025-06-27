@@ -54,6 +54,7 @@ macro_rules! app_commands {
             commands::create_request_history,
             commands::update_request_history,
             commands::delete_request_history,
+            commands::set_active_request_history,
             commands::proxy_http_request,
         ]
     };

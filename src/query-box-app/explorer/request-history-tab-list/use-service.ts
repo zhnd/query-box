@@ -1,10 +1,11 @@
 import { RequestHistoryBridge } from '@/bridges'
-import { HttpMethod } from '@/generated/typeshare-types'
+import { RequestHistory } from '@/generated/typeshare-types'
 import {
   useEndpointSelectedStateStore,
   useGraphQLExplorerPageStore,
 } from '@/stores'
 import { useEffect, useRef } from 'react'
+import { createEmptyRequestHistory } from './utils'
 
 export const useRequestHistoryTabsService = () => {
   const requestHistories = useGraphQLExplorerPageStore(
@@ -26,17 +27,13 @@ export const useRequestHistoryTabsService = () => {
     (state) => state.currentPageSelectedEndpoint
   )
 
-  const createEmptyRequestHistory = async () => {
-    return await RequestHistoryBridge.createRequestHistory({
-      endpoint_id: selectedEndpoint?.id ?? '',
-      method: HttpMethod.POST,
-    })
-  }
-
   const handleAddRequestHistory = async () => {
-    const newRequestHistory = await createEmptyRequestHistory()
+    const newRequestHistory = await createEmptyRequestHistory({
+      endpoint: selectedEndpoint,
+    })
     setRequestHistories([...requestHistories, newRequestHistory])
-    setActiveRequestHistory(newRequestHistory)
+    setActiveRequestHistory({ requestHistory: newRequestHistory })
+    autoTabScrollIntoView(newRequestHistory)
   }
 
   const getInitialRequestHistories = async () => {
@@ -45,11 +42,21 @@ export const useRequestHistoryTabsService = () => {
         endpoint_id: selectedEndpoint?.id ?? '',
       })
     if (initialRequestHistories.length === 0) {
-      const newRequestHistory = await createEmptyRequestHistory()
+      const newRequestHistory = await createEmptyRequestHistory({
+        endpoint: selectedEndpoint,
+      })
       initialRequestHistories = [newRequestHistory]
+      setActiveRequestHistory({ requestHistory: newRequestHistory })
     }
     setRequestHistories(initialRequestHistories)
-    setActiveRequestHistory(initialRequestHistories[0])
+    const activeRequestHistoryInDatabase = initialRequestHistories.find(
+      (history) => history.active
+    )
+    setActiveRequestHistory({
+      requestHistory:
+        activeRequestHistoryInDatabase ?? initialRequestHistories[0],
+      updateActiveBackend: !activeRequestHistoryInDatabase,
+    })
   }
 
   useEffect(() => {
@@ -59,48 +66,28 @@ export const useRequestHistoryTabsService = () => {
     getInitialRequestHistories()
   }, [selectedEndpoint])
 
-  const handleDeleteRequestHistory = async (id: string) => {
-    await RequestHistoryBridge.deleteRequestHistory({
-      id,
-      endpoint_id: selectedEndpoint?.id ?? '',
-    })
-
-    const targetRequestHistoryIndex = requestHistories.findIndex(
-      (requestHistory) => requestHistory.id === id
-    )
-
-    let newRequestHistories = requestHistories.filter(
-      (requestHistory) => requestHistory.id !== id
-    )
-
-    if (newRequestHistories.length === 0) {
-      const newRequestHistory = await createEmptyRequestHistory()
-      newRequestHistories = [newRequestHistory]
-      setActiveRequestHistory(newRequestHistory)
-      setRequestHistories(newRequestHistories)
-      return
-    }
-    setRequestHistories(newRequestHistories)
-    if (activeRequestHistory?.id === id) {
-      const nextActiveRequestHistory =
-        newRequestHistories[Math.max(targetRequestHistoryIndex - 1, 0)]
-      setActiveRequestHistory(nextActiveRequestHistory)
-    }
-  }
-
   const handleDeleteAllRequestHistories = async () => {
     await RequestHistoryBridge.deleteRequestHistory({
       endpoint_id: selectedEndpoint?.id ?? '',
     })
-    const newRequestHistory = await createEmptyRequestHistory()
+    const newRequestHistory = await createEmptyRequestHistory({
+      endpoint: selectedEndpoint,
+    })
     setRequestHistories([newRequestHistory])
-    setActiveRequestHistory(newRequestHistory)
+    setActiveRequestHistory({ requestHistory: newRequestHistory })
+    autoTabScrollIntoView(newRequestHistory)
   }
 
-  useEffect(() => {
-    if (tabsContainerRef.current && activeRequestHistory) {
+  /**
+   * when click select the active tab from the request history list of the collapsed dropdown list
+   * Automatically scroll the active tab into view.
+   * This is useful when the list is long and the active tab is not visible.
+   * @param requestHistory
+   */
+  const autoTabScrollIntoView = (requestHistory: RequestHistory) => {
+    if (tabsContainerRef.current && requestHistory) {
       const activeTabElement = tabsContainerRef.current.querySelector(
-        `[data-tab-id="${activeRequestHistory.id}"]`
+        `[data-tab-id="${requestHistory.id}"]`
       )
       if (activeTabElement) {
         activeTabElement.scrollIntoView({
@@ -108,10 +95,21 @@ export const useRequestHistoryTabsService = () => {
         })
       }
     }
+  }
+
+  useEffect(() => {
+    if (!activeRequestHistory) {
+      return
+    }
+    const timer = setTimeout(() => {
+      autoTabScrollIntoView(activeRequestHistory)
+    })
+    return () => clearTimeout(timer)
   }, [activeRequestHistory])
 
-  const handleActiveTabChange = (id: string) => {
-    setActiveRequestHistory(requestHistories.find((r) => r.id === id) ?? null)
+  const handleActiveTabChange = (record: RequestHistory) => {
+    setActiveRequestHistory({ requestHistory: record })
+    autoTabScrollIntoView(record)
   }
 
   return {
@@ -120,7 +118,6 @@ export const useRequestHistoryTabsService = () => {
     tabsContainerRef,
     handleActiveTabChange,
     handleAddRequestHistory,
-    handleDeleteRequestHistory,
     handleDeleteAllRequestHistories,
   }
 }

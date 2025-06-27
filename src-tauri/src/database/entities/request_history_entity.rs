@@ -16,6 +16,10 @@ pub struct RequestHistory {
     pub endpoint_id: Uuid,
     /// History name
     pub name: Option<String>,
+    /// Whether the history entry has a custom name
+    pub is_custom_name: Option<bool>,
+    /// this request is active or not
+    pub active: Option<bool>,
     /// HTTP method used for the request (e.g., GET, POST)
     pub method: HttpMethod,
     /// Request headers in JSON format
@@ -35,6 +39,8 @@ pub struct RequestHistoryRow {
     pub id: String,
     pub endpoint_id: String,
     pub name: Option<String>,
+    pub is_custom_name: Option<bool>,
+    pub active: Option<bool>,
     pub method: String,
     pub headers: Option<String>,
     pub body: Option<String>,
@@ -66,6 +72,8 @@ impl TryFrom<RequestHistoryRow> for RequestHistory {
             id: Uuid::parse_str(&row.id)?,
             endpoint_id: Uuid::parse_str(&row.endpoint_id)?,
             name: row.name,
+            is_custom_name: row.is_custom_name,
+            active: row.active,
             method,
             headers,
             body,

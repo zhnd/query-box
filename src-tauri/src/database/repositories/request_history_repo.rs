@@ -6,7 +6,7 @@ use crate::{
     database::entities::request_history_entity::{RequestHistory, RequestHistoryRow},
     models::request_history_model::{
         CreateRequestHistoryDto, DeleteRequestHistoryDto, RequestHistoryFilter,
-        UpdateRequestHistoryDto,
+        SetActiveRequestHistoryDto, UpdateRequestHistoryDto,
     },
 };
 
@@ -24,7 +24,7 @@ impl RequestHistoryRepository {
 
         let rows: Vec<RequestHistoryRow> = sqlx::query_as::<_, RequestHistoryRow>(
             r#"
-            SELECT * FROM request_history WHERE endpoint_id = ? ORDER BY created_at DESC
+            SELECT * FROM request_history WHERE endpoint_id = ? ORDER BY created_at ASC
             "#,
         )
         .bind(&filter.endpoint_id)
@@ -71,6 +71,8 @@ impl RequestHistoryRepository {
                 id,
                 endpoint_id,
                 name,
+                is_custom_name,
+                active,
                 method,
                 headers,
                 body,
@@ -80,6 +82,8 @@ impl RequestHistoryRepository {
                 ?,  -- id
                 ?,  -- endpoint_id
                 ?,  -- name
+                ?,  -- is_custom_name
+                ?,  -- active
                 ?,  -- method
                 ?,  -- headers
                 ?,  -- body
@@ -89,6 +93,8 @@ impl RequestHistoryRepository {
             id,
             dto.endpoint_id,
             dto.name,
+            dto.is_custom_name,
+            dto.active,
             method_str,
             dto.headers,
             dto.body,
@@ -145,6 +151,20 @@ impl RequestHistoryRepository {
             separated.push("name = ").push_bind_unseparated(name);
             update_field_count += 1;
             debug!("Updating name field");
+        }
+
+        if let Some(is_custom_name) = &dto.is_custom_name {
+            separated
+                .push("is_custom_name = ")
+                .push_bind_unseparated(is_custom_name);
+            update_field_count += 1;
+            debug!("Updating is_custom_name field to: {}", is_custom_name);
+        }
+
+        if let Some(active) = &dto.active {
+            separated.push("active = ").push_bind_unseparated(active);
+            update_field_count += 1;
+            debug!("Updating active field to: {}", active);
         }
 
         if let Some(method) = &dto.method {
@@ -260,6 +280,51 @@ impl RequestHistoryRepository {
             "Successfully deleted {} request history record(s)",
             result.rows_affected()
         );
+        Ok(())
+    }
+
+    pub async fn set_active(
+        pool: &SqlitePool,
+        dto: SetActiveRequestHistoryDto,
+    ) -> Result<(), anyhow::Error> {
+        let mut tx = pool.begin().await?;
+
+        sqlx::query!(
+            r#"
+            UPDATE request_history
+            SET active = FALSE
+            WHERE endpoint_id = ? AND active = TRUE
+            "#,
+            dto.endpoint_id
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        let result = sqlx::query!(
+            r#"
+            UPDATE request_history
+            SET active = ?
+            WHERE id = ? AND endpoint_id = ?
+            "#,
+            dto.active,
+            dto.id,
+            dto.endpoint_id
+        )
+        .execute(&mut *tx)
+        .await?;
+
+        if result.rows_affected() == 0 {
+            warn!(
+                "No request history record found to update active status for id: {} and endpoint_id: {}",
+                dto.id, dto.endpoint_id
+            );
+            return Err(anyhow::Error::msg(
+                "No record found to update request history active status",
+            ));
+        }
+
+        tx.commit().await?;
+
         Ok(())
     }
 }

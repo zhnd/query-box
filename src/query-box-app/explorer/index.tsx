@@ -3,8 +3,8 @@ import { ResponseViewer } from '@/components/response-viewer'
 import { SplitResizable } from '@/components/split-resizable'
 import { Documentation } from './documentation'
 import { ToggleDocumentationCollapsedButton } from './documentation/components/toggle-documentation-collapsed'
-import { RequestHistoryTabs } from './history-tabs'
 import { Request } from './request'
+import { RequestHistoryTabs } from './request-history-tab-list'
 import { useExplorerService } from './use-explorer-service'
 
 export function Explorer() {
