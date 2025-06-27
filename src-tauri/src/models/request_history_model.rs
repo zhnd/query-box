@@ -11,6 +11,10 @@ pub struct CreateRequestHistoryDto {
     pub endpoint_id: String,
     /// Name of the request
     pub name: Option<String>,
+    /// Identifier for the config source
+    pub is_custom_name: Option<bool>,
+    /// Identifier for the selected status
+    pub active: Option<bool>,
     /// HTTP method used for the request
     pub method: HttpMethod,
     /// Headers included in the request
@@ -28,6 +32,10 @@ pub struct UpdateRequestHistoryDto {
     pub id: String,
     /// Name of the request
     pub name: Option<String>,
+    /// Identifier for the config source
+    pub is_custom_name: Option<bool>,
+    /// Identifier for the selected status
+    pub active: Option<bool>,
     /// HTTP method used for the request
     pub method: Option<HttpMethod>,
     /// Headers included in the request
@@ -49,4 +57,12 @@ pub struct DeleteRequestHistoryDto {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RequestHistoryFilter {
     pub endpoint_id: String,
+}
+
+#[typeshare]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SetActiveRequestHistoryDto {
+    pub id: String,
+    pub endpoint_id: String,
+    pub active: bool,
 }

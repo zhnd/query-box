@@ -15,6 +15,7 @@ import { editor, languages, Position, Uri } from 'monaco-editor'
 import { MonacoGraphQLAPI } from 'monaco-graphql/esm/api.js'
 import { initializeMode } from 'monaco-graphql/initializeMode'
 import { CODE_LENS_EXECUTE_OPERATIONS } from './constants'
+import { QueryEditorCodeLensOperation, RunGraphQLQueryArguments } from './types'
 
 export async function updateGraphQLSchema(params: {
   schema: GraphQLSchema
@@ -148,13 +149,18 @@ export function handleGoToGraphqlFieldDefinition(params: {
   onViewDefinition?.(fieldType ?? '')
 }
 
-export function getProvideCodeLenses(params: {
-  model: editor.ITextModel
-}): languages.CodeLens[] {
+export function getProvideCodeLenses(params: { model: editor.ITextModel }):
+  | {
+      codeLens: languages.CodeLens[]
+      codeLensOperations?: QueryEditorCodeLensOperation[]
+    }
+  | undefined {
   const { model } = params
   const code = model.getValue()
 
-  const lenses: languages.CodeLens[] = []
+  const codeLens: languages.CodeLens[] = []
+  const codeLensOperations: QueryEditorCodeLensOperation[] = []
+  if (!code) return
   try {
     const parsed = parse(code)
 
@@ -166,13 +172,15 @@ export function getProvideCodeLenses(params: {
       ) {
         continue
       }
-
       const pos = model.getPositionAt(definition.loc?.start ?? 0)
       const runQueryArguments = getCodeLensRunGraphQLQueryArguments({
         definition,
         model,
       })
-      lenses.push({
+
+      codeLensOperations.push(runQueryArguments)
+
+      codeLens.push({
         range: {
           startLineNumber: pos.lineNumber,
           startColumn: 1,
@@ -184,27 +192,25 @@ export function getProvideCodeLenses(params: {
           id: 'runGraphQLQuery',
           title: '▶ Run',
           tooltip: `Run ${definition.operation}`,
-          arguments: runQueryArguments,
+          arguments: [runQueryArguments],
         },
       })
     }
-  } catch (e) {
-    console.error('Error parsing GraphQL code:', e)
+  } catch {
+    // Handle error
+    console.warn('Failed to parse GraphQL code for code lens generation')
   }
-  return lenses
-}
-
-export type RunGraphQLQueryArguments = {
-  operationName: string
-  codeString: string
+  return {
+    codeLens,
+    codeLensOperations,
+  }
 }
 
 function getCodeLensRunGraphQLQueryArguments(params: {
   definition: OperationDefinitionNode
   model: editor.ITextModel
-}): RunGraphQLQueryArguments[] {
+}): RunGraphQLQueryArguments {
   const { definition, model } = params
-  const operationName = definition.name?.value || ''
 
   const range = {
     start: model.getPositionAt(definition.loc?.start ?? 0),
@@ -218,10 +224,9 @@ function getCodeLensRunGraphQLQueryArguments(params: {
     endLineNumber: range.end.lineNumber,
   })
 
-  return [
-    {
-      operationName,
-      codeString: codeInRange,
-    },
-  ]
+  return {
+    definitionNameValue: definition.name?.value || '',
+    codeString: codeInRange,
+    operationKind: definition.operation,
+  }
 }

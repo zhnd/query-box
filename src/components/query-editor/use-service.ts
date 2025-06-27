@@ -9,23 +9,13 @@ import parserGraphql from 'prettier/parser-graphql'
 import prettier from 'prettier/standalone'
 import { useEffect, useRef } from 'react'
 import { QUERY_EXAMPLE } from './constants'
+import { QueryEditorProps, RunGraphQLQueryArguments } from './types'
 import {
-  RunGraphQLQueryArguments,
   getProvideCodeLenses,
   handleGoToGraphqlFieldDefinition,
   setupGraphQLSchemaInMonaco,
   updateGraphQLSchema,
 } from './utils'
-
-export interface QueryEditorProps {
-  initialValue?: string
-  value?: string
-  onChange?: (value: string) => void
-  className?: string
-  schema: GraphQLSchema | null
-  onViewDefinition?: (fieldName: string) => void
-  runGraphQLQuery?: (args: RunGraphQLQueryArguments) => void
-}
 
 export function useService(props: QueryEditorProps) {
   const {
@@ -35,6 +25,7 @@ export function useService(props: QueryEditorProps) {
     schema,
     onViewDefinition,
     runGraphQLQuery,
+    onUpdateLensOperations,
   } = props
 
   const editorContainerElementRef = useRef<HTMLDivElement>(null)
@@ -118,9 +109,12 @@ export function useService(props: QueryEditorProps) {
 
     monaco.languages.registerCodeLensProvider('graphql', {
       provideCodeLenses(model) {
-        const lenses = getProvideCodeLenses({ model })
+        const codeLensData = getProvideCodeLenses({ model })
+        onUpdateLensOperations?.({
+          codeLensOperations: codeLensData?.codeLensOperations ?? null,
+        })
         return {
-          lenses,
+          lenses: codeLensData?.codeLens ?? [],
           dispose: () => {},
         }
       },
