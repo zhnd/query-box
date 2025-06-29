@@ -13,7 +13,7 @@ export const Request = memo(function Request() {
   return (
     <div className="h-full flex flex-col">
       <div className="flex justify-between items-center px-2 py-1 border-b">
-        <div className="flex items-center text-sm font-medium">Operation</div>
+        <div className="flex items-center text-sm font-medium">Request</div>
 
         <RunGraphQLQuery
           isPending={service.isPending}

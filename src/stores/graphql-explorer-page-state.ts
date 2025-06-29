@@ -1,5 +1,8 @@
 import { RequestHistoryBridge } from '@/bridges'
 import { HttpResponse, RequestHistory } from '@/generated/typeshare-types'
+import { NavigationStack } from '@/query-box-app/explorer/documentation/types'
+import { initializeNavigationStack } from '@/query-box-app/explorer/documentation/utils'
+import { OperationTypeNode } from 'graphql'
 import { create } from 'zustand'
 
 interface PageLoadState {
@@ -7,12 +10,19 @@ interface PageLoadState {
   error: string | null
 }
 
+interface ViewGraphQLDefinitionField {
+  name: string
+  // The type of field to view in the GraphQL definition
+  operationType?: OperationTypeNode
+}
+
 interface GraphQLExplorerPageState {
   pageLoadState: PageLoadState
   response: HttpResponse | null
   requestHistories: RequestHistory[]
   activeRequestHistory: RequestHistory | null
-  viewGraphQLDefinitionFieldType: string | null
+  viewGraphQLDefinitionField: ViewGraphQLDefinitionField | null
+  navigationStack: NavigationStack
 }
 
 interface GraphQLExplorerPageActions {
@@ -24,7 +34,10 @@ interface GraphQLExplorerPageActions {
     updateActiveBackend?: boolean
     active?: boolean
   }) => void
-  setViewGraphQLDefinitionFieldType: (field: string | null) => void
+  setViewGraphQLDefinitionField: (
+    field: ViewGraphQLDefinitionField | null
+  ) => void
+  setNavigationStack: (stack: NavigationStack) => void
 }
 type GraphQLExplorerPageStore = GraphQLExplorerPageState &
   GraphQLExplorerPageActions
@@ -38,7 +51,8 @@ export const useGraphQLExplorerPageStore = create<GraphQLExplorerPageStore>()(
     requestHistories: [],
     activeRequestHistory: null,
     response: null,
-    viewGraphQLDefinitionFieldType: null,
+    viewGraphQLDefinitionField: null,
+    navigationStack: initializeNavigationStack(),
     setPageLoadState: (state) =>
       set(() => ({
         pageLoadState: state,
@@ -61,7 +75,11 @@ export const useGraphQLExplorerPageStore = create<GraphQLExplorerPageStore>()(
         endpoint_id: requestHistory?.endpoint_id ?? '',
       })
     },
-    setViewGraphQLDefinitionFieldType: (field) =>
-      set(() => ({ viewGraphQLDefinitionFieldType: field })),
+    setViewGraphQLDefinitionField: (field) =>
+      set(() => ({ viewGraphQLDefinitionField: field })),
+    setNavigationStack: (stack) =>
+      set(() => ({
+        navigationStack: stack,
+      })),
   })
 )

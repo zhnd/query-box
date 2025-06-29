@@ -1,5 +1,6 @@
 import { GraphQLBridge, RequestHistoryBridge } from '@/bridges'
 import {
+  FieldPath,
   QueryEditorCodeLensOperation,
   QueryEditorOnUpdateLensOperationsActionParameters,
 } from '@/components/query-editor/types'
@@ -34,8 +35,8 @@ export const useRequestService = () => {
 
   const setResponse = useGraphQLExplorerPageStore((state) => state.setResponse)
 
-  const setViewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
-    (state) => state.setViewGraphQLDefinitionFieldType
+  const setNavigationStack = useGraphQLExplorerPageStore(
+    (state) => state.setNavigationStack
   )
 
   // Get the currently selected endpoint for the current page
@@ -48,6 +49,9 @@ export const useRequestService = () => {
   // Fetch the GraphQL schema for the current endpoint
   const { schema } = useGraphQLSchema({
     endpoint: currentPageSelectedEndpoint,
+    options: {
+      enableAutoRefresh: false,
+    },
   })
 
   useEffect(() => {
@@ -168,10 +172,13 @@ export const useRequestService = () => {
     [sendGraphQLRequest, codeLensOperations]
   )
 
-  const handleGoToGraphqlFieldDefinition = useCallback((field: string) => {
-    if (!field) return
-    setViewGraphQLDefinitionFieldType(field)
-  }, [])
+  const handleGoToGraphqlFieldDefinition = useCallback(
+    (fieldPath: FieldPath[] | null) => {
+      if (!fieldPath) return
+      setNavigationStack(fieldPath)
+    },
+    []
+  )
 
   const handleUpdateCodeLensOperations = useCallback(
     (data: QueryEditorOnUpdateLensOperationsActionParameters) => {

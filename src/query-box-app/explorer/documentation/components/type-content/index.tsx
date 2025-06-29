@@ -1,74 +1,138 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { FileText, Hash, Zap } from 'lucide-react'
-import { CurrentTypeField } from '../../utils'
+import { MarkdownRender } from '@/components/markdown-render'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import { ChevronsUpDown, Hash, Megaphone, Type } from 'lucide-react'
 import { FieldList } from '../field-list'
-import { OperationSection } from '../operation-section'
-import { ParsedDescription } from '../parsed-description'
+import { useTypeContentService } from './use-service'
 
-export function TypeContent(props: {
-  fields: CurrentTypeField
-  onNavigate: (typeName: string) => void
-}) {
-  const { fields, onNavigate } = props
-
+export function TypeContent() {
+  const service = useTypeContentService()
   return (
     <div className="space-y-4">
-      {/* Type Header */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-8 h-8 rounded bg-primary/10">
-            <Hash className="h-4 w-4 text-primary" />
+      <div className="space-y-3">
+        <div className="flex gap-3 items-center">
+          <div className="flex-shrink-0 flex items-center justify-center p-2 rounded bg-primary/10">
+            <Hash className="h-3 w-3 text-primary" />
           </div>
-          <h1 className="text-xl font-bold text-foreground">{fields.name}</h1>
+          <div className="self-stretch w-px bg-border shrink-0" />
+          <div className="flex-1 min-w-0 space-y-0">
+            <h2
+              className="font-medium text-foreground truncate leading-tight"
+              title={service.currentFieldCompleteDetails?.info.name}
+            >
+              {service.currentFieldCompleteDetails?.info.name}
+            </h2>
+
+            <div className="text-xs text-muted-foreground font-mono truncate leading-tight">
+              <span
+                title={service.currentFieldCompleteDetails?.info.displayType}
+              >
+                {service.currentFieldCompleteDetails?.info.displayType}
+              </span>
+            </div>
+          </div>
         </div>
-        {fields.description && (
-          <p className="text-sm text-muted-foreground leading-relaxed pl-10">
-            <ParsedDescription text={fields.description} />
-          </p>
+
+        {service.currentFieldCompleteDetails?.info.description && (
+          <div className="text-sm text-muted-foreground leading-relaxed">
+            <MarkdownRender
+              content={service.currentFieldCompleteDetails?.info.description}
+            />
+          </div>
         )}
       </div>
 
-      {/* Operations Section */}
-      {fields.operations?.some((op) => op.subFields?.length) && (
-        <Card className="shadow-sm gap-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <div className="flex items-center justify-center w-6 h-6 rounded bg-primary/10">
-                <Zap className="h-3.5 w-3.5 text-primary" />
-              </div>
-              Operations
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {fields.operations?.map((operation) =>
-              operation.subFields?.length ? (
-                <OperationSection
-                  key={operation.name}
-                  operation={operation}
-                  onNavigate={onNavigate}
-                />
-              ) : null
-            )}
-          </CardContent>
-        </Card>
+      {service.currentFieldCompleteDetails?.info.deprecationReason && (
+        <Alert variant="destructive">
+          <Megaphone />
+          <AlertTitle>DEPRECATED</AlertTitle>
+          <AlertDescription>
+            {service.currentFieldCompleteDetails.info.deprecationReason}
+          </AlertDescription>
+        </Alert>
       )}
 
-      {/* Fields Section */}
-      {fields.subFields?.length ? (
-        <Card className="shadow-sm gap-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <div className="flex items-center justify-center w-6 h-6 rounded bg-primary/10">
-                <FileText className="h-3.5 w-3.5 text-primary" />
+      {service.currentFieldCompleteDetails?.info.isLeafType &&
+        service.currentFieldCompleteDetails.info.fieldGraphQLType ===
+          'scalar' && (
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                {/* Icon */}
+                <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded bg-primary/10">
+                  <Type className="h-4 w-4" />
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 space-y-3">
+                  {/* Header */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs font-medium">
+                        Scalar
+                      </Badge>
+                      <span className="font-semibold text-sm text-foreground">
+                        {service.currentFieldCompleteDetails?.scalarInfo?.name}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Represents primitive leaf values in a GraphQL type system.
+                    </p>
+                  </div>
+
+                  {/* Description */}
+                  <div className="text-sm">
+                    <MarkdownRender
+                      content={
+                        service.currentFieldCompleteDetails?.scalarInfo
+                          ?.description
+                      }
+                    />
+                  </div>
+                </div>
               </div>
-              Fields
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <FieldList fields={fields.subFields} onNavigate={onNavigate} />
-          </CardContent>
-        </Card>
-      ) : null}
+            </CardContent>
+          </Card>
+        )}
+
+      {service.renderCardList.map((card) => (
+        <Collapsible defaultOpen key={card.id}>
+          <Card>
+            <CollapsibleTrigger className="w-full">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <CardTitle className="text-base">{card.title}</CardTitle>
+                    <CardDescription>{card.description}</CardDescription>
+                  </div>
+                  <ChevronsUpDown />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+
+            <CollapsibleContent>
+              <CardContent className="pt-0">
+                <FieldList
+                  subFields={card.fields ?? []}
+                  fieldDetails={service.currentFieldCompleteDetails?.info}
+                />
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+      ))}
     </div>
   )
 }

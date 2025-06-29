@@ -1,44 +1,46 @@
-import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib'
 import { ChevronRight } from 'lucide-react'
-import { DocumentationField } from '../../utils'
+import { FieldDetailBasicInfo, FieldMetaInfo } from '../../types'
 
-export function FieldItem(props: {
-  field: DocumentationField
-  onNavigate: (typeName: string) => void
-}) {
-  const { field, onNavigate } = props
+export interface FieldItemProps {
+  field: FieldMetaInfo
+  fieldDetails: FieldDetailBasicInfo | undefined
+  index: number
+}
+
+export function FieldItem(props: FieldItemProps) {
+  const { field, fieldDetails, index } = props
+
   return (
-    <div
-      className="group relative flex items-center justify-between py-2.5 px-3 rounded border border-border bg-card transition-all duration-150 hover:bg-accent hover:border-accent-foreground/20 cursor-pointer active:scale-[0.98]"
-      onClick={() => onNavigate(field.type?.namedType.name ?? '')}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onNavigate(field.type?.namedType.name ?? '')
-        }
-      }}
+    <Button
+      variant="ghost"
+      data-field-index={index}
+      className="h-auto px-2 py-1.5 justify-start hover:bg-accent/50 transition-colors group w-full"
     >
-      <div className="flex items-center gap-3 min-w-0 flex-1 mr-2">
-        <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary/80" />
-        <div className="flex items-center justify-between min-w-0 flex-1 gap-3">
+      <div className="flex items-center w-full min-w-0 gap-2">
+        <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0 w-0 overflow-hidden">
           <span
-            className="font-medium text-sm text-foreground truncate max-w-[50%]"
+            className={cn(
+              'font-medium text-sm text-left text-foreground leading-tight truncate w-full',
+              Boolean(field?.deprecationReason) && 'line-through'
+            )}
             title={field.name}
           >
             {field.name}
           </span>
-          <Badge
-            variant="secondary"
-            className="text-xs font-mono bg-muted/60 hover:bg-muted/80 transition-colors border-0 px-1.5 py-0.5 flex-shrink-0 max-w-[50%]"
-            title={field.type?.displayName ?? ''}
+          <span
+            className="text-xs text-muted-foreground text-left font-mono leading-tight truncate w-full"
+            title={field.displayType}
           >
-            <span className="truncate">{field.type?.displayName ?? ''}</span>
-          </Badge>
+            {field.displayType}
+          </span>
         </div>
+
+        {!fieldDetails?.isLeafType && (
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:text-foreground group-hover:translate-x-0.5 transition-all duration-200 shrink-0" />
+        )}
       </div>
-      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-all duration-150 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 flex-shrink-0" />
-    </div>
+    </Button>
   )
 }
