@@ -1,15 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Hash, Zap } from 'lucide-react'
-import { CurrentTypeField } from '../../utils'
+import { CurrentTypeField } from '../../types'
 import { FieldList } from '../field-list'
 import { OperationSection } from '../operation-section'
 import { ParsedDescription } from '../parsed-description'
 
-export function TypeContent(props: {
-  fields: CurrentTypeField
-  onNavigate: (typeName: string) => void
-}) {
-  const { fields, onNavigate } = props
+export function TypeContent(props: { fields: CurrentTypeField }) {
+  const { fields } = props
 
   return (
     <div className="space-y-4">
@@ -29,7 +26,7 @@ export function TypeContent(props: {
       </div>
 
       {/* Operations Section */}
-      {fields.operations?.some((op) => op.subFields?.length) && (
+      {Boolean(fields.operations?.length) && (
         <Card className="shadow-sm gap-2">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -42,11 +39,7 @@ export function TypeContent(props: {
           <CardContent className="space-y-4">
             {fields.operations?.map((operation) =>
               operation.subFields?.length ? (
-                <OperationSection
-                  key={operation.name}
-                  operation={operation}
-                  onNavigate={onNavigate}
-                />
+                <OperationSection key={operation.name} operation={operation} />
               ) : null
             )}
           </CardContent>
@@ -65,7 +58,7 @@ export function TypeContent(props: {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <FieldList fields={fields.subFields} onNavigate={onNavigate} />
+            <FieldList fields={fields.subFields} />
           </CardContent>
         </Card>
       ) : null}

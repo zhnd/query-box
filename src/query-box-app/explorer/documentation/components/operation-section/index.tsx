@@ -6,14 +6,11 @@ import {
 } from '@/components/ui/collapsible'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { DocumentationField } from '../../utils'
+import { DocumentationField } from '../../types'
 import { FieldList } from '../field-list'
 
-export function OperationSection(props: {
-  operation: DocumentationField
-  onNavigate: (typeName: string) => void
-}) {
-  const { operation, onNavigate } = props
+export function OperationSection(props: { operation: DocumentationField }) {
+  const { operation } = props
   const [isOpen, setIsOpen] = useState(true)
 
   return (
@@ -41,7 +38,10 @@ export function OperationSection(props: {
       <CollapsibleContent>
         <div key={operation.name} className="space-y-2 mt-1">
           <div className="pl-3 border-l-2 border-muted">
-            <FieldList fields={operation.subFields} onNavigate={onNavigate} />
+            <FieldList
+              fields={operation.subFields ?? []}
+              operation={operation}
+            />
           </div>
         </div>
       </CollapsibleContent>

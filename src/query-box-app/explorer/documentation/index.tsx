@@ -12,8 +12,6 @@ export function Documentation() {
     path,
     currentTypeName,
     currentTypeFields,
-    navigateToType,
-    navigateToBreadcrumb,
     schemaLoading,
     schemaError,
   } = useService()
@@ -59,7 +57,7 @@ export function Documentation() {
     if (currentTypeFields) {
       return (
         <div className="space-y-6">
-          <TypeContent fields={currentTypeFields} onNavigate={navigateToType} />
+          <TypeContent fields={currentTypeFields} />
         </div>
       )
     }
@@ -89,7 +87,7 @@ export function Documentation() {
         <>
           <Separator />
           <div className="px-4 py-2 bg-muted/30 border-b">
-            <Breadcrumb path={path} onNavigate={navigateToBreadcrumb} />
+            <Breadcrumb path={path} />
           </div>
         </>
       )}

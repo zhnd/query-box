@@ -1,24 +1,22 @@
 import { Badge } from '@/components/ui/badge'
 import { ChevronRight } from 'lucide-react'
-import { DocumentationField } from '../../utils'
+import { FieldItemProps, useFieldItemService } from './use-service'
 
-export function FieldItem(props: {
-  field: DocumentationField
-  onNavigate: (typeName: string) => void
-}) {
-  const { field, onNavigate } = props
+export function FieldItem(props: FieldItemProps) {
+  const { field } = props
+  const service = useFieldItemService(props)
   return (
     <div
       className="group relative flex items-center justify-between py-2.5 px-3 rounded border border-border bg-card transition-all duration-150 hover:bg-accent hover:border-accent-foreground/20 cursor-pointer active:scale-[0.98]"
-      onClick={() => onNavigate(field.type?.namedType.name ?? '')}
+      onClick={service.navigateToFieldDefinition}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onNavigate(field.type?.namedType.name ?? '')
-        }
-      }}
+      // onKeyDown={(e) => {
+      //   if (e.key === 'Enter' || e.key === ' ') {
+      //     e.preventDefault()
+      //     service.navigateToFieldDefinition(field.type?.namedType.name ?? '')
+      //   }
+      // }}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1 mr-2">
         <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary/80" />
@@ -32,9 +30,11 @@ export function FieldItem(props: {
           <Badge
             variant="secondary"
             className="text-xs font-mono bg-muted/60 hover:bg-muted/80 transition-colors border-0 px-1.5 py-0.5 flex-shrink-0 max-w-[50%]"
-            title={field.type?.displayName ?? ''}
+            title={field.parsedGraphQLTypeInfo?.displayName ?? ''}
           >
-            <span className="truncate">{field.type?.displayName ?? ''}</span>
+            <span className="truncate">
+              {field.parsedGraphQLTypeInfo?.displayName ?? ''}
+            </span>
           </Badge>
         </div>
       </div>

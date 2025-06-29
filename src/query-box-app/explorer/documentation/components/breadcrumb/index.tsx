@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
-import { BreadcrumbPathType } from '../../utils'
+import { BreadcrumbPathType } from '../../types'
+import { useBreadcrumbService } from './use-service'
 
-export function Breadcrumb(props: {
-  path: BreadcrumbPathType[]
-  onNavigate: (index: number) => void
-}) {
-  const { path, onNavigate } = props
+export function Breadcrumb(props: { path: BreadcrumbPathType[] }) {
+  const { path } = props
+  const service = useBreadcrumbService()
   return (
     <nav className="flex items-center gap-1 flex-wrap" aria-label="Breadcrumb">
       {path.map((breadcrumb, idx) => (
@@ -15,7 +14,7 @@ export function Breadcrumb(props: {
             variant="ghost"
             size="sm"
             className="h-6 px-2 text-xs font-medium hover:bg-accent hover:text-accent-foreground transition-colors rounded"
-            onClick={() => onNavigate(idx)}
+            onClick={() => service.navigateToBreadcrumb(idx)}
           >
             {breadcrumb.name}
           </Button>

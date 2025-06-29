@@ -34,9 +34,9 @@ export const useRequestService = () => {
 
   const setResponse = useGraphQLExplorerPageStore((state) => state.setResponse)
 
-  const setViewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
-    (state) => state.setViewGraphQLDefinitionFieldType
-  )
+  // const setViewGraphQLDefinitionFieldType = useGraphQLExplorerPageStore(
+  //   (state) => state.setViewGraphQLDefinitionFieldType
+  // )
 
   // Get the currently selected endpoint for the current page
   // This is used to send the GraphQL request
@@ -170,7 +170,8 @@ export const useRequestService = () => {
 
   const handleGoToGraphqlFieldDefinition = useCallback((field: string) => {
     if (!field) return
-    setViewGraphQLDefinitionFieldType(field)
+    console.log('Navigating to GraphQL field definition:', field)
+    // setViewGraphQLDefinitionFieldType(field)
   }, [])
 
   const handleUpdateCodeLensOperations = useCallback(
