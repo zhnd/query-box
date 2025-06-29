@@ -14,7 +14,7 @@ export interface QueryEditorProps {
   onChange?: (value: string) => void
   className?: string
   schema: GraphQLSchema | null
-  onViewDefinition?: (fieldName: string) => void
+  onViewDefinition?: (fieldPath: FieldPath[] | null) => void
   runGraphQLQuery?: (args: RunGraphQLQueryArguments) => void
   onUpdateLensOperations?: QueryEditorOnUpdateLensOperationsAction
 }
@@ -29,4 +29,18 @@ export type RunGraphQLQueryArguments = {
   definitionNameValue: string
   codeString: string
   operationKind: OperationTypeNode
+}
+
+export interface FieldPath {
+  name: string
+  typeName: string
+  displayType: string
+}
+
+export interface GetFieldPathTracker {
+  // Tracks the currently matched field paths
+  matched: FieldPath[] | null
+  // Tracks the current field path being built
+  // If the current node matches the found content, set it as the matched path and exit the search.
+  current: FieldPath[]
 }

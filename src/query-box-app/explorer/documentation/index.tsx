@@ -2,24 +2,15 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
 import { Breadcrumb } from './components/breadcrumb'
-import { EmptyState } from './components/empty-state'
 import { ToggleDocumentationCollapsedButton } from './components/toggle-documentation-collapsed'
 import { TypeContent } from './components/type-content'
 import { useService } from './use-service'
 
 export function Documentation() {
-  const {
-    path,
-    currentTypeName,
-    currentTypeFields,
-    navigateToType,
-    navigateToBreadcrumb,
-    schemaLoading,
-    schemaError,
-  } = useService()
+  const service = useService()
 
   const mainContent = () => {
-    if (schemaLoading) {
+    if (service.schemaLoading) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[300px] space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -31,7 +22,7 @@ export function Documentation() {
         </div>
       )
     }
-    if (schemaError) {
+    if (service.schemaError) {
       return (
         <div className="mx-auto">
           <Alert variant="destructive">
@@ -47,7 +38,7 @@ export function Documentation() {
                   View error details
                 </summary>
                 <pre className="mt-2 p-2 bg-muted/50 rounded text-xs overflow-auto whitespace-pre-wrap break-words">
-                  {schemaError}
+                  {service.schemaError}
                 </pre>
               </details>
             </AlertDescription>
@@ -56,19 +47,7 @@ export function Documentation() {
       )
     }
 
-    if (currentTypeFields) {
-      return (
-        <div className="space-y-6">
-          <TypeContent fields={currentTypeFields} onNavigate={navigateToType} />
-        </div>
-      )
-    }
-
-    return (
-      <div className="max-w-2xl mx-auto">
-        <EmptyState typeName={currentTypeName} />
-      </div>
-    )
+    return <TypeContent />
   }
 
   return (
@@ -85,17 +64,17 @@ export function Documentation() {
         <ToggleDocumentationCollapsedButton />
       </div>
 
-      {path.length > 0 && !schemaLoading && !schemaError && (
+      {!service.schemaLoading && !service.schemaError && (
         <>
           <Separator />
           <div className="px-4 py-2 bg-muted/30 border-b">
-            <Breadcrumb path={path} onNavigate={navigateToBreadcrumb} />
+            <Breadcrumb />
           </div>
         </>
       )}
 
       <div className="flex-1 min-h-0 h-0 overflow-hidden bg-muted/30">
-        <div className="h-full overflow-y-auto">
+        <div ref={service.containerRef} className="h-full overflow-y-auto">
           <div className="container mx-auto p-6">{mainContent()}</div>
         </div>
       </div>

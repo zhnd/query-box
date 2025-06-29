@@ -9,6 +9,7 @@
         "githubusercontent",
         "graphiql",
         "mkdirp",
+        "sonner",
         "sqlx",
         "streetsidesoftware",
         "tauri",

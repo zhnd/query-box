@@ -1,17 +1,23 @@
-import { DocumentationField } from '../../utils'
 import { FieldItem } from '../field-item'
+import { FieldListProps, useFieldListService } from './use-service'
 
-export function FieldList(props: {
-  fields: DocumentationField[] | undefined
-  onNavigate: (typeName: string) => void
-}) {
-  const { fields, onNavigate } = props
-  if (!fields?.length) return null
+export function FieldList(props: FieldListProps) {
+  const { subFields } = props
+  const service = useFieldListService(props)
+  if (!subFields?.length) return null
 
   return (
-    <div className="space-y-1.5">
-      {fields.map((field) => (
-        <FieldItem key={field.name} field={field} onNavigate={onNavigate} />
+    <div
+      className="flex flex-col space-y-1.5"
+      onClick={service.navigateToFieldDefinition}
+    >
+      {subFields.map((field, index) => (
+        <FieldItem
+          key={field.name}
+          field={field}
+          fieldDetails={props.fieldDetails}
+          index={index}
+        />
       ))}
     </div>
   )
