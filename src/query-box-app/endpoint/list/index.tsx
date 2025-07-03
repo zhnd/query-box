@@ -57,6 +57,7 @@ export function EndpointList() {
 
   return (
     <DataTable
+      rowCount={service.endpointsInfo?.total ?? 0}
       columns={columns}
       data={service.endpointsInfo?.items ?? []}
       paginationState={service.pagination}
