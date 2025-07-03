@@ -35,6 +35,7 @@ export function useService(props: QueryEditorProps) {
   const initializingRef = useRef(false)
   const monacoGraphQLApiRef = useRef<MonacoGraphQLAPI | null>(null)
   const schemaRef = useRef<GraphQLSchema | null>(schema)
+  const disposablesRef = useRef<monaco.IDisposable[]>([])
 
   const { resolvedThemeMode } = useThemeModeStore()
 
@@ -83,53 +84,61 @@ export function useService(props: QueryEditorProps) {
       }
     )
 
-    monaco.languages.registerDocumentFormattingEditProvider('graphql', {
-      provideDocumentFormattingEdits: async (modal) => {
-        try {
-          const formattedText = await prettier.format(modal.getValue(), {
-            parser: 'graphql',
-            plugins: [parserGraphql],
-            printWidth: 80,
-            tabWidth: 2,
-            useTabs: false,
-            singleQuote: true,
+    const documentFormattingEditDisposable =
+      monaco.languages.registerDocumentFormattingEditProvider('graphql', {
+        provideDocumentFormattingEdits: async (modal) => {
+          try {
+            const formattedText = await prettier.format(modal.getValue(), {
+              parser: 'graphql',
+              plugins: [parserGraphql],
+              printWidth: 80,
+              tabWidth: 2,
+              useTabs: false,
+              singleQuote: true,
+            })
+            return [
+              {
+                range: modal.getFullModelRange(),
+                text: formattedText,
+              },
+            ]
+          } catch (error) {
+            console.error('Formatting error:', error)
+            return []
+          }
+        },
+      })
+    disposablesRef.current.push(documentFormattingEditDisposable)
+
+    const codeLensDisposable = monaco.languages.registerCodeLensProvider(
+      'graphql',
+      {
+        provideCodeLenses(model) {
+          const codeLensData = getProvideCodeLenses({ model })
+          onUpdateLensOperations?.({
+            codeLensOperations: codeLensData?.codeLensOperations ?? null,
           })
-          return [
-            {
-              range: modal.getFullModelRange(),
-              text: formattedText,
-            },
-          ]
-        } catch (error) {
-          console.error('Formatting error:', error)
-          return []
-        }
-      },
-    })
+          return {
+            lenses: codeLensData?.codeLens ?? [],
+            dispose: () => {},
+          }
+        },
+        resolveCodeLens(_, codeLens) {
+          return codeLens
+        },
+      }
+    )
 
-    monaco.languages.registerCodeLensProvider('graphql', {
-      provideCodeLenses(model) {
-        const codeLensData = getProvideCodeLenses({ model })
-        onUpdateLensOperations?.({
-          codeLensOperations: codeLensData?.codeLensOperations ?? null,
-        })
-        return {
-          lenses: codeLensData?.codeLens ?? [],
-          dispose: () => {},
-        }
-      },
-      resolveCodeLens(_, codeLens) {
-        return codeLens
-      },
-    })
+    disposablesRef.current.push(codeLensDisposable)
 
-    monaco.editor.registerCommand(
+    const commandDisposable = monaco.editor.registerCommand(
       'runGraphQLQuery',
       (_, args: RunGraphQLQueryArguments) => {
         runGraphQLQuery?.(args)
         return null
       }
     )
+    disposablesRef.current.push(commandDisposable)
     // add Go to Definition action
     editorInstance.addAction({
       id: 'graphql-provide-definition',
@@ -190,6 +199,9 @@ export function useService(props: QueryEditorProps) {
         editorInstanceRef.current.dispose()
         editorInstanceRef.current = null
         initializingRef.current = false
+        disposablesRef.current.forEach((disposable) => {
+          disposable.dispose()
+        })
       }
     }
   }, [])
