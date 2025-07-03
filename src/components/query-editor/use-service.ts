@@ -1,7 +1,7 @@
 import { githubDarkTheme, githubLightTheme } from '@/constants'
 import { useThemeModeStore } from '@/stores'
 import { GraphQLSchema } from 'graphql'
-import { debounce } from 'lodash'
+import _ from 'lodash'
 import { Uri } from 'monaco-editor'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { MonacoGraphQLAPI } from 'monaco-graphql/esm/api.js'
@@ -39,6 +39,15 @@ export function useService(props: QueryEditorProps) {
 
   const { resolvedThemeMode } = useThemeModeStore()
 
+  // Debounced function to handle value changes
+  //  this props don't change frequently, so we can use a ref to store the debounced function
+  // and avoid unnecessary re-creations on every render
+  const debouncedValueChange = useRef(
+    _.debounce((value: string) => {
+      onChange?.(value)
+    }, 500)
+  ).current
+
   const init = async () => {
     if (editorInstanceRef.current || initializingRef.current) return
     initializingRef.current = true
@@ -57,11 +66,13 @@ export function useService(props: QueryEditorProps) {
 
     const queryModel = getOrCreateModel('operation.graphql', defaultOperations)
 
-    queryModel.onDidChangeContent(
-      debounce(() => {
-        onChange?.(queryModel.getValue())
-      }, 600)
+    const onDidChangeContentDisposable = queryModel.onDidChangeContent(
+      (event: monaco.editor.IModelContentChangedEvent) => {
+        if (event.isFlush) return // Skip flush events
+        debouncedValueChange(queryModel.getValue())
+      }
     )
+    disposablesRef.current.push(onDidChangeContentDisposable)
 
     const editorInstance = monaco.editor.create(
       editorContainerElementRef.current!,
@@ -168,7 +179,7 @@ export function useService(props: QueryEditorProps) {
     // when Ctrl/Cmd key is pressed
     // and the target is a text content
     // This allows users to click on field names to navigate to their definitions
-    editorInstance.onMouseDown((e) => {
+    const mouseDownDisposable = editorInstance.onMouseDown((e) => {
       const { event, target } = e
       if (
         (event.ctrlKey || event.metaKey) &&
@@ -182,6 +193,7 @@ export function useService(props: QueryEditorProps) {
         })
       }
     })
+    disposablesRef.current.push(mouseDownDisposable)
 
     // Initialize GraphQL mode with the endpoint URL
     monacoGraphQLApiRef.current = await setupGraphQLSchemaInMonaco({
@@ -195,10 +207,15 @@ export function useService(props: QueryEditorProps) {
   useEffect(() => {
     init()
     return () => {
+      // cancel the debounced of value change
+      debouncedValueChange.cancel()
       if (editorInstanceRef.current) {
+        // Dispose the editor instance
         editorInstanceRef.current.dispose()
         editorInstanceRef.current = null
         initializingRef.current = false
+
+        // Dispose all registered Monaco commands and providers
         disposablesRef.current.forEach((disposable) => {
           disposable.dispose()
         })
