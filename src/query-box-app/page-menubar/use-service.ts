@@ -1,5 +1,5 @@
 import { EndpointBridge } from '@/bridges'
-import { AppSidebarMenuItemKeys } from '@/constants'
+import { SHOW_ENDPOINT_MENU_ITEM_KEYS } from '@/constants'
 import { useAppSidebarMenuStore, useEndpointSelectedStateStore } from '@/stores'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -31,8 +31,9 @@ export const usePageMenubarService = () => {
     key: activeItemKey,
   })
 
-  const showEndpointSelector =
-    activeAppSidebarMenuItem?.key !== AppSidebarMenuItemKeys.ENDPOINT
+  const showEndpointSelector = activeAppSidebarMenuItem?.key
+    ? SHOW_ENDPOINT_MENU_ITEM_KEYS.includes(activeAppSidebarMenuItem.key)
+    : false
 
   const updateEndpointId = (value: string) => {
     setSelectedEndpoint({

@@ -8,9 +8,11 @@ import { FC } from 'react'
 import { AppSidebar } from './app-sidebar'
 import { Endpoint } from './endpoint'
 import { Explorer } from './explorer'
+import { Function } from './function'
 import { PageMenubar } from './page-menubar'
 import { ResourceTopology } from './resource-topology'
 import { useAppService } from './use-app-service'
+
 const queryClient = new QueryClient()
 export function QueryBoxApp() {
   const appService = useAppService()
@@ -55,6 +57,8 @@ const MainContentRenderer: FC<{
       return <Explorer />
     case AppSidebarMenuItemKeys.RESOURCE_TOPOLOGY:
       return <ResourceTopology />
+    case AppSidebarMenuItemKeys.FUNCTION:
+      return <Function />
     default:
       return <div>Not Found</div>
   }
