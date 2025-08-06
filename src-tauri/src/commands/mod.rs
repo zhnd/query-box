@@ -13,6 +13,9 @@ pub use request_history_commands::*;
 pub mod proxy_http_commands;
 pub use proxy_http_commands::*;
 
+pub mod custom_function_commands;
+pub use custom_function_commands::*;
+
 ///
 /// # Command Registration Macro
 ///
@@ -56,6 +59,7 @@ macro_rules! app_commands {
             commands::delete_request_history,
             commands::set_active_request_history,
             commands::proxy_http_request,
+            commands::get_all_custom_functions,
         ]
     };
 }
