@@ -1,5 +1,6 @@
 export * from './app-sidebar-collapsed'
 export * from './app-sidebar-menu'
+export * from './custom-function-page-state'
 export * from './endpoint-page-state'
 export * from './endpoint-selected-state'
 export * from './explorer-documentation-collapsed-state'

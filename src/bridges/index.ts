@@ -1,3 +1,4 @@
+export * from './custom-function-bridge'
 export * from './endpoint-bridge'
 export * from './graphql-bridge'
 export * from './proxy-bridge'
